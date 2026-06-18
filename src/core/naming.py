@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 
 PROJECT_FILENAME_PATTERN = re.compile(r"^(?P<project>.+)_\d{8}_\d{4}$")
+STAGE_ALLOWED_CHARS_PATTERN = re.compile(r"[^A-Z0-9-]+")
 
 
 class BackupStage(str, Enum):
@@ -20,8 +22,6 @@ class BackupStage(str, Enum):
     PRE_TAC = "PRE-TAC"
     TAC = "TAC"
     POS_TAC = "POS-TAC"
-    PRODUCAO = "PRODUCAO"
-    CUSTOM = "CUSTOM"
 
 
 def get_project_id(filename: str) -> str:
@@ -56,13 +56,25 @@ def normalize_collaborator(collaborator: str) -> str:
     return normalized
 
 
+def normalize_stage(stage: BackupStage | str) -> str:
+    """Normalize a stage/description while allowing it to be intentionally empty."""
+
+    raw_stage = stage.value if isinstance(stage, BackupStage) else stage
+    ascii_stage = unicodedata.normalize("NFKD", raw_stage).encode("ascii", "ignore").decode("ascii")
+    normalized = ascii_stage.strip().upper().replace("_", "-")
+    normalized = "-".join(normalized.split())
+    normalized = STAGE_ALLOWED_CHARS_PATTERN.sub("-", normalized)
+    normalized = re.sub(r"-{2,}", "-", normalized).strip("-")
+    return normalized
+
+
 def build_backup_name(
     *,
     software_version: str,
     project_id: str,
     timestamp: datetime,
     collaborator: str,
-    stage: BackupStage,
+    stage: BackupStage | str,
 ) -> str:
     """Build the standard backup filename from normalized metadata."""
 
@@ -72,6 +84,6 @@ def build_backup_name(
             project_id,
             format_backup_timestamp(timestamp),
             normalize_collaborator(collaborator),
-            stage.value,
+            normalize_stage(stage),
         ]
     ) + ".zip"

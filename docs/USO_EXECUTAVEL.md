@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.0.5.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.0.6.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, o tipo disponivel e DIGSI 5
 (`.dz5`).
 
@@ -67,12 +67,16 @@ Etapas disponiveis:
 - `PRE-TAC`
 - `TAC`
 - `POS-TAC`
-- `PRODUCAO`
-- `CUSTOM`
+- `Descrição livre`
 
 A etapa entra no nome do backup gerado. Ela nao bloqueia retornos de etapa. Por
 exemplo, se um projeto ja passou por `TAC` e depois precisar voltar para `DEV`,
 o backup podera ser gerado normalmente.
+
+Ao selecionar `Descrição livre`, um campo `Descrição` sera exibido. Esse campo
+pode ser preenchido manualmente, por exemplo para indicar um backup antes de uma
+grande alteracao, ou pode ficar vazio quando o caso nao se enquadrar nas etapas
+anteriores.
 
 ## 5. Conferir a previa do lote
 

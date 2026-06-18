@@ -93,7 +93,7 @@ def test_update_storage_treats_same_timestamp_with_different_stage_as_same_backu
     atu.mkdir()
     current = atu / "DIGSI-V100_SE-GVM_20260529-1624_JEAN-CARLOS-MACHADO_DEV.zip"
     current.write_text("current", encoding="utf-8")
-    same_identity = tmp_path / "DIGSI-V100_SE-GVM_20260529-1624_JEAN-CARLOS-MACHADO_PRODUCAO.zip"
+    same_identity = tmp_path / "DIGSI-V100_SE-GVM_20260529-1624_JEAN-CARLOS-MACHADO_TAC.zip"
     same_identity.write_text("same", encoding="utf-8")
 
     final_path = update_storage(new_backup=same_identity, atu_path=atu, his_path=his)

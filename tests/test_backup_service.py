@@ -127,7 +127,7 @@ def test_process_all_backups_does_not_archive_when_same_identity_exists_in_his(
     his.mkdir()
 
     create_dz5(project_dir / "SE-GVM_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
-    current = atu / "DIGSI-V100_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_PRODUCAO.zip"
+    current = atu / "DIGSI-V100_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_TAC.zip"
     current.write_text("current", encoding="utf-8")
     existing_history = his / "DIGSI-V100_SE-GVM_20260525-1218_OUTRO-COLABORADOR_DEV.zip"
     existing_history.write_text("history", encoding="utf-8")
@@ -137,7 +137,7 @@ def test_process_all_backups_does_not_archive_when_same_identity_exists_in_his(
         atu_path=atu,
         his_path=his,
         collaborator="JEAN-CARLOS-MACHADO",
-        stage=BackupStage.PRODUCAO,
+        stage=BackupStage.TAC,
     )
 
     assert [result.status for result in results] == ["skipped_older"]
@@ -163,7 +163,7 @@ def test_process_all_backups_treats_same_identity_in_atu_as_current(
         atu_path=atu,
         his_path=his,
         collaborator="JEAN-CARLOS-MACHADO",
-        stage=BackupStage.PRODUCAO,
+        stage=BackupStage.TAC,
     )
 
     assert [result.status for result in results] == ["already_current"]

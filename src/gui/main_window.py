@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QMainWindow,
     QMessageBox,
     QPlainTextEdit,
@@ -44,7 +45,7 @@ from src.core.backup_service import (
     summarize_results,
 )
 from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
-from src.core.naming import BackupStage
+from src.core.naming import BackupStage, normalize_stage
 from src.core.project_types.base import ProjectType
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
 from src.gui.resources import app_icon_path
@@ -59,6 +60,7 @@ STATUS_COLORS = {
     "skipped_older": QColor("#666666"),
     "already_current": QColor("#2f6f73"),
 }
+MANUAL_STAGE_DATA = "__manual_stage__"
 
 
 class MainWindow(QMainWindow):
@@ -177,11 +179,19 @@ class MainWindow(QMainWindow):
         form = QFormLayout()
         self.action_form = form
         self.stage_input = QComboBox()
-        self.stage_input.addItem("")
-        self.stage_input.addItems([stage.value for stage in BackupStage])
-        self.stage_input.currentTextChanged.connect(self.refresh_preview)
+        self.stage_input.addItem("", None)
+        for stage in BackupStage:
+            self.stage_input.addItem(stage.value, stage.value)
+        self.stage_input.addItem("", MANUAL_STAGE_DATA)
+        self.stage_input.currentIndexChanged.connect(self.on_stage_selection_changed)
         self.stage_label = QLabel()
         form.addRow(self.stage_label, self.stage_input)
+
+        self.stage_description_label = QLabel()
+        self.stage_description_input = QLineEdit()
+        self.stage_description_input.textChanged.connect(self.refresh_preview)
+        form.addRow(self.stage_description_label, self.stage_description_input)
+        self._set_stage_description_visible(False)
 
         self.type_checkboxes: dict[str, QCheckBox] = {}
         self.type_checkboxes_layout = QVBoxLayout()
@@ -267,7 +277,8 @@ class MainWindow(QMainWindow):
             self._clear_preview(ui_text("required_type", self.language))
             return
 
-        if not self.stage_input.currentText():
+        selected_stage = self._selected_stage()
+        if selected_stage is None:
             self.current_plans = []
             self.atu_duplicate_plans = []
             self._clear_preview(ui_text("required_stage", self.language))
@@ -286,7 +297,7 @@ class MainWindow(QMainWindow):
                         atu_path=self.config.atu_path,
                         his_path=self.config.his_path,
                         collaborator=self.config.collaborator,
-                        stage=BackupStage(self.stage_input.currentText()),
+                        stage=selected_stage,
                         project_type=project_type,
                     )
                 )
@@ -493,7 +504,7 @@ class MainWindow(QMainWindow):
             atu_path=self.config.atu_path,
             his_path=self.config.his_path,
             collaborator=self.config.collaborator,
-            stage=BackupStage(self.stage_input.currentText()),
+            stage=self._selected_stage() or "",
             project_type=get_project_type(plan.project_type_key),
         )
         return BackupResult(
@@ -588,6 +599,28 @@ class MainWindow(QMainWindow):
             if checkbox.isChecked()
         ]
 
+    def _selected_stage(self) -> str | None:
+        """Return selected fixed stage or normalized free description."""
+
+        data = self.stage_input.currentData()
+        if data is None:
+            return None
+        if data == MANUAL_STAGE_DATA:
+            return normalize_stage(self.stage_description_input.text())
+        return str(data)
+
+    def on_stage_selection_changed(self) -> None:
+        """Show the free stage field only for the manual description option."""
+
+        self._set_stage_description_visible(self.stage_input.currentData() == MANUAL_STAGE_DATA)
+        self.refresh_preview()
+
+    def _set_stage_description_visible(self, visible: bool) -> None:
+        """Toggle the optional stage description controls."""
+
+        self.stage_description_label.setVisible(visible)
+        self.stage_description_input.setVisible(visible)
+
     def _summary_text(self, summary) -> str:
         """Format a human-readable summary for dialogs and logs."""
 
@@ -674,6 +707,15 @@ class MainWindow(QMainWindow):
         for title_key, label in self.summary_title_labels.items():
             label.setText(ui_text(title_key, self.language))
         self.stage_label.setText(ui_text("stage", self.language))
+        self.stage_description_label.setText(ui_text("stage_description", self.language))
+        self.stage_description_input.setPlaceholderText(
+            ui_text("stage_description_placeholder", self.language)
+        )
+        manual_index = self.stage_input.count() - 1
+        self.stage_input.setItemText(
+            manual_index,
+            ui_text("stage_description_option", self.language),
+        )
         self.type_label.setText(ui_text("type", self.language))
         self.mode_label.setText(ui_text("mode", self.language))
         for project_type in PROJECT_TYPES:

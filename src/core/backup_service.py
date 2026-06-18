@@ -35,6 +35,7 @@ STATUS_ARCHIVED_HISTORY = "archived_history"
 STATUS_ATU_DUPLICATE = "atu_duplicate"
 STATUS_SKIPPED_OLDER = "skipped_older"
 STATUS_ALREADY_CURRENT = "already_current"
+StageValue = BackupStage | str
 
 
 @dataclass(frozen=True)
@@ -114,7 +115,7 @@ def process_latest_backup(
     atu_path: Path,
     his_path: Path,
     collaborator: str,
-    stage: BackupStage,
+    stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> BackupResult:
     """Process only the newest file for the selected project type."""
@@ -135,7 +136,7 @@ def process_all_backups(
     atu_path: Path,
     his_path: Path,
     collaborator: str,
-    stage: BackupStage,
+    stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> list[BackupResult]:
     """Plan and process all supported files in chronological order."""
@@ -203,7 +204,7 @@ def process_backup_plans(
     atu_path: Path,
     his_path: Path,
     collaborator: str,
-    stage: BackupStage,
+    stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> list[BackupResult]:
     """Execute a previously computed list of plans."""
@@ -286,7 +287,7 @@ def plan_latest_backup(
     atu_path: Path,
     his_path: Path,
     collaborator: str,
-    stage: BackupStage,
+    stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> BackupPlan:
     """Plan only the newest file for the selected project type."""
@@ -307,7 +308,7 @@ def plan_all_backups(
     atu_path: Path,
     his_path: Path,
     collaborator: str,
-    stage: BackupStage,
+    stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     virtual_current: dict[str, Path] | None = None,
 ) -> list[BackupPlan]:
@@ -355,7 +356,7 @@ def process_backup_file(
     atu_path: Path,
     his_path: Path,
     collaborator: str,
-    stage: BackupStage,
+    stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> BackupResult:
     """Create a staged zip and move it into ATU/HIS using the storage rules."""
@@ -391,7 +392,7 @@ def plan_backup_file(
     atu_path: Path,
     his_path: Path,
     collaborator: str,
-    stage: BackupStage,
+    stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     current_override: dict[str, Path] | None = None,
 ) -> BackupPlan:
@@ -528,7 +529,7 @@ def build_project_backup_name(
     *,
     project_file: Path,
     collaborator: str,
-    stage: BackupStage,
+    stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> str:
     """Build a backup filename using the selected project type adapter."""

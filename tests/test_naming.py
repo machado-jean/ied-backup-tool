@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.core.naming import BackupStage, build_backup_name, get_project_id
+from src.core.naming import BackupStage, build_backup_name, get_project_id, normalize_stage
 
 
 def test_backup_stage_order_matches_workflow() -> None:
@@ -12,8 +12,6 @@ def test_backup_stage_order_matches_workflow() -> None:
         "PRE-TAC",
         "TAC",
         "POS-TAC",
-        "PRODUCAO",
-        "CUSTOM",
     ]
 
 
@@ -35,3 +33,35 @@ def test_build_backup_name_uses_required_pattern() -> None:
     )
 
     assert result == "DIGSI-V100_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
+
+
+def test_build_backup_name_accepts_free_stage_description() -> None:
+    result = build_backup_name(
+        software_version="DIGSI-V100",
+        project_id="SE-CTU",
+        timestamp=datetime(2026, 6, 12, 17, 39),
+        collaborator="Jean Carlos Machado",
+        stage="backup antes de grande alteração",
+    )
+
+    assert (
+        result
+        == "DIGSI-V100_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_"
+        "BACKUP-ANTES-DE-GRANDE-ALTERACAO.zip"
+    )
+
+
+def test_build_backup_name_accepts_empty_stage_description() -> None:
+    result = build_backup_name(
+        software_version="DIGSI-V100",
+        project_id="SE-CTU",
+        timestamp=datetime(2026, 6, 12, 17, 39),
+        collaborator="Jean Carlos Machado",
+        stage="",
+    )
+
+    assert result == "DIGSI-V100_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_.zip"
+
+
+def test_normalize_stage_removes_filename_unsafe_separators() -> None:
+    assert normalize_stage(" grande_alteracao / fase 2 ") == "GRANDE-ALTERACAO-FASE-2"
