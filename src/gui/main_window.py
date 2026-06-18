@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QTimer, QUrl
-from PySide6.QtGui import QColor, QDesktopServices, QIcon, QPixmap
+from PySide6.QtGui import QColor, QDesktopServices, QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
@@ -90,17 +90,6 @@ class MainWindow(QMainWindow):
         layout.setSpacing(14)
 
         top = QHBoxLayout()
-        self.app_icon_label = QLabel()
-        self.app_icon_label.setFixedSize(36, 36)
-        self.app_icon_label.setPixmap(
-            QPixmap(str(app_icon_path())).scaled(
-                36,
-                36,
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation,
-            )
-        )
-        self.app_icon_label.setToolTip(APP_DISPLAY_NAME)
         self.project_dir_label = QLabel(str(self.project_dir))
         self.project_dir_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.language_button = QPushButton(self._language_flag())
@@ -112,7 +101,6 @@ class MainWindow(QMainWindow):
         self.settings_button = QPushButton()
         self.settings_button.clicked.connect(self.open_settings)
         self.current_folder_title = QLabel()
-        top.addWidget(self.app_icon_label)
         top.addWidget(self.current_folder_title)
         top.addWidget(self.project_dir_label, 1)
         top.addWidget(self.language_button)
