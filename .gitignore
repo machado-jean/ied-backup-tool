@@ -16,6 +16,13 @@ build/
 # Logs
 logs/*.log
 
+# Local config and real backup samples
+config.json
+config/config.json
+BKPs/
+IED-ATU/
+IED-HIS/
+
 # Windows
 Thumbs.db
 Desktop.ini

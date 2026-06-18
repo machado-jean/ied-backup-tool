@@ -1,0 +1,472 @@
+from __future__ import annotations
+
+import tempfile
+from dataclasses import dataclass
+from pathlib import Path
+
+from src.core.detector import find_project_file, find_project_files
+from src.core.digsi import extract_digsi_version
+from src.core.naming import (
+    BackupStage,
+    build_backup_name,
+    get_file_timestamp,
+    get_project_id,
+)
+from src.core.storage import (
+    BackupFileInfo,
+    find_atu_duplicates,
+    find_backup_by_identity,
+    find_current_backup,
+    fix_atu_duplicates,
+    parse_backup_filename,
+    update_storage,
+)
+from src.core.zipper import create_backup_zip
+
+STATUS_STORED = "stored"
+STATUS_REPLACED_CURRENT = "replaced_current"
+STATUS_ARCHIVED_HISTORY = "archived_history"
+STATUS_ATU_DUPLICATE = "atu_duplicate"
+STATUS_SKIPPED_OLDER = "skipped_older"
+STATUS_ALREADY_CURRENT = "already_current"
+
+
+@dataclass(frozen=True)
+class BackupResult:
+    source_file: Path
+    backup_name: str
+    final_path: Path
+    status: str = STATUS_STORED
+
+
+@dataclass(frozen=True)
+class BackupPlan:
+    source_file: Path
+    backup_name: str
+    destination_path: Path
+    status: str
+    software: str
+    project: str
+    timestamp_text: str
+    collaborator: str
+    stage: str
+    current_backup: Path | None = None
+    history_path: Path | None = None
+
+
+@dataclass(frozen=True)
+class BackupSummary:
+    total: int
+    stored: int
+    replaced_current: int
+    archived_history: int
+    atu_duplicates: int
+    skipped_older: int
+    already_current: int
+
+
+def summarize_results(
+    results: list[BackupResult] | list[BackupPlan] | list[AtuDuplicatePlan],
+) -> BackupSummary:
+    statuses = [result.status for result in results]
+    return BackupSummary(
+        total=len(results),
+        stored=statuses.count(STATUS_STORED),
+        replaced_current=statuses.count(STATUS_REPLACED_CURRENT),
+        archived_history=statuses.count(STATUS_ARCHIVED_HISTORY),
+        atu_duplicates=statuses.count(STATUS_ATU_DUPLICATE),
+        skipped_older=statuses.count(STATUS_SKIPPED_OLDER),
+        already_current=statuses.count(STATUS_ALREADY_CURRENT),
+    )
+
+
+@dataclass(frozen=True)
+class AtuDuplicatePlan:
+    source_file: Path
+    backup_name: str
+    destination_path: Path
+    status: str
+    key: str
+    keep_file: Path
+
+
+def process_latest_backup(
+    *,
+    project_dir: Path,
+    atu_path: Path,
+    his_path: Path,
+    collaborator: str,
+    stage: BackupStage,
+) -> BackupResult:
+    return process_backup_file(
+        project_file=find_project_file(project_dir),
+        atu_path=atu_path,
+        his_path=his_path,
+        collaborator=collaborator,
+        stage=stage,
+    )
+
+
+def process_all_backups(
+    *,
+    project_dir: Path,
+    atu_path: Path,
+    his_path: Path,
+    collaborator: str,
+    stage: BackupStage,
+) -> list[BackupResult]:
+    results = []
+    virtual_current: dict[str, Path] = {}
+    for plan in plan_all_backups(
+        project_dir=project_dir,
+        atu_path=atu_path,
+        his_path=his_path,
+        collaborator=collaborator,
+        stage=stage,
+        virtual_current=virtual_current,
+    ):
+        if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
+            results.append(
+                BackupResult(
+                    source_file=plan.source_file,
+                    backup_name=plan.backup_name,
+                    final_path=plan.destination_path,
+                    status=plan.status,
+                )
+            )
+            continue
+
+        if plan.status == STATUS_ARCHIVED_HISTORY:
+            final_path = archive_history_backup(
+                project_file=plan.source_file,
+                backup_name=plan.backup_name,
+                his_path=his_path,
+            )
+            results.append(
+                BackupResult(
+                    source_file=plan.source_file,
+                    backup_name=plan.backup_name,
+                    final_path=final_path,
+                    status=plan.status,
+                )
+            )
+            continue
+
+        result = process_backup_file(
+            project_file=plan.source_file,
+            atu_path=atu_path,
+            his_path=his_path,
+            collaborator=collaborator,
+            stage=stage,
+        )
+        results.append(
+            BackupResult(
+                source_file=result.source_file,
+                backup_name=result.backup_name,
+                final_path=result.final_path,
+                status=plan.status,
+            )
+        )
+    return results
+
+
+def process_backup_plans(
+    *,
+    plans: list[BackupPlan],
+    atu_path: Path,
+    his_path: Path,
+    collaborator: str,
+    stage: BackupStage,
+) -> list[BackupResult]:
+    results = []
+    for plan in plans:
+        if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
+            results.append(
+                BackupResult(
+                    source_file=plan.source_file,
+                    backup_name=plan.backup_name,
+                    final_path=plan.destination_path,
+                    status=plan.status,
+                )
+            )
+            continue
+
+        if plan.status == STATUS_ARCHIVED_HISTORY:
+            final_path = archive_history_backup(
+                project_file=plan.source_file,
+                backup_name=plan.backup_name,
+                his_path=his_path,
+            )
+            results.append(
+                BackupResult(
+                    source_file=plan.source_file,
+                    backup_name=plan.backup_name,
+                    final_path=final_path,
+                    status=plan.status,
+                )
+            )
+            continue
+
+        result = process_backup_file(
+            project_file=plan.source_file,
+            atu_path=atu_path,
+            his_path=his_path,
+            collaborator=collaborator,
+            stage=stage,
+        )
+        results.append(
+            BackupResult(
+                source_file=result.source_file,
+                backup_name=result.backup_name,
+                final_path=result.final_path,
+                status=plan.status,
+            )
+        )
+    return results
+
+
+def plan_atu_duplicate_fixes(*, atu_path: Path, his_path: Path) -> list[AtuDuplicatePlan]:
+    return [
+        AtuDuplicatePlan(
+            source_file=duplicate.duplicate.path,
+            backup_name=duplicate.duplicate.path.name,
+            destination_path=duplicate.history_path,
+            status=STATUS_ATU_DUPLICATE,
+            key=duplicate.key,
+            keep_file=duplicate.keep.path,
+        )
+        for duplicate in find_atu_duplicates(atu_path, his_path)
+    ]
+
+
+def fix_atu_duplicate_backups(*, atu_path: Path, his_path: Path) -> list[AtuDuplicatePlan]:
+    plans = plan_atu_duplicate_fixes(atu_path=atu_path, his_path=his_path)
+    fix_atu_duplicates(atu_path, his_path)
+    return plans
+
+
+def plan_latest_backup(
+    *,
+    project_dir: Path,
+    atu_path: Path,
+    his_path: Path,
+    collaborator: str,
+    stage: BackupStage,
+) -> BackupPlan:
+    return plan_backup_file(
+        project_file=find_project_file(project_dir),
+        atu_path=atu_path,
+        his_path=his_path,
+        collaborator=collaborator,
+        stage=stage,
+    )
+
+
+def plan_all_backups(
+    *,
+    project_dir: Path,
+    atu_path: Path,
+    his_path: Path,
+    collaborator: str,
+    stage: BackupStage,
+    virtual_current: dict[str, Path] | None = None,
+) -> list[BackupPlan]:
+    plans = []
+    current_by_key = virtual_current if virtual_current is not None else {}
+    for project_file in find_project_files(project_dir):
+        plan = plan_backup_file(
+            project_file=project_file,
+            atu_path=atu_path,
+            his_path=his_path,
+            collaborator=collaborator,
+            stage=stage,
+            current_override=current_by_key,
+        )
+        plans.append(plan)
+
+        planned_info = parse_backup_filename(Path(plan.backup_name))
+        if plan.status in {STATUS_STORED, STATUS_REPLACED_CURRENT, STATUS_ALREADY_CURRENT}:
+            current_by_key[planned_info.key] = plan.destination_path
+
+    return plans
+
+
+def filter_current_and_newer_plans(plans: list[BackupPlan]) -> list[BackupPlan]:
+    return [
+        plan
+        for plan in plans
+        if plan.status
+        in {
+            STATUS_ALREADY_CURRENT,
+            STATUS_STORED,
+            STATUS_REPLACED_CURRENT,
+        }
+    ]
+
+
+def process_backup_file(
+    *,
+    project_file: Path,
+    atu_path: Path,
+    his_path: Path,
+    collaborator: str,
+    stage: BackupStage,
+) -> BackupResult:
+    plan = plan_backup_file(
+        project_file=project_file,
+        atu_path=atu_path,
+        his_path=his_path,
+        collaborator=collaborator,
+        stage=stage,
+    )
+
+    with tempfile.TemporaryDirectory(prefix="ied-backup-") as staging:
+        staged_zip = create_backup_zip(project_file, plan.backup_name, output_dir=Path(staging))
+        final_path = update_storage(
+            new_backup=staged_zip,
+            atu_path=atu_path,
+            his_path=his_path,
+        )
+
+    return BackupResult(
+        source_file=project_file,
+        backup_name=plan.backup_name,
+        final_path=final_path,
+        status=plan.status,
+    )
+
+
+def plan_backup_file(
+    *,
+    project_file: Path,
+    atu_path: Path,
+    his_path: Path,
+    collaborator: str,
+    stage: BackupStage,
+    current_override: dict[str, Path] | None = None,
+) -> BackupPlan:
+    backup_name = build_project_backup_name(
+        project_file=project_file,
+        collaborator=collaborator,
+        stage=stage,
+    )
+    planned_info = parse_backup_filename(Path(backup_name))
+    current = _find_current_for_plan(
+        atu_path=atu_path,
+        planned_key=planned_info.key,
+        current_override=current_override,
+    )
+    destination = atu_path / backup_name
+
+    if current and current.timestamp > planned_info.timestamp:
+        history_path = find_backup_by_identity(his_path, planned_info.identity)
+        if history_path is None:
+            history_path = his_path / backup_name
+            return BackupPlan(
+                source_file=project_file,
+                backup_name=backup_name,
+                destination_path=history_path,
+                status=STATUS_ARCHIVED_HISTORY,
+                software=planned_info.software,
+                project=planned_info.project,
+                timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+                collaborator=planned_info.collaborator,
+                stage=planned_info.stage,
+                current_backup=current.path,
+                history_path=history_path,
+            )
+
+        return BackupPlan(
+            source_file=project_file,
+            backup_name=backup_name,
+            destination_path=current.path,
+            status=STATUS_SKIPPED_OLDER,
+            software=planned_info.software,
+            project=planned_info.project,
+            timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+            collaborator=planned_info.collaborator,
+            stage=planned_info.stage,
+            current_backup=current.path,
+        )
+
+    if current and current.identity == planned_info.identity:
+        return BackupPlan(
+            source_file=project_file,
+            backup_name=backup_name,
+            destination_path=current.path,
+            status=STATUS_ALREADY_CURRENT,
+            software=planned_info.software,
+            project=planned_info.project,
+            timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+            collaborator=planned_info.collaborator,
+            stage=planned_info.stage,
+            current_backup=current.path,
+        )
+
+    if current:
+        return BackupPlan(
+            source_file=project_file,
+            backup_name=backup_name,
+            destination_path=destination,
+            status=STATUS_REPLACED_CURRENT,
+            software=planned_info.software,
+            project=planned_info.project,
+            timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+            collaborator=planned_info.collaborator,
+            stage=planned_info.stage,
+            current_backup=current.path,
+            history_path=his_path / current.path.name,
+        )
+
+    return BackupPlan(
+        source_file=project_file,
+        backup_name=backup_name,
+        destination_path=destination,
+        status=STATUS_STORED,
+        software=planned_info.software,
+        project=planned_info.project,
+        timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+        collaborator=planned_info.collaborator,
+        stage=planned_info.stage,
+    )
+
+
+def archive_history_backup(*, project_file: Path, backup_name: str, his_path: Path) -> Path:
+    his_path.mkdir(parents=True, exist_ok=True)
+    planned_info = parse_backup_filename(Path(backup_name))
+    existing = find_backup_by_identity(his_path, planned_info.identity)
+    if existing is not None:
+        return existing
+    destination = his_path / backup_name
+    if destination.exists():
+        return destination
+    return create_backup_zip(project_file, backup_name, output_dir=his_path)
+
+
+def _find_current_for_plan(
+    *,
+    atu_path: Path,
+    planned_key: str,
+    current_override: dict[str, Path] | None,
+) -> BackupFileInfo | None:
+    if current_override and planned_key in current_override:
+        return parse_backup_filename(current_override[planned_key])
+    return find_current_backup(atu_path, planned_key)
+
+
+def build_project_backup_name(
+    *,
+    project_file: Path,
+    collaborator: str,
+    stage: BackupStage,
+) -> str:
+    project_id = get_project_id(project_file.name)
+    version = extract_digsi_version(project_file)
+    timestamp = get_file_timestamp(project_file)
+    return build_backup_name(
+        software_version=version,
+        project_id=project_id,
+        timestamp=timestamp,
+        collaborator=collaborator,
+        stage=stage,
+    )

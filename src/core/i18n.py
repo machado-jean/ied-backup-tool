@@ -1,0 +1,176 @@
+from __future__ import annotations
+
+DEFAULT_LANGUAGE = "pt_BR"
+
+STATUS_TEXT = {
+    "pt_BR": {
+        "stored": "Novo",
+        "replaced_current": "Atualiza ATU",
+        "archived_history": "Arquivar HIS",
+        "atu_duplicate": "Corrigir ATU",
+        "skipped_older": "Ignorado",
+        "already_current": "Já atual",
+    },
+    "en_US": {
+        "stored": "New",
+        "replaced_current": "Update ATU",
+        "archived_history": "Archive HIS",
+        "atu_duplicate": "Fix ATU",
+        "skipped_older": "Skipped",
+        "already_current": "Already current",
+    },
+}
+
+MESSAGE_TEXT = {
+    "pt_BR": {
+        "planned": "PREVISTO",
+        "problematic": "PROBLEMÁTICO",
+        "executed": "EXECUTADO",
+    },
+    "en_US": {
+        "planned": "PLANNED",
+        "problematic": "PROBLEMATIC",
+        "executed": "EXECUTED",
+    },
+}
+
+UI_TEXT = {
+    "pt_BR": {
+        "action": "Ação",
+        "already_current": "Já atuais",
+        "archive_count": "Históricos",
+        "atu_corrections": "Correções ATU",
+        "atu_folder": "Pasta ATU",
+        "backup_failed": "Falha ao gerar backup",
+        "backup_processed_title": "Backups processados",
+        "cancel": "Cancelar",
+        "collaborator": "Colaborador",
+        "completed_at": "Concluído em",
+        "confirm_execution": "Confirmar execução",
+        "continue_question": "Continuar?",
+        "current_folder": "Pasta atual",
+        "destination": "Destino",
+        "duplicate_files_found": "Foram encontrados arquivos antigos duplicados em ATU:",
+        "duplicates_question": "Deseja mover esses arquivos problemáticos para HIS?",
+        "duplicates_title": "Duplicidades em ATU",
+        "dz5_type": "DIGSI 5 (.dz5)",
+        "error_prefix": "ERRO",
+        "execution": "Execução",
+        "files_to_process": "Serão processados {count} backups.",
+        "file": "Arquivo",
+        "fill_fields": "Preencha",
+        "generate_backups": "Gerar backups",
+        "ignored": "Ignorados",
+        "his_folder": "Pasta HIS",
+        "language_tooltip": "Idioma",
+        "mode": "Modo",
+        "new": "Novos",
+        "no_digsi_found": "Nenhum arquivo DIGSI 5 encontrado nesta pasta.",
+        "no_new_backups": "Não há backups novos para processar.",
+        "nothing_to_execute": "Nada a executar",
+        "open_atu": "Abrir ATU",
+        "open_his": "Abrir HIS",
+        "preview": "Prévia do lote",
+        "preview_note": "PRÉVIA: nenhum arquivo foi criado ou movido ainda.",
+        "process_from_current": "Processar apenas a partir do backup atual",
+        "project": "Projeto",
+        "refresh": "Atualizar",
+        "replaced_current": "Substituições em ATU",
+        "required_config": "Configure colaborador, ATU e HIS antes de gerar backup.",
+        "required_fields": "Campos obrigatórios",
+        "required_stage": "Selecione a etapa antes de gerar backup.",
+        "required_type": "Selecione ao menos um tipo de arquivo suportado.",
+        "save": "Salvar",
+        "select": "Selecionar",
+        "settings": "Configurações",
+        "settings_invalid": "Configuração inválida",
+        "settings_pending": "Configuração pendente",
+        "settings_required": "Salve as configurações antes de gerar backup.",
+        "stage": "Etapa",
+        "status_summary": (
+            "total={total}, novos={stored}, substituídos={replaced_current}, "
+            "históricos={archived_history}, correções_atu={atu_duplicates}, "
+            "ignorados_antigos={skipped_older}, já_atuais={already_current}"
+        ),
+        "summary": "Resumo",
+        "timestamp": "Data/Hora",
+        "total": "Total",
+        "type": "Tipos",
+        "version": "Versão",
+    },
+    "en_US": {
+        "action": "Action",
+        "already_current": "Already current",
+        "archive_count": "History",
+        "atu_corrections": "ATU fixes",
+        "atu_folder": "ATU folder",
+        "backup_failed": "Backup failed",
+        "backup_processed_title": "Backups processed",
+        "cancel": "Cancel",
+        "collaborator": "Collaborator",
+        "completed_at": "Completed at",
+        "confirm_execution": "Confirm execution",
+        "continue_question": "Continue?",
+        "current_folder": "Current folder",
+        "destination": "Destination",
+        "duplicate_files_found": "Older duplicate files were found in ATU:",
+        "duplicates_question": "Do you want to move these problematic files to HIS?",
+        "duplicates_title": "ATU duplicates",
+        "dz5_type": "DIGSI 5 (.dz5)",
+        "error_prefix": "ERROR",
+        "execution": "Execution",
+        "files_to_process": "{count} backups will be processed.",
+        "file": "File",
+        "fill_fields": "Fill in",
+        "generate_backups": "Generate backups",
+        "ignored": "Ignored",
+        "his_folder": "HIS folder",
+        "language_tooltip": "Language",
+        "mode": "Mode",
+        "new": "New",
+        "no_digsi_found": "No DIGSI 5 file found in this folder.",
+        "no_new_backups": "There are no new backups to process.",
+        "nothing_to_execute": "Nothing to execute",
+        "open_atu": "Open ATU",
+        "open_his": "Open HIS",
+        "preview": "Batch preview",
+        "preview_note": "PREVIEW: no file has been created or moved yet.",
+        "process_from_current": "Process only from current backup",
+        "project": "Project",
+        "refresh": "Refresh",
+        "replaced_current": "ATU updates",
+        "required_config": "Configure collaborator, ATU and HIS before generating backup.",
+        "required_fields": "Required fields",
+        "required_stage": "Select the stage before generating backup.",
+        "required_type": "Select at least one supported file type.",
+        "save": "Save",
+        "select": "Select",
+        "settings": "Settings",
+        "settings_invalid": "Invalid settings",
+        "settings_pending": "Pending settings",
+        "settings_required": "Save settings before generating backup.",
+        "stage": "Stage",
+        "status_summary": (
+            "total={total}, new={stored}, updated={replaced_current}, "
+            "history={archived_history}, atu_fixes={atu_duplicates}, "
+            "old_skipped={skipped_older}, already_current={already_current}"
+        ),
+        "summary": "Summary",
+        "timestamp": "Date/Time",
+        "total": "Total",
+        "type": "Types",
+        "version": "Version",
+    },
+}
+
+
+def status_label(status: str, language: str = DEFAULT_LANGUAGE) -> str:
+    return STATUS_TEXT.get(language, STATUS_TEXT[DEFAULT_LANGUAGE]).get(status, status)
+
+
+def message_label(key: str, language: str = DEFAULT_LANGUAGE) -> str:
+    return MESSAGE_TEXT.get(language, MESSAGE_TEXT[DEFAULT_LANGUAGE]).get(key, key)
+
+
+def ui_text(key: str, language: str = DEFAULT_LANGUAGE) -> str:
+    return UI_TEXT.get(language, UI_TEXT[DEFAULT_LANGUAGE]).get(key, key)
