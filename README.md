@@ -49,6 +49,8 @@ Crie `config.json` ao lado do executavel:
 
 Versao atual do aplicativo: `1.0.0`.
 
+Manual de uso do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md).
+
 Para gerar o executavel versionado:
 
 ```powershell
