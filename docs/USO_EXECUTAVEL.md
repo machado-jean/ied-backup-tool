@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.0.2.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.0.3.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, o tipo disponivel e DIGSI 5
 (`.dz5`).
 

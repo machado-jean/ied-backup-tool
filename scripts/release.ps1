@@ -26,9 +26,6 @@ if (-not $SkipTests) {
     .\.venv\Scripts\python.exe -m pytest
 }
 
-$env:QT_QPA_PLATFORM = "offscreen"
-.\.venv\Scripts\python.exe scripts\generate_icon.py
-
 .\.venv\Scripts\python.exe -m PyInstaller `
     --noconfirm `
     --clean `

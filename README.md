@@ -47,7 +47,7 @@ Crie `config.json` ao lado do executavel:
 .\.venv\Scripts\python.exe -m src.gui.app
 ```
 
-Versao atual do aplicativo: `1.0.2`.
+Versao atual do aplicativo: `1.0.3`.
 
 Manual de uso do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md).
 
