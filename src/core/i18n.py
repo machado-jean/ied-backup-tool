@@ -72,6 +72,11 @@ UI_TEXT = {
         "open_his": "Abrir HIS",
         "preview": "Prévia do lote",
         "preview_note": "PRÉVIA: nenhum arquivo foi criado ou movido ainda.",
+        "progress_finished": "Backups concluídos.",
+        "progress_fixing_atu": "Corrigindo duplicidades em ATU...",
+        "progress_processing_file": "Processando {file}...",
+        "progress_starting": "Preparando processamento...",
+        "progress_title": "Gerando backups",
         "process_from_current": "Processar apenas a partir do backup atual",
         "project": "Projeto",
         "refresh": "Atualizar",
@@ -87,12 +92,14 @@ UI_TEXT = {
         "settings_pending": "Configuração pendente",
         "settings_required": "Salve as configurações antes de gerar backup.",
         "stage": "Etapa",
-        "status_summary": (
-            "total={total}, novos={stored}, substituídos={replaced_current}, "
-            "históricos={archived_history}, correções_atu={atu_duplicates}, "
-            "ignorados_antigos={skipped_older}, já_atuais={already_current}"
-        ),
         "summary": "Resumo",
+        "summary_archived_line": "Históricos arquivados: {count}",
+        "summary_atu_line": "Correções em ATU: {count}",
+        "summary_current_line": "Já estavam atuais: {count}",
+        "summary_replaced_line": "ATU atualizado: {count}",
+        "summary_skipped_line": "Ignorados por serem antigos: {count}",
+        "summary_stored_line": "Novos backups criados: {count}",
+        "summary_total_line": "Total analisado: {total}",
         "timestamp": "Data/Hora",
         "total": "Total",
         "type": "Tipos",
@@ -135,6 +142,11 @@ UI_TEXT = {
         "open_his": "Open HIS",
         "preview": "Batch preview",
         "preview_note": "PREVIEW: no file has been created or moved yet.",
+        "progress_finished": "Backups completed.",
+        "progress_fixing_atu": "Fixing ATU duplicates...",
+        "progress_processing_file": "Processing {file}...",
+        "progress_starting": "Preparing processing...",
+        "progress_title": "Generating backups",
         "process_from_current": "Process only from current backup",
         "project": "Project",
         "refresh": "Refresh",
@@ -150,12 +162,14 @@ UI_TEXT = {
         "settings_pending": "Pending settings",
         "settings_required": "Save settings before generating backup.",
         "stage": "Stage",
-        "status_summary": (
-            "total={total}, new={stored}, updated={replaced_current}, "
-            "history={archived_history}, atu_fixes={atu_duplicates}, "
-            "old_skipped={skipped_older}, already_current={already_current}"
-        ),
         "summary": "Summary",
+        "summary_archived_line": "History archived: {count}",
+        "summary_atu_line": "ATU fixes: {count}",
+        "summary_current_line": "Already current: {count}",
+        "summary_replaced_line": "ATU updated: {count}",
+        "summary_skipped_line": "Skipped because older: {count}",
+        "summary_stored_line": "New backups created: {count}",
+        "summary_total_line": "Total analyzed: {total}",
         "timestamp": "Date/Time",
         "total": "Total",
         "type": "Types",

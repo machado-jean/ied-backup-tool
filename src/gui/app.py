@@ -7,6 +7,7 @@ from pathlib import Path
 from PySide6.QtWidgets import QApplication
 
 from src.gui.main_window import MainWindow
+from src.version import APP_NAME, APP_VERSION
 
 
 def parse_args() -> argparse.Namespace:
@@ -22,7 +23,8 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     app = QApplication(sys.argv)
-    app.setApplicationName("IED Backup Manager")
+    app.setApplicationName(APP_NAME)
+    app.setApplicationVersion(APP_VERSION)
     window = MainWindow(project_dir=args.project_dir)
     window.show()
     return app.exec()

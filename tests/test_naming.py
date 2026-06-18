@@ -3,6 +3,20 @@ from datetime import datetime
 from src.core.naming import BackupStage, build_backup_name, get_project_id
 
 
+def test_backup_stage_order_matches_workflow() -> None:
+    assert [stage.value for stage in BackupStage] == [
+        "DEV",
+        "PRE-TAF",
+        "TAF",
+        "POS-TAF",
+        "PRE-TAC",
+        "TAC",
+        "POS-TAC",
+        "PRODUCAO",
+        "CUSTOM",
+    ]
+
+
 def test_get_project_id_uses_text_before_first_underscore() -> None:
     assert get_project_id("SE-CTU_20260612_1736.dz5") == "SE-CTU"
 

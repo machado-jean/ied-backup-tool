@@ -7,6 +7,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QTimer, QUrl
 from PySide6.QtGui import QColor, QDesktopServices
 from PySide6.QtWidgets import (
+    QApplication,
     QCheckBox,
     QComboBox,
     QFormLayout,
@@ -16,6 +17,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPlainTextEdit,
+    QProgressDialog,
     QPushButton,
     QTableWidget,
     QTableWidgetItem,
@@ -25,19 +27,24 @@ from PySide6.QtWidgets import (
 
 from src.config.config_manager import AppConfig, load_config, save_config
 from src.core.backup_service import (
+    STATUS_ALREADY_CURRENT,
+    STATUS_ARCHIVED_HISTORY,
+    STATUS_SKIPPED_OLDER,
     AtuDuplicatePlan,
     BackupPlan,
+    BackupResult,
+    archive_history_backup,
     filter_current_and_newer_plans,
     fix_atu_duplicate_backups,
     plan_all_backups,
     plan_atu_duplicate_fixes,
-    process_all_backups,
-    process_backup_plans,
+    process_backup_file,
     summarize_results,
 )
 from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
 from src.core.naming import BackupStage
 from src.gui.settings_window import SettingsWindow
+from src.version import APP_DISPLAY_NAME
 
 STATUS_COLORS = {
     "stored": QColor("#1f7a3f"),
@@ -59,7 +66,7 @@ class MainWindow(QMainWindow):
         self.atu_duplicate_plans: list[AtuDuplicatePlan] = []
         self.language = self.config.language if self.config else DEFAULT_LANGUAGE
 
-        self.setWindowTitle("IED Backup Manager")
+        self.setWindowTitle(APP_DISPLAY_NAME)
         self.setMinimumSize(920, 620)
         self._build_ui()
         if not self.config:
@@ -328,30 +335,7 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            duplicate_results = (
-                fix_atu_duplicate_backups(
-                    atu_path=self.config.atu_path,
-                    his_path=self.config.his_path,
-                )
-                if fix_duplicates
-                else []
-            )
-            if self.latest_only_checkbox.isChecked():
-                results = process_backup_plans(
-                    plans=self.current_plans,
-                    atu_path=self.config.atu_path,
-                    his_path=self.config.his_path,
-                    collaborator=self.config.collaborator,
-                    stage=BackupStage(self.stage_input.currentText()),
-                )
-            else:
-                results = process_all_backups(
-                    project_dir=self.project_dir,
-                    atu_path=self.config.atu_path,
-                    his_path=self.config.his_path,
-                    collaborator=self.config.collaborator,
-                    stage=BackupStage(self.stage_input.currentText()),
-                )
+            duplicate_results, results = self._run_backup_with_progress(fix_duplicates)
         except Exception as exc:
             QMessageBox.critical(self, ui_text("backup_failed", self.language), str(exc))
             self.log_output.appendPlainText(f"{ui_text('error_prefix', self.language)}: {exc}")
@@ -381,6 +365,107 @@ class MainWindow(QMainWindow):
             self._summary_text(summary),
         )
         self.refresh_preview()
+
+    def _run_backup_with_progress(
+        self,
+        fix_duplicates: bool,
+    ) -> tuple[list[AtuDuplicatePlan], list[BackupResult]]:
+        if not self.config:
+            return [], []
+
+        plans = self.current_plans
+        total_steps = len(plans) + (1 if fix_duplicates else 0)
+        progress = QProgressDialog(
+            ui_text("progress_starting", self.language),
+            None,
+            0,
+            max(total_steps, 1),
+            self,
+        )
+        progress.setWindowTitle(ui_text("progress_title", self.language))
+        progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        progress.setMinimumDuration(0)
+        progress.setAutoClose(False)
+        progress.setAutoReset(False)
+        progress.setValue(0)
+
+        self.generate_button.setEnabled(False)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        QApplication.processEvents()
+        try:
+            step = 0
+            duplicate_results: list[AtuDuplicatePlan] = []
+            if fix_duplicates:
+                progress.setLabelText(ui_text("progress_fixing_atu", self.language))
+                QApplication.processEvents()
+                duplicate_results = fix_atu_duplicate_backups(
+                    atu_path=self.config.atu_path,
+                    his_path=self.config.his_path,
+                )
+                step += 1
+                progress.setValue(step)
+                QApplication.processEvents()
+
+            results: list[BackupResult] = []
+            for plan in plans:
+                progress.setLabelText(
+                    ui_text("progress_processing_file", self.language).format(
+                        file=plan.source_file.name
+                    )
+                )
+                QApplication.processEvents()
+                results.append(self._process_plan(plan))
+                step += 1
+                progress.setValue(step)
+                QApplication.processEvents()
+
+            progress.setLabelText(ui_text("progress_finished", self.language))
+            progress.setValue(max(total_steps, 1))
+            QApplication.processEvents()
+            return duplicate_results, results
+        finally:
+            QApplication.restoreOverrideCursor()
+            self.generate_button.setEnabled(True)
+            progress.close()
+
+    def _process_plan(self, plan: BackupPlan) -> BackupResult:
+        if not self.config:
+            raise RuntimeError(ui_text("settings_required", self.language))
+
+        if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
+            return BackupResult(
+                source_file=plan.source_file,
+                backup_name=plan.backup_name,
+                final_path=plan.destination_path,
+                status=plan.status,
+            )
+
+        if plan.status == STATUS_ARCHIVED_HISTORY:
+            final_path = archive_history_backup(
+                project_file=plan.source_file,
+                backup_name=plan.backup_name,
+                his_path=self.config.his_path,
+            )
+            return BackupResult(
+                source_file=plan.source_file,
+                backup_name=plan.backup_name,
+                final_path=final_path,
+                status=plan.status,
+            )
+
+        result = process_backup_file(
+            project_file=plan.source_file,
+            atu_path=self.config.atu_path,
+            his_path=self.config.his_path,
+            collaborator=self.config.collaborator,
+            stage=BackupStage(self.stage_input.currentText()),
+        )
+        return BackupResult(
+            source_file=result.source_file,
+            backup_name=result.backup_name,
+            final_path=result.final_path,
+            status=plan.status,
+        )
 
     def _show_plans(
         self,
@@ -459,14 +544,24 @@ class MainWindow(QMainWindow):
         return selected
 
     def _summary_text(self, summary) -> str:
-        return ui_text("status_summary", self.language).format(
-            total=summary.total,
-            stored=summary.stored,
-            replaced_current=summary.replaced_current,
-            archived_history=summary.archived_history,
-            atu_duplicates=summary.atu_duplicates,
-            skipped_older=summary.skipped_older,
-            already_current=summary.already_current,
+        return "\n".join(
+            [
+                ui_text("summary_total_line", self.language).format(total=summary.total),
+                ui_text("summary_stored_line", self.language).format(count=summary.stored),
+                ui_text("summary_replaced_line", self.language).format(
+                    count=summary.replaced_current
+                ),
+                ui_text("summary_archived_line", self.language).format(
+                    count=summary.archived_history
+                ),
+                ui_text("summary_atu_line", self.language).format(count=summary.atu_duplicates),
+                ui_text("summary_skipped_line", self.language).format(
+                    count=summary.skipped_older
+                ),
+                ui_text("summary_current_line", self.language).format(
+                    count=summary.already_current
+                ),
+            ]
         )
 
     def toggle_language(self) -> None:

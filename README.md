@@ -47,6 +47,14 @@ Crie `config.json` ao lado do executavel:
 .\.venv\Scripts\python.exe -m src.gui.app
 ```
 
+Versao atual do aplicativo: `1.0.0`.
+
+Para gerar o executavel versionado:
+
+```powershell
+.\.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --onefile --windowed --name "IED Backup Manager v1.0.0" --paths . src\gui\app.py
+```
+
 Para avaliar a GUI usando a pasta de amostras durante o desenvolvimento:
 
 ```powershell

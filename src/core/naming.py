@@ -11,8 +11,10 @@ PROJECT_FILENAME_PATTERN = re.compile(r"^(?P<project>.+)_\d{8}_\d{4}$")
 class BackupStage(str, Enum):
     DEV = "DEV"
     PRE_TAF = "PRE-TAF"
+    TAF = "TAF"
     POS_TAF = "POS-TAF"
     PRE_TAC = "PRE-TAC"
+    TAC = "TAC"
     POS_TAC = "POS-TAC"
     PRODUCAO = "PRODUCAO"
     CUSTOM = "CUSTOM"
