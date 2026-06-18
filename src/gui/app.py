@@ -6,9 +6,11 @@ import argparse
 import sys
 from pathlib import Path
 
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from src.gui.main_window import MainWindow
+from src.gui.resources import app_icon_path
 from src.version import APP_NAME, APP_VERSION
 
 
@@ -31,6 +33,7 @@ def main() -> int:
     app = QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setApplicationVersion(APP_VERSION)
+    app.setWindowIcon(QIcon(str(app_icon_path())))
     window = MainWindow(project_dir=args.project_dir)
     window.show()
     return app.exec()

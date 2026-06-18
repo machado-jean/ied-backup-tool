@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QTimer, QUrl
-from PySide6.QtGui import QColor, QDesktopServices
+from PySide6.QtGui import QColor, QDesktopServices, QIcon, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
@@ -47,6 +47,7 @@ from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
 from src.core.naming import BackupStage
 from src.core.project_types.base import ProjectType
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
+from src.gui.resources import app_icon_path
 from src.gui.settings_window import SettingsWindow
 from src.version import APP_DISPLAY_NAME
 
@@ -73,6 +74,7 @@ class MainWindow(QMainWindow):
         self.language = self.config.language if self.config else DEFAULT_LANGUAGE
 
         self.setWindowTitle(APP_DISPLAY_NAME)
+        self.setWindowIcon(QIcon(str(app_icon_path())))
         self.setMinimumSize(920, 620)
         self._build_ui()
         if not self.config:
@@ -88,6 +90,17 @@ class MainWindow(QMainWindow):
         layout.setSpacing(14)
 
         top = QHBoxLayout()
+        self.app_icon_label = QLabel()
+        self.app_icon_label.setFixedSize(36, 36)
+        self.app_icon_label.setPixmap(
+            QPixmap(str(app_icon_path())).scaled(
+                36,
+                36,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+        )
+        self.app_icon_label.setToolTip(APP_DISPLAY_NAME)
         self.project_dir_label = QLabel(str(self.project_dir))
         self.project_dir_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.language_button = QPushButton(self._language_flag())
@@ -99,6 +112,7 @@ class MainWindow(QMainWindow):
         self.settings_button = QPushButton()
         self.settings_button.clicked.connect(self.open_settings)
         self.current_folder_title = QLabel()
+        top.addWidget(self.app_icon_label)
         top.addWidget(self.current_folder_title)
         top.addWidget(self.project_dir_label, 1)
         top.addWidget(self.language_button)
