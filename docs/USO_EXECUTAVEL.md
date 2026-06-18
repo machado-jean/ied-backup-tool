@@ -1,12 +1,13 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.0.0.exe` para gerar backups
-padronizados dos projetos DIGSI 5 (`.dz5`).
+Este guia explica como usar o `IED Backup Manager v1.0.1.exe` para gerar backups
+padronizados de projetos de IED. Nesta versao, o tipo disponivel e DIGSI 5
+(`.dz5`).
 
 ## 1. Estrutura esperada
 
 O executavel deve ficar na pasta do projeto que sera processada. Essa mesma
-pasta deve conter os arquivos `.dz5`.
+pasta deve conter os arquivos de projeto suportados.
 
 Exemplo:
 
@@ -75,7 +76,7 @@ o backup podera ser gerado normalmente.
 
 ## 5. Conferir a previa do lote
 
-Depois de selecionar a etapa, a tela mostra uma previa dos arquivos `.dz5`
+Depois de selecionar a etapa, a tela mostra uma previa dos arquivos suportados
 encontrados na pasta.
 
 Colunas principais:

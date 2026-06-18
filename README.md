@@ -7,7 +7,7 @@ Status: base funcional em desenvolvimento.
 
 ## Escopo V1
 
-- Detectar automaticamente o `.dz5` mais recente na pasta do projeto.
+- Detectar automaticamente arquivos de projeto suportados na pasta do projeto.
 - Extrair o identificador do projeto pelo trecho antes do sufixo
   `_AAAAMMDD_HHMM`.
 - Tratar o `.dz5` como ZIP para localizar a versao do DIGSI.
@@ -47,14 +47,14 @@ Crie `config.json` ao lado do executavel:
 .\.venv\Scripts\python.exe -m src.gui.app
 ```
 
-Versao atual do aplicativo: `1.0.0`.
+Versao atual do aplicativo: `1.0.1`.
 
 Manual de uso do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md).
 
 Para gerar o executavel versionado:
 
 ```powershell
-.\.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --onefile --windowed --name "IED Backup Manager v1.0.0" --paths . src\gui\app.py
+.\.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --onefile --windowed --name "IED Backup Manager v1.0.1" --paths . src\gui\app.py
 ```
 
 Para avaliar a GUI usando a pasta de amostras durante o desenvolvimento:
@@ -111,3 +111,21 @@ mostra mensagem amigavel caso esteja aberto, bloqueado ou indisponivel.
 .\.venv\Scripts\python.exe -m pytest
 .\.venv\Scripts\python.exe -m ruff check src tests
 ```
+
+## Tipos de IED
+
+A regra geral de backup (`ATU/HIS`, nomenclatura, historico e duplicidade
+tecnica) fica em `src/core/backup_service.py`.
+
+As regras especificas de cada software/IED ficam em `src/core/project_types/`.
+Atualmente existe o tipo `digsi5`, implementado em
+`src/core/project_types/digsi.py`.
+
+Para adicionar outro tipo, como SEL (`.rdb`), a ideia e criar um novo modulo
+nessa pasta implementando:
+
+- extensoes suportadas;
+- identificador do projeto;
+- software/versao usada no nome do backup.
+
+Depois, o novo tipo deve ser registrado em `src/core/project_types/registry.py`.

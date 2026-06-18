@@ -43,6 +43,8 @@ from src.core.backup_service import (
 )
 from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
 from src.core.naming import BackupStage
+from src.core.project_types.base import ProjectType
+from src.core.project_types.registry import PROJECT_TYPES, get_project_type
 from src.gui.settings_window import SettingsWindow
 from src.version import APP_DISPLAY_NAME
 
@@ -167,11 +169,16 @@ class MainWindow(QMainWindow):
         self.stage_label = QLabel()
         form.addRow(self.stage_label, self.stage_input)
 
-        self.dz5_checkbox = QCheckBox()
-        self.dz5_checkbox.setChecked(True)
-        self.dz5_checkbox.stateChanged.connect(self.refresh_preview)
+        self.type_checkboxes: dict[str, QCheckBox] = {}
+        self.type_checkboxes_layout = QVBoxLayout()
+        for project_type in PROJECT_TYPES:
+            checkbox = QCheckBox()
+            checkbox.setChecked(project_type.key == PROJECT_TYPES[0].key)
+            checkbox.stateChanged.connect(self.refresh_preview)
+            self.type_checkboxes[project_type.key] = checkbox
+            self.type_checkboxes_layout.addWidget(checkbox)
         self.type_label = QLabel()
-        form.addRow(self.type_label, self.dz5_checkbox)
+        form.addRow(self.type_label, self.type_checkboxes_layout)
 
         self.latest_only_checkbox = QCheckBox()
         self.latest_only_checkbox.setChecked(False)
@@ -231,7 +238,8 @@ class MainWindow(QMainWindow):
             self._clear_preview(ui_text("required_config", self.language))
             return
 
-        if self._selected_file_types() != [".dz5"]:
+        selected_project_types = self._selected_project_types()
+        if not selected_project_types:
             self.current_plans = []
             self.atu_duplicate_plans = []
             self._clear_preview(ui_text("required_type", self.language))
@@ -248,24 +256,23 @@ class MainWindow(QMainWindow):
                 atu_path=self.config.atu_path,
                 his_path=self.config.his_path,
             )
-            if self.latest_only_checkbox.isChecked():
-                self.current_plans = filter_current_and_newer_plans(
+            plans: list[BackupPlan] = []
+            for project_type in selected_project_types:
+                plans.extend(
                     plan_all_backups(
                         project_dir=self.project_dir,
                         atu_path=self.config.atu_path,
                         his_path=self.config.his_path,
                         collaborator=self.config.collaborator,
                         stage=BackupStage(self.stage_input.currentText()),
+                        project_type=project_type,
                     )
                 )
-            else:
-                self.current_plans = plan_all_backups(
-                    project_dir=self.project_dir,
-                    atu_path=self.config.atu_path,
-                    his_path=self.config.his_path,
-                    collaborator=self.config.collaborator,
-                    stage=BackupStage(self.stage_input.currentText()),
-                )
+            self.current_plans = (
+                filter_current_and_newer_plans(plans)
+                if self.latest_only_checkbox.isChecked()
+                else plans
+            )
         except Exception as exc:
             self.current_plans = []
             self.atu_duplicate_plans = []
@@ -459,6 +466,7 @@ class MainWindow(QMainWindow):
             his_path=self.config.his_path,
             collaborator=self.config.collaborator,
             stage=BackupStage(self.stage_input.currentText()),
+            project_type=get_project_type(plan.project_type_key),
         )
         return BackupResult(
             source_file=result.source_file,
@@ -473,7 +481,7 @@ class MainWindow(QMainWindow):
         duplicate_plans: list[AtuDuplicatePlan],
     ) -> None:
         if not plans and not duplicate_plans:
-            self._clear_preview(ui_text("no_digsi_found", self.language))
+            self._clear_preview(ui_text("no_project_files_found", self.language))
             return
         executable_count = sum(
             plan.status in {"stored", "replaced_current", "archived_history"} for plan in plans
@@ -537,11 +545,12 @@ class MainWindow(QMainWindow):
         self._set_summary_empty()
         self.log_output.appendPlainText(message)
 
-    def _selected_file_types(self) -> list[str]:
-        selected = []
-        if self.dz5_checkbox.isChecked():
-            selected.append(".dz5")
-        return selected
+    def _selected_project_types(self) -> list[ProjectType]:
+        return [
+            get_project_type(key)
+            for key, checkbox in self.type_checkboxes.items()
+            if checkbox.isChecked()
+        ]
 
     def _summary_text(self, summary) -> str:
         return "\n".join(
@@ -619,7 +628,8 @@ class MainWindow(QMainWindow):
         self.stage_label.setText(ui_text("stage", self.language))
         self.type_label.setText(ui_text("type", self.language))
         self.mode_label.setText(ui_text("mode", self.language))
-        self.dz5_checkbox.setText(ui_text("dz5_type", self.language))
+        for project_type in PROJECT_TYPES:
+            self.type_checkboxes[project_type.key].setText(project_type.label)
         self.latest_only_checkbox.setText(ui_text("process_from_current", self.language))
         self.generate_button.setText(ui_text("generate_backups", self.language))
         self.open_atu_button.setText(ui_text("open_atu", self.language))

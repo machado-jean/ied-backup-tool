@@ -4,14 +4,13 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-from src.core.detector import find_project_file, find_project_files
-from src.core.digsi import extract_digsi_version
 from src.core.naming import (
     BackupStage,
     build_backup_name,
     get_file_timestamp,
-    get_project_id,
 )
+from src.core.project_types.base import ProjectType
+from src.core.project_types.registry import DEFAULT_PROJECT_TYPE
 from src.core.storage import (
     BackupFileInfo,
     find_atu_duplicates,
@@ -50,6 +49,8 @@ class BackupPlan:
     timestamp_text: str
     collaborator: str
     stage: str
+    project_type_key: str
+    project_type_label: str
     current_backup: Path | None = None
     history_path: Path | None = None
 
@@ -97,13 +98,15 @@ def process_latest_backup(
     his_path: Path,
     collaborator: str,
     stage: BackupStage,
+    project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> BackupResult:
     return process_backup_file(
-        project_file=find_project_file(project_dir),
+        project_file=project_type.find_latest_file(project_dir),
         atu_path=atu_path,
         his_path=his_path,
         collaborator=collaborator,
         stage=stage,
+        project_type=project_type,
     )
 
 
@@ -114,6 +117,7 @@ def process_all_backups(
     his_path: Path,
     collaborator: str,
     stage: BackupStage,
+    project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> list[BackupResult]:
     results = []
     virtual_current: dict[str, Path] = {}
@@ -123,6 +127,7 @@ def process_all_backups(
         his_path=his_path,
         collaborator=collaborator,
         stage=stage,
+        project_type=project_type,
         virtual_current=virtual_current,
     ):
         if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
@@ -158,6 +163,7 @@ def process_all_backups(
             his_path=his_path,
             collaborator=collaborator,
             stage=stage,
+            project_type=project_type,
         )
         results.append(
             BackupResult(
@@ -177,6 +183,7 @@ def process_backup_plans(
     his_path: Path,
     collaborator: str,
     stage: BackupStage,
+    project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> list[BackupResult]:
     results = []
     for plan in plans:
@@ -213,6 +220,7 @@ def process_backup_plans(
             his_path=his_path,
             collaborator=collaborator,
             stage=stage,
+            project_type=project_type,
         )
         results.append(
             BackupResult(
@@ -252,13 +260,15 @@ def plan_latest_backup(
     his_path: Path,
     collaborator: str,
     stage: BackupStage,
+    project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> BackupPlan:
     return plan_backup_file(
-        project_file=find_project_file(project_dir),
+        project_file=project_type.find_latest_file(project_dir),
         atu_path=atu_path,
         his_path=his_path,
         collaborator=collaborator,
         stage=stage,
+        project_type=project_type,
     )
 
 
@@ -269,17 +279,19 @@ def plan_all_backups(
     his_path: Path,
     collaborator: str,
     stage: BackupStage,
+    project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     virtual_current: dict[str, Path] | None = None,
 ) -> list[BackupPlan]:
     plans = []
     current_by_key = virtual_current if virtual_current is not None else {}
-    for project_file in find_project_files(project_dir):
+    for project_file in project_type.find_files(project_dir):
         plan = plan_backup_file(
             project_file=project_file,
             atu_path=atu_path,
             his_path=his_path,
             collaborator=collaborator,
             stage=stage,
+            project_type=project_type,
             current_override=current_by_key,
         )
         plans.append(plan)
@@ -311,6 +323,7 @@ def process_backup_file(
     his_path: Path,
     collaborator: str,
     stage: BackupStage,
+    project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> BackupResult:
     plan = plan_backup_file(
         project_file=project_file,
@@ -318,6 +331,7 @@ def process_backup_file(
         his_path=his_path,
         collaborator=collaborator,
         stage=stage,
+        project_type=project_type,
     )
 
     with tempfile.TemporaryDirectory(prefix="ied-backup-") as staging:
@@ -343,12 +357,14 @@ def plan_backup_file(
     his_path: Path,
     collaborator: str,
     stage: BackupStage,
+    project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     current_override: dict[str, Path] | None = None,
 ) -> BackupPlan:
     backup_name = build_project_backup_name(
         project_file=project_file,
         collaborator=collaborator,
         stage=stage,
+        project_type=project_type,
     )
     planned_info = parse_backup_filename(Path(backup_name))
     current = _find_current_for_plan(
@@ -372,6 +388,8 @@ def plan_backup_file(
                 timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
                 collaborator=planned_info.collaborator,
                 stage=planned_info.stage,
+                project_type_key=project_type.key,
+                project_type_label=project_type.label,
                 current_backup=current.path,
                 history_path=history_path,
             )
@@ -386,6 +404,8 @@ def plan_backup_file(
             timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
             collaborator=planned_info.collaborator,
             stage=planned_info.stage,
+            project_type_key=project_type.key,
+            project_type_label=project_type.label,
             current_backup=current.path,
         )
 
@@ -400,6 +420,8 @@ def plan_backup_file(
             timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
             collaborator=planned_info.collaborator,
             stage=planned_info.stage,
+            project_type_key=project_type.key,
+            project_type_label=project_type.label,
             current_backup=current.path,
         )
 
@@ -414,6 +436,8 @@ def plan_backup_file(
             timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
             collaborator=planned_info.collaborator,
             stage=planned_info.stage,
+            project_type_key=project_type.key,
+            project_type_label=project_type.label,
             current_backup=current.path,
             history_path=his_path / current.path.name,
         )
@@ -428,6 +452,8 @@ def plan_backup_file(
         timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
         collaborator=planned_info.collaborator,
         stage=planned_info.stage,
+        project_type_key=project_type.key,
+        project_type_label=project_type.label,
     )
 
 
@@ -459,9 +485,10 @@ def build_project_backup_name(
     project_file: Path,
     collaborator: str,
     stage: BackupStage,
+    project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> str:
-    project_id = get_project_id(project_file.name)
-    version = extract_digsi_version(project_file)
+    project_id = project_type.get_project_id(project_file)
+    version = project_type.get_software_version(project_file)
     timestamp = get_file_timestamp(project_file)
     return build_backup_name(
         software_version=version,

@@ -18,6 +18,7 @@ from src.core.digsi import DigsiVersionError
 from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label
 from src.core.logger import get_logger
 from src.core.naming import BackupStage
+from src.core.project_types.registry import DEFAULT_PROJECT_TYPE, PROJECT_TYPES, get_project_type
 from src.core.storage import StorageError
 from src.core.zipper import BackupZipError
 
@@ -45,7 +46,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--process-all",
         action="store_true",
-        help="Processa todos os .dz5 da pasta em ordem cronologica.",
+        help="Processa todos os arquivos suportados da pasta em ordem cronologica.",
+    )
+    parser.add_argument(
+        "--project-type",
+        default=DEFAULT_PROJECT_TYPE.key,
+        choices=[project_type.key for project_type in PROJECT_TYPES],
+        help="Tipo de projeto/IED a processar.",
     )
     parser.add_argument(
         "--dry-run",
@@ -123,6 +130,7 @@ def main() -> int:
     try:
         runtime_config = resolve_runtime_config(args)
         stage = BackupStage(args.stage)
+        project_type = get_project_type(args.project_type)
 
         if args.dry_run:
             plans = (
@@ -132,6 +140,7 @@ def main() -> int:
                     his_path=runtime_config.his_path,
                     collaborator=runtime_config.collaborator,
                     stage=stage,
+                    project_type=project_type,
                 )
                 if args.process_all
                 else [
@@ -141,6 +150,7 @@ def main() -> int:
                         his_path=runtime_config.his_path,
                         collaborator=runtime_config.collaborator,
                         stage=stage,
+                        project_type=project_type,
                     )
                 ]
             )
@@ -160,6 +170,7 @@ def main() -> int:
                 his_path=runtime_config.his_path,
                 collaborator=runtime_config.collaborator,
                 stage=stage,
+                project_type=project_type,
             )
             for result in results:
                 logger.info("Backup processado: %s -> %s", result.source_file, result.final_path)
@@ -177,6 +188,7 @@ def main() -> int:
             his_path=runtime_config.his_path,
             collaborator=runtime_config.collaborator,
             stage=stage,
+            project_type=project_type,
         )
 
     except (
