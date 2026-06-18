@@ -1,3 +1,5 @@
+"""ZIP creation helpers used by the backup workflow."""
+
 from __future__ import annotations
 
 import zipfile
@@ -9,6 +11,8 @@ class BackupZipError(RuntimeError):
 
 
 def create_backup_zip(source_file: Path, backup_name: str, output_dir: Path | None = None) -> Path:
+    """Create a zip containing the original project file under its original name."""
+
     destination_dir = output_dir or source_file.parent
     destination_dir.mkdir(parents=True, exist_ok=True)
     destination = destination_dir / backup_name
@@ -27,6 +31,8 @@ def create_backup_zip(source_file: Path, backup_name: str, output_dir: Path | No
 
 
 def ensure_source_is_readable(source_file: Path) -> None:
+    """Fail early with a user-friendly message when the source file is unavailable."""
+
     try:
         with source_file.open("rb") as handle:
             handle.read(1024 * 1024)

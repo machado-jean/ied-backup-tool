@@ -1,3 +1,5 @@
+"""Small translation table for GUI, CLI, and status labels."""
+
 from __future__ import annotations
 
 DEFAULT_LANGUAGE = "pt_BR"
@@ -181,12 +183,18 @@ UI_TEXT = {
 
 
 def status_label(status: str, language: str = DEFAULT_LANGUAGE) -> str:
+    """Return a translated label for an internal status code."""
+
     return STATUS_TEXT.get(language, STATUS_TEXT[DEFAULT_LANGUAGE]).get(status, status)
 
 
 def message_label(key: str, language: str = DEFAULT_LANGUAGE) -> str:
+    """Return a translated log/message prefix."""
+
     return MESSAGE_TEXT.get(language, MESSAGE_TEXT[DEFAULT_LANGUAGE]).get(key, key)
 
 
 def ui_text(key: str, language: str = DEFAULT_LANGUAGE) -> str:
+    """Return translated UI text, falling back to the key when unknown."""
+
     return UI_TEXT.get(language, UI_TEXT[DEFAULT_LANGUAGE]).get(key, key)

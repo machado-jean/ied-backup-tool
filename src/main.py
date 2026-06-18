@@ -1,3 +1,5 @@
+"""Command-line entry point for backup automation and dry runs."""
+
 from __future__ import annotations
 
 import argparse
@@ -24,6 +26,8 @@ from src.core.zipper import BackupZipError
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI options while keeping config.json as the default source of paths."""
+
     parser = argparse.ArgumentParser(description="IED Backup Manager")
     parser.add_argument(
         "--project-dir",
@@ -84,12 +88,16 @@ def parse_args() -> argparse.Namespace:
 
 @dataclass(frozen=True)
 class RuntimeConfig:
+    """Resolved runtime configuration after applying CLI overrides."""
+
     collaborator: str
     atu_path: Path
     his_path: Path
 
 
 def resolve_runtime_config(args: argparse.Namespace) -> RuntimeConfig:
+    """Merge config.json with explicit CLI overrides."""
+
     config = load_optional_config(args.config)
     collaborator = args.collaborator or (config.collaborator if config else None)
     atu_path = args.atu_path or (config.atu_path if config else None)
@@ -118,12 +126,16 @@ def resolve_runtime_config(args: argparse.Namespace) -> RuntimeConfig:
 
 
 def load_optional_config(path: Path) -> AppConfig | None:
+    """Load config.json only when it exists."""
+
     if not path.exists():
         return None
     return load_config(path)
 
 
 def main() -> int:
+    """Execute the requested backup action and return a process exit code."""
+
     args = parse_args()
     logger = get_logger()
 
@@ -209,6 +221,8 @@ def main() -> int:
 
 
 def print_summary(summary: BackupSummary) -> None:
+    """Print a compact CLI summary."""
+
     print(
         "Resumo: "
         f"total={summary.total}, "

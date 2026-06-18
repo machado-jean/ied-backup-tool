@@ -1,3 +1,5 @@
+"""DIGSI-specific version extraction from `.dz5` archives."""
+
 from __future__ import annotations
 
 import re
@@ -14,6 +16,8 @@ DP5_VERSION_PATTERN = re.compile(r"\.dp5v(\d+)\b", re.IGNORECASE)
 
 
 def extract_digsi_version(dz5_path: Path) -> str:
+    """Extract the DIGSI version prefix from archive names or file contents."""
+
     if not zipfile.is_zipfile(dz5_path):
         raise DigsiVersionError(f"Arquivo .dz5 nao e um ZIP valido: {dz5_path}")
 
@@ -43,16 +47,22 @@ def extract_digsi_version(dz5_path: Path) -> str:
 
 
 def _dp5_version_from_name(name: str) -> str | None:
+    """Read the preferred `.dp5v###` version marker from an archive member name."""
+
     match = DP5_VERSION_PATTERN.search(name)
     return f"DIGSI-V{int(match.group(1))}" if match else None
 
 
 def _version_from_name(name: str) -> str | None:
+    """Fallback version detection based on semantic-looking version fragments."""
+
     match = VERSION_PATTERN.search(name)
     return _format_version(match) if match else None
 
 
 def _version_from_member(archive: zipfile.ZipFile, info: zipfile.ZipInfo) -> str | None:
+    """Fallback version detection by scanning small text-like archive members."""
+
     try:
         content = archive.read(info).decode("utf-8", errors="ignore")
     except (OSError, UnicodeDecodeError, zipfile.BadZipFile):
@@ -63,6 +73,8 @@ def _version_from_member(archive: zipfile.ZipFile, info: zipfile.ZipInfo) -> str
 
 
 def _format_version(match: re.Match[str]) -> str:
+    """Convert a matched DIGSI version into the backup prefix format."""
+
     major, minor, patch = match.groups()
     version = f"{int(major)}{int(minor)}"
     if int(patch) != 0:

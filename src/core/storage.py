@@ -1,3 +1,10 @@
+"""Storage rules for the ATU/HIS backup folders.
+
+ATU stores the current backup for each technical key (`SOFTWARE_PROJECT`).
+HIS stores older backups and prevents technical duplicates based on
+`SOFTWARE_PROJECT_TIMESTAMP`, regardless of collaborator or stage.
+"""
+
 from __future__ import annotations
 
 import re
@@ -16,6 +23,8 @@ BACKUP_TIMESTAMP_PATTERN = re.compile(r"^\d{8}-\d{4}$")
 
 @dataclass(frozen=True)
 class BackupFileInfo:
+    """Parsed metadata from a generated backup filename."""
+
     path: Path
     software: str
     project: str
@@ -25,15 +34,19 @@ class BackupFileInfo:
 
     @property
     def key(self) -> str:
+        """Technical group that can have only one current file in ATU."""
         return f"{self.software}_{self.project}"
 
     @property
     def identity(self) -> str:
+        """Technical identity used to avoid duplicates across ATU and HIS."""
         return f"{self.key}_{self.timestamp.strftime('%Y%m%d-%H%M')}"
 
 
 @dataclass(frozen=True)
 class AtuDuplicateInfo:
+    """Represents an older ATU file that should be moved to HIS."""
+
     key: str
     keep: BackupFileInfo
     duplicate: BackupFileInfo
@@ -41,15 +54,19 @@ class AtuDuplicateInfo:
 
 
 def update_storage(*, new_backup: Path, atu_path: Path, his_path: Path) -> Path:
+    """Move a staged backup into ATU while preserving the previous current file in HIS."""
+
     new_info = parse_backup_filename(new_backup)
     atu_path.mkdir(parents=True, exist_ok=True)
     his_path.mkdir(parents=True, exist_ok=True)
 
     current = find_current_backup(atu_path, new_info.key)
     if current is not None:
+        # A staged older backup must never replace a newer current backup.
         if current.timestamp > new_info.timestamp:
             new_backup.unlink(missing_ok=True)
             raise StorageError("Ja existe um backup mais recente em ATU.")
+        # Same technical identity means the current backup already exists.
         if current.identity == new_info.identity:
             new_backup.unlink(missing_ok=True)
             return current.path
@@ -64,6 +81,8 @@ def update_storage(*, new_backup: Path, atu_path: Path, his_path: Path) -> Path:
 
 
 def find_current_backup(atu_path: Path, key: str) -> BackupFileInfo | None:
+    """Return the newest ATU backup for a project key, ignoring invalid filenames."""
+
     candidates = []
     for path in atu_path.glob("*.zip"):
         try:
@@ -76,6 +95,8 @@ def find_current_backup(atu_path: Path, key: str) -> BackupFileInfo | None:
 
 
 def find_atu_duplicates(atu_path: Path, his_path: Path) -> list[AtuDuplicateInfo]:
+    """Find extra ATU files for the same key, keeping only the newest one current."""
+
     grouped: dict[str, list[BackupFileInfo]] = {}
     for path in atu_path.glob("*.zip"):
         try:
@@ -103,6 +124,8 @@ def find_atu_duplicates(atu_path: Path, his_path: Path) -> list[AtuDuplicateInfo
 
 
 def fix_atu_duplicates(atu_path: Path, his_path: Path) -> list[Path]:
+    """Move older duplicate ATU files into HIS."""
+
     his_path.mkdir(parents=True, exist_ok=True)
     moved = []
     for duplicate in find_atu_duplicates(atu_path, his_path):
@@ -111,6 +134,8 @@ def fix_atu_duplicates(atu_path: Path, his_path: Path) -> list[Path]:
 
 
 def move_to_history(path: Path, his_path: Path) -> Path:
+    """Move a backup to HIS, reusing an existing file with the same identity if present."""
+
     source_info = parse_backup_filename(path)
     destination = find_backup_by_identity(his_path, source_info.identity)
     if destination is None:
@@ -122,6 +147,8 @@ def move_to_history(path: Path, his_path: Path) -> Path:
 
 
 def find_backup_by_identity(folder: Path, identity: str) -> Path | None:
+    """Find a backup by technical identity inside a folder."""
+
     if not folder.exists():
         return None
     for path in folder.glob("*.zip"):
@@ -135,6 +162,8 @@ def find_backup_by_identity(folder: Path, identity: str) -> Path | None:
 
 
 def parse_backup_filename(path: Path) -> BackupFileInfo:
+    """Parse the standard backup filename into structured metadata."""
+
     stem = path.stem
     parts = stem.split("_")
     if len(parts) < 5:

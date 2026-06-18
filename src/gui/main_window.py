@@ -1,3 +1,5 @@
+"""Main Qt window for previewing and executing backup batches."""
+
 from __future__ import annotations
 
 import sys
@@ -59,6 +61,8 @@ STATUS_COLORS = {
 
 
 class MainWindow(QMainWindow):
+    """Main GUI controller for configuration, preview, execution, and logs."""
+
     def __init__(self, *, project_dir: Path | None = None) -> None:
         super().__init__()
         self.project_dir = (project_dir or get_runtime_project_dir()).resolve()
@@ -76,6 +80,8 @@ class MainWindow(QMainWindow):
         self.refresh_preview()
 
     def _build_ui(self) -> None:
+        """Create the static layout used by the application."""
+
         root = QWidget()
         layout = QVBoxLayout(root)
         layout.setContentsMargins(18, 18, 18, 18)
@@ -116,6 +122,8 @@ class MainWindow(QMainWindow):
         self.retranslate_ui()
 
     def _build_preview_group(self) -> QGroupBox:
+        """Create the table that shows the planned batch actions."""
+
         self.preview_group = QGroupBox()
         layout = QVBoxLayout(self.preview_group)
         self.preview_table = QTableWidget(0, 6)
@@ -128,6 +136,8 @@ class MainWindow(QMainWindow):
         return self.preview_group
 
     def _build_summary_group(self) -> QGroupBox:
+        """Create the numeric summary displayed above the preview table."""
+
         self.summary_group = QGroupBox()
         layout = QHBoxLayout(self.summary_group)
         self.summary_labels: dict[str, QLabel] = {}
@@ -157,6 +167,8 @@ class MainWindow(QMainWindow):
         return self.summary_group
 
     def _build_action_group(self) -> QGroupBox:
+        """Create stage, project type, mode, and execution controls."""
+
         self.action_group = QGroupBox()
         layout = QVBoxLayout(self.action_group)
 
@@ -206,6 +218,8 @@ class MainWindow(QMainWindow):
         return self.action_group
 
     def _load_config(self) -> AppConfig | None:
+        """Load config.json from the runtime folder when it exists."""
+
         if not self.config_path.exists():
             return None
         try:
@@ -215,6 +229,8 @@ class MainWindow(QMainWindow):
             return None
 
     def open_settings(self) -> None:
+        """Open the settings dialog and refresh the preview after saving."""
+
         dialog = SettingsWindow(
             config_path=self.config_path,
             config=self.config,
@@ -225,6 +241,8 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def on_settings_saved(self, config: AppConfig) -> None:
+        """Update in-memory configuration after the settings dialog saves."""
+
         self.config = config
         self.language = config.language
         self.language_button.setText(self._language_flag())
@@ -232,6 +250,8 @@ class MainWindow(QMainWindow):
         self.refresh_preview()
 
     def refresh_preview(self) -> None:
+        """Rebuild the batch preview using the current config and selected filters."""
+
         if not self.config:
             self.current_plans = []
             self.atu_duplicate_plans = []
@@ -282,6 +302,8 @@ class MainWindow(QMainWindow):
         self._show_plans(self.current_plans, self.atu_duplicate_plans)
 
     def generate_backup(self) -> None:
+        """Confirm and execute the currently planned backup batch."""
+
         if not self.config:
             QMessageBox.warning(
                 self,
@@ -377,6 +399,8 @@ class MainWindow(QMainWindow):
         self,
         fix_duplicates: bool,
     ) -> tuple[list[AtuDuplicatePlan], list[BackupResult]]:
+        """Execute plans while keeping the UI responsive with a progress dialog."""
+
         if not self.config:
             return [], []
 
@@ -436,6 +460,8 @@ class MainWindow(QMainWindow):
             progress.close()
 
     def _process_plan(self, plan: BackupPlan) -> BackupResult:
+        """Execute one plan using the project type captured during preview."""
+
         if not self.config:
             raise RuntimeError(ui_text("settings_required", self.language))
 
@@ -480,6 +506,8 @@ class MainWindow(QMainWindow):
         plans: list[BackupPlan],
         duplicate_plans: list[AtuDuplicatePlan],
     ) -> None:
+        """Display plans in the preview table, counters, and text log."""
+
         if not plans and not duplicate_plans:
             self._clear_preview(ui_text("no_project_files_found", self.language))
             return
@@ -510,6 +538,8 @@ class MainWindow(QMainWindow):
         plans: list[BackupPlan],
         duplicate_plans: list[AtuDuplicatePlan],
     ) -> None:
+        """Write preview rows to the table widget."""
+
         rows = [*duplicate_plans, *plans]
         self.preview_table.setRowCount(len(rows))
         for row, plan in enumerate(rows):
@@ -539,6 +569,8 @@ class MainWindow(QMainWindow):
         self.preview_table.resizeColumnsToContents()
 
     def _clear_preview(self, message: str) -> None:
+        """Reset preview state and show a blocking message in the log area."""
+
         self.generate_button.setEnabled(False)
         self.log_output.clear()
         self.preview_table.setRowCount(0)
@@ -546,6 +578,8 @@ class MainWindow(QMainWindow):
         self.log_output.appendPlainText(message)
 
     def _selected_project_types(self) -> list[ProjectType]:
+        """Return project types selected in the checkbox list."""
+
         return [
             get_project_type(key)
             for key, checkbox in self.type_checkboxes.items()
@@ -553,6 +587,8 @@ class MainWindow(QMainWindow):
         ]
 
     def _summary_text(self, summary) -> str:
+        """Format a human-readable summary for dialogs and logs."""
+
         return "\n".join(
             [
                 ui_text("summary_total_line", self.language).format(total=summary.total),
@@ -574,6 +610,8 @@ class MainWindow(QMainWindow):
         )
 
     def toggle_language(self) -> None:
+        """Switch UI language and persist the preference when config exists."""
+
         self.language = "en_US" if self.language == "pt_BR" else "pt_BR"
         self.language_button.setText(self._language_flag())
         if self.config:
@@ -589,9 +627,13 @@ class MainWindow(QMainWindow):
             self._show_plans(self.current_plans, self.atu_duplicate_plans)
 
     def _language_flag(self) -> str:
+        """Return the flag shown in the language toggle button."""
+
         return "🇺🇸" if self.language == "en_US" else "🇧🇷"
 
     def _set_summary(self, summary) -> None:
+        """Update the numeric summary strip."""
+
         self.summary_labels["total"].setText(str(summary.total))
         self.summary_labels["stored"].setText(str(summary.stored))
         self.summary_labels["replaced_current"].setText(str(summary.replaced_current))
@@ -601,10 +643,14 @@ class MainWindow(QMainWindow):
         self.summary_labels["already_current"].setText(str(summary.already_current))
 
     def _set_summary_empty(self) -> None:
+        """Reset all summary counters to zero."""
+
         for label in self.summary_labels.values():
             label.setText("0")
 
     def retranslate_ui(self) -> None:
+        """Apply the current language to visible labels and buttons."""
+
         self.current_folder_title.setText(ui_text("current_folder", self.language))
         self.language_button.setToolTip(ui_text("language_tooltip", self.language))
         self.refresh_button.setText(ui_text("refresh", self.language))
@@ -636,6 +682,8 @@ class MainWindow(QMainWindow):
         self.open_his_button.setText(ui_text("open_his", self.language))
 
     def open_folder(self, folder: Path | None) -> None:
+        """Create and open a configured folder in Windows Explorer."""
+
         if not folder:
             return
         folder.mkdir(parents=True, exist_ok=True)
@@ -643,6 +691,8 @@ class MainWindow(QMainWindow):
 
 
 def get_runtime_project_dir() -> Path:
+    """Return the executable folder in production or cwd during development."""
+
     if getattr(sys, "frozen", False):
         return Path(sys.executable).resolve().parent
     return Path.cwd()

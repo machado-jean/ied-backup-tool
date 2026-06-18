@@ -1,3 +1,5 @@
+"""Settings dialog used to create and edit the local config.json file."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -19,6 +21,8 @@ from src.core.i18n import DEFAULT_LANGUAGE, ui_text
 
 
 class SettingsWindow(QDialog):
+    """Modal dialog for collaborator, ATU path, and HIS path configuration."""
+
     saved = Signal(AppConfig)
 
     def __init__(
@@ -58,6 +62,8 @@ class SettingsWindow(QDialog):
         layout.addLayout(buttons)
 
     def _path_row(self, line_edit: QLineEdit) -> QHBoxLayout:
+        """Build a path input row with a folder picker button."""
+
         row = QHBoxLayout()
         browse_button = QPushButton(ui_text("select", self.language))
         browse_button.clicked.connect(lambda: self.select_folder(line_edit))
@@ -66,11 +72,15 @@ class SettingsWindow(QDialog):
         return row
 
     def select_folder(self, line_edit: QLineEdit) -> None:
+        """Open a native folder picker and write the result into an input."""
+
         folder = QFileDialog.getExistingDirectory(self, "Selecionar pasta", line_edit.text())
         if folder:
             line_edit.setText(folder)
 
     def save(self) -> None:
+        """Validate fields, persist config.json, and notify the main window."""
+
         collaborator = self.collaborator_input.text().strip()
         atu_path = self.atu_input.text().strip()
         his_path = self.his_input.text().strip()

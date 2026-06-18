@@ -1,3 +1,5 @@
+"""Load and save the user configuration stored next to the executable."""
+
 from __future__ import annotations
 
 import json
@@ -14,6 +16,8 @@ class ConfigError(RuntimeError):
 
 @dataclass(frozen=True)
 class AppConfig:
+    """Runtime settings required to generate backups."""
+
     collaborator: str
     atu_path: Path
     his_path: Path
@@ -21,6 +25,8 @@ class AppConfig:
 
 
 def load_config(path: Path) -> AppConfig:
+    """Read and validate a JSON configuration file."""
+
     if not path.exists():
         raise ConfigError(
             f"Arquivo de configuracao nao encontrado: {path}. "
@@ -36,6 +42,8 @@ def load_config(path: Path) -> AppConfig:
 
 
 def save_config(path: Path, config: AppConfig) -> None:
+    """Persist the current GUI configuration in a portable JSON format."""
+
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "colaborador": config.collaborator,
@@ -47,6 +55,8 @@ def save_config(path: Path, config: AppConfig) -> None:
 
 
 def parse_config(raw: dict[str, Any]) -> AppConfig:
+    """Convert raw JSON data into a normalized application configuration."""
+
     collaborator = _required_str(raw, "colaborador")
     atu_path = Path(_required_str(raw, "atu_path"))
     his_path = Path(_required_str(raw, "his_path"))
@@ -63,6 +73,8 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
 
 
 def _required_str(raw: dict[str, Any], key: str) -> str:
+    """Return a required non-empty string field from the raw config payload."""
+
     value = raw.get(key)
     if not isinstance(value, str) or not value.strip():
         raise ConfigError(f"Campo obrigatorio ausente ou invalido: {key}")

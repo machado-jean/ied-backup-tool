@@ -1,3 +1,5 @@
+"""Application identity used by the GUI title and release builds."""
+
 from __future__ import annotations
 
 APP_NAME = "IED Backup Manager"

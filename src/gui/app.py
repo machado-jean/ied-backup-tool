@@ -1,3 +1,5 @@
+"""GUI entry point for the packaged Windows application."""
+
 from __future__ import annotations
 
 import argparse
@@ -11,6 +13,8 @@ from src.version import APP_NAME, APP_VERSION
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse development-only GUI arguments."""
+
     parser = argparse.ArgumentParser(description="IED Backup Manager GUI")
     parser.add_argument(
         "--project-dir",
@@ -21,6 +25,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    """Start the Qt application and show the main window."""
+
     args = parse_args()
     app = QApplication(sys.argv)
     app.setApplicationName(APP_NAME)

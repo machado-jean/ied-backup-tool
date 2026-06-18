@@ -1,3 +1,10 @@
+"""High-level backup planning and execution service.
+
+This module contains the project-type-agnostic business rules. Project-specific
+logic, such as file extension and software/version extraction, is injected
+through the `ProjectType` interface.
+"""
+
 from __future__ import annotations
 
 import tempfile
@@ -32,6 +39,8 @@ STATUS_ALREADY_CURRENT = "already_current"
 
 @dataclass(frozen=True)
 class BackupResult:
+    """Result of an executed backup operation."""
+
     source_file: Path
     backup_name: str
     final_path: Path
@@ -40,6 +49,8 @@ class BackupResult:
 
 @dataclass(frozen=True)
 class BackupPlan:
+    """Dry-run description of what will happen to a project file."""
+
     source_file: Path
     backup_name: str
     destination_path: Path
@@ -57,6 +68,8 @@ class BackupPlan:
 
 @dataclass(frozen=True)
 class BackupSummary:
+    """Aggregated counters used by the CLI, GUI, and final dialogs."""
+
     total: int
     stored: int
     replaced_current: int
@@ -69,6 +82,8 @@ class BackupSummary:
 def summarize_results(
     results: list[BackupResult] | list[BackupPlan] | list[AtuDuplicatePlan],
 ) -> BackupSummary:
+    """Count result statuses in a presentation-friendly structure."""
+
     statuses = [result.status for result in results]
     return BackupSummary(
         total=len(results),
@@ -83,6 +98,8 @@ def summarize_results(
 
 @dataclass(frozen=True)
 class AtuDuplicatePlan:
+    """Dry-run description of an ATU duplicate correction."""
+
     source_file: Path
     backup_name: str
     destination_path: Path
@@ -100,6 +117,8 @@ def process_latest_backup(
     stage: BackupStage,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> BackupResult:
+    """Process only the newest file for the selected project type."""
+
     return process_backup_file(
         project_file=project_type.find_latest_file(project_dir),
         atu_path=atu_path,
@@ -119,6 +138,8 @@ def process_all_backups(
     stage: BackupStage,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> list[BackupResult]:
+    """Plan and process all supported files in chronological order."""
+
     results = []
     virtual_current: dict[str, Path] = {}
     for plan in plan_all_backups(
@@ -185,6 +206,8 @@ def process_backup_plans(
     stage: BackupStage,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> list[BackupResult]:
+    """Execute a previously computed list of plans."""
+
     results = []
     for plan in plans:
         if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
@@ -234,6 +257,8 @@ def process_backup_plans(
 
 
 def plan_atu_duplicate_fixes(*, atu_path: Path, his_path: Path) -> list[AtuDuplicatePlan]:
+    """Describe ATU duplicate corrections without moving files."""
+
     return [
         AtuDuplicatePlan(
             source_file=duplicate.duplicate.path,
@@ -248,6 +273,8 @@ def plan_atu_duplicate_fixes(*, atu_path: Path, his_path: Path) -> list[AtuDupli
 
 
 def fix_atu_duplicate_backups(*, atu_path: Path, his_path: Path) -> list[AtuDuplicatePlan]:
+    """Move older duplicate ATU files to HIS and return the planned actions."""
+
     plans = plan_atu_duplicate_fixes(atu_path=atu_path, his_path=his_path)
     fix_atu_duplicates(atu_path, his_path)
     return plans
@@ -262,6 +289,8 @@ def plan_latest_backup(
     stage: BackupStage,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> BackupPlan:
+    """Plan only the newest file for the selected project type."""
+
     return plan_backup_file(
         project_file=project_type.find_latest_file(project_dir),
         atu_path=atu_path,
@@ -282,6 +311,8 @@ def plan_all_backups(
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     virtual_current: dict[str, Path] | None = None,
 ) -> list[BackupPlan]:
+    """Build an ordered plan for every supported project file."""
+
     plans = []
     current_by_key = virtual_current if virtual_current is not None else {}
     for project_file in project_type.find_files(project_dir):
@@ -304,6 +335,8 @@ def plan_all_backups(
 
 
 def filter_current_and_newer_plans(plans: list[BackupPlan]) -> list[BackupPlan]:
+    """Keep only the current backup and newer files from a full chronological plan."""
+
     return [
         plan
         for plan in plans
@@ -325,6 +358,8 @@ def process_backup_file(
     stage: BackupStage,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> BackupResult:
+    """Create a staged zip and move it into ATU/HIS using the storage rules."""
+
     plan = plan_backup_file(
         project_file=project_file,
         atu_path=atu_path,
@@ -360,6 +395,8 @@ def plan_backup_file(
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     current_override: dict[str, Path] | None = None,
 ) -> BackupPlan:
+    """Plan how a single project file should interact with ATU and HIS."""
+
     backup_name = build_project_backup_name(
         project_file=project_file,
         collaborator=collaborator,
@@ -377,6 +414,7 @@ def plan_backup_file(
     if current and current.timestamp > planned_info.timestamp:
         history_path = find_backup_by_identity(his_path, planned_info.identity)
         if history_path is None:
+            # Older files missing from HIS are archived without touching ATU.
             history_path = his_path / backup_name
             return BackupPlan(
                 source_file=project_file,
@@ -410,6 +448,7 @@ def plan_backup_file(
         )
 
     if current and current.identity == planned_info.identity:
+        # Collaborator/stage differences do not create a new technical backup.
         return BackupPlan(
             source_file=project_file,
             backup_name=backup_name,
@@ -426,6 +465,7 @@ def plan_backup_file(
         )
 
     if current:
+        # A newer file replaces the current ATU backup and sends the old one to HIS.
         return BackupPlan(
             source_file=project_file,
             backup_name=backup_name,
@@ -458,6 +498,8 @@ def plan_backup_file(
 
 
 def archive_history_backup(*, project_file: Path, backup_name: str, his_path: Path) -> Path:
+    """Create a missing historical backup directly in HIS."""
+
     his_path.mkdir(parents=True, exist_ok=True)
     planned_info = parse_backup_filename(Path(backup_name))
     existing = find_backup_by_identity(his_path, planned_info.identity)
@@ -475,6 +517,8 @@ def _find_current_for_plan(
     planned_key: str,
     current_override: dict[str, Path] | None,
 ) -> BackupFileInfo | None:
+    """Read the current backup from a virtual batch state or from ATU."""
+
     if current_override and planned_key in current_override:
         return parse_backup_filename(current_override[planned_key])
     return find_current_backup(atu_path, planned_key)
@@ -487,6 +531,8 @@ def build_project_backup_name(
     stage: BackupStage,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
 ) -> str:
+    """Build a backup filename using the selected project type adapter."""
+
     project_id = project_type.get_project_id(project_file)
     version = project_type.get_software_version(project_file)
     timestamp = get_file_timestamp(project_file)
