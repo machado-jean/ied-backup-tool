@@ -19,8 +19,12 @@ def test_get_project_id_uses_text_before_first_underscore() -> None:
     assert get_project_id("SE-CTU_20260612_1736.dz5") == "SE-CTU"
 
 
-def test_get_project_id_supports_underscore_inside_project_name() -> None:
-    assert get_project_id("SE_GVM_20260529_1624.dz5") == "SE_GVM"
+def test_get_project_id_ignores_text_between_project_and_timestamp() -> None:
+    assert get_project_id("SE-CTU_DEV_01_20260619_0013.dz5") == "SE-CTU"
+
+
+def test_get_project_id_uses_first_block_even_without_timestamp_suffix() -> None:
+    assert get_project_id("SE-CTU_REVISAO_FINAL.dz5") == "SE-CTU"
 
 
 def test_build_backup_name_uses_required_pattern() -> None:

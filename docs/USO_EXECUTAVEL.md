@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.0.6.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.0.7.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, o tipo disponivel e DIGSI 5
 (`.dz5`).
 
@@ -78,7 +78,46 @@ pode ser preenchido manualmente, por exemplo para indicar um backup antes de uma
 grande alteracao, ou pode ficar vazio quando o caso nao se enquadrar nas etapas
 anteriores.
 
-## 5. Conferir a previa do lote
+## 5. Padrao de nome dos arquivos de origem
+
+Para o DIGSI 5 (`.dz5`), o programa identifica o projeto/subestacao pelo nome
+do arquivo. Pela politica atual, o projeto e sempre o primeiro bloco antes do
+primeiro `_`.
+
+O padrao recomendado e:
+
+```text
+SE-XXXXXX_OUTROS-TEXTOS_AAAAMMDD_HHMM.dz5
+```
+
+O programa considera como `Projeto` apenas `SE-XXXXXX`. Textos depois do
+primeiro `_` sao ignorados para identificar o projeto, mas podem continuar no
+nome do arquivo de origem para controle interno da equipe.
+
+Exemplos:
+
+```text
+SE-GVM_20260529_1624.dz5           -> Projeto: SE-GVM
+SE-CTU_DEV_01_20260619_0013.dz5    -> Projeto: SE-CTU
+SE-ABC_REVISAO_FINAL_20260619_1015.dz5 -> Projeto: SE-ABC
+```
+
+Cuidados:
+
+- O nome deve terminar com data e hora no formato `_AAAAMMDD_HHMM`.
+- Textos adicionais devem ficar depois do primeiro `_` e antes da data/hora.
+- Evite usar a data/hora no meio do nome se ela nao for o sufixo final.
+- Mesmo quando houver textos intermediarios, o projeto sera sempre apenas o
+  primeiro bloco antes do primeiro `_`.
+- Nao coloque `_` dentro do nome da subestacao/projeto. Exemplo:
+  `SE_CTU_20260619_0013.dz5` sera identificado como projeto `SE`, nao `SE_CTU`.
+- Nao coloque textos antes da subestacao/projeto. Exemplo:
+  `CLIENTE_SE-CTU_20260619_0013.dz5` sera identificado como projeto `CLIENTE`.
+- Nao use nomes que comecem com etapa/revisao antes da subestacao. Exemplo:
+  `DEV_SE-CTU_20260619_0013.dz5` sera identificado como projeto `DEV`.
+- Confira sempre a coluna `Projeto` na previa antes de gerar backups.
+
+## 6. Conferir a previa do lote
 
 Depois de selecionar a etapa, a tela mostra uma previa dos arquivos suportados
 encontrados na pasta.
@@ -101,7 +140,7 @@ Status possiveis:
 - `Ignorado`: o arquivo e antigo e ja existe no historico.
 - `Ja atual`: o arquivo ja corresponde ao backup atual em `ATU`.
 
-## 6. Modo de processamento
+## 7. Modo de processamento
 
 A opcao `Processar apenas a partir do backup atual` evita reprocessar arquivos
 antigos que vieram antes do backup atual ja existente em `ATU`.
@@ -109,7 +148,7 @@ antigos que vieram antes do backup atual ja existente em `ATU`.
 Use essa opcao quando a pasta tiver muitos arquivos antigos e voce quiser
 processar somente o backup atual e os arquivos mais novos.
 
-## 7. Gerar backups
+## 8. Gerar backups
 
 Clique em `Gerar backups`.
 
@@ -129,7 +168,7 @@ Ao final, sera exibido um resumo com:
 - Arquivos ignorados por serem antigos.
 - Arquivos que ja estavam atuais.
 
-## 8. Resultado dos arquivos
+## 9. Resultado dos arquivos
 
 O nome final do backup segue o padrao:
 
@@ -150,7 +189,7 @@ Regras principais:
 - A comparacao tecnica considera `SOFTWARE_PROJETO_DATAHORA`.
 - Mudancas apenas de colaborador ou etapa nao criam duplicidade tecnica.
 
-## 9. Abrir pastas ATU e HIS
+## 10. Abrir pastas ATU e HIS
 
 Use os botoes:
 
@@ -159,7 +198,7 @@ Use os botoes:
 
 Eles abrem as pastas configuradas diretamente no Windows Explorer.
 
-## 10. Cuidados recomendados
+## 11. Cuidados recomendados
 
 - Feche o DIGSI antes de gerar backups, para evitar arquivo bloqueado.
 - Confira a previa antes de clicar em `Gerar backups`.
@@ -168,7 +207,7 @@ Eles abrem as pastas configuradas diretamente no Windows Explorer.
   confirmar a correcao.
 - Mantenha o `config.json` junto do executavel.
 
-## 11. Atualizacao de versao
+## 12. Atualizacao de versao
 
 Quando receber uma nova versao do executavel:
 

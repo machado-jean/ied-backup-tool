@@ -28,8 +28,7 @@ def get_project_id(filename: str) -> str:
     """Infer a project identifier from an exported project filename."""
 
     stem = Path(filename).stem
-    match = PROJECT_FILENAME_PATTERN.match(stem)
-    project_id = (match.group("project") if match else stem.split("_", maxsplit=1)[0]).strip()
+    project_id = stem.split("_", maxsplit=1)[0].strip()
     if not project_id:
         raise ValueError(f"Identificador do projeto invalido: {filename}")
     return project_id
