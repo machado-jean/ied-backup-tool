@@ -9,6 +9,7 @@ venv/
 # Build
 dist/
 build/
+*.spec
 
 # VS Code
 .vscode/
