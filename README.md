@@ -54,7 +54,7 @@ Crie `config.json` ao lado do executavel:
 .\.venv\Scripts\python.exe -m src.gui.app
 ```
 
-Versao atual do aplicativo: `1.1.0`.
+Versao atual do aplicativo: `1.1.2`.
 
 Manual de uso do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md).
 
@@ -79,10 +79,12 @@ suportados e o modo `Processar apenas a partir do backup atual`. Use
 Na GUI, a pasta processada e sempre a pasta atual do executavel/processo. A tela
 pre-visualiza todos os arquivos suportados encontrados nessa pasta e o botao
 `Gerar backups` executa o lote completo seguindo as regras `ATU/HIS`. Quando
-mais de um tipo de IED estiver marcado, os arquivos sao agrupados por
-subestacao/projeto em um pacote `IED-PACK`. O pacote usa somente o arquivo
-principal mais recente de cada tipo selecionado e inclui um manifesto `.txt`
-com as versoes detectadas. Antes de executar, a GUI exibe uma confirmacao com a
+mais de um tipo de IED estiver marcado, os arquivos encontrados sao avaliados
+por subestacao/projeto. Se a subestacao tiver dois ou mais tipos encontrados, o
+resultado e um pacote `IED-PACK`. Se apenas um tipo existir para aquela
+subestacao, o backup mantem o nome individual daquele tipo. O pacote usa somente
+o arquivo principal mais recente de cada tipo selecionado e inclui um manifesto
+`.txt` com as versoes detectadas. Antes de executar, a GUI exibe uma confirmacao com a
 quantidade de backups novos/substituidos. Apos a execucao, os botoes `Abrir ATU`
 e `Abrir HIS` permitem acessar as pastas no Explorer.
 

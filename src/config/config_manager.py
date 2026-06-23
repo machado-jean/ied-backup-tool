@@ -22,6 +22,7 @@ class AppConfig:
     atu_path: Path
     his_path: Path
     language: str = DEFAULT_LANGUAGE
+    project_types: tuple[str, ...] = ()
 
 
 def load_config(path: Path) -> AppConfig:
@@ -50,6 +51,7 @@ def save_config(path: Path, config: AppConfig) -> None:
         "atu_path": str(config.atu_path),
         "his_path": str(config.his_path),
         "language": config.language,
+        "project_types": list(config.project_types),
     }
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -63,12 +65,16 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
     language = raw.get("language", DEFAULT_LANGUAGE)
     if not isinstance(language, str) or language not in {"pt_BR", "en_US"}:
         language = DEFAULT_LANGUAGE
+    project_types = raw.get("project_types", [])
+    if not isinstance(project_types, list):
+        project_types = []
 
     return AppConfig(
         collaborator=collaborator.strip().upper().replace(" ", "-"),
         atu_path=atu_path,
         his_path=his_path,
         language=language,
+        project_types=tuple(item for item in project_types if isinstance(item, str)),
     )
 
 

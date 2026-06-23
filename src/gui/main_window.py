@@ -200,8 +200,10 @@ class MainWindow(QMainWindow):
         self.type_checkboxes_layout = QVBoxLayout()
         for project_type in PROJECT_TYPES:
             checkbox = QCheckBox()
-            checkbox.setChecked(project_type.key == PROJECT_TYPES[0].key)
-            checkbox.stateChanged.connect(self.refresh_preview)
+            checkbox.setChecked(
+                self.config is not None and project_type.key in self.config.project_types
+            )
+            checkbox.stateChanged.connect(self.on_project_type_selection_changed)
             self.type_checkboxes[project_type.key] = checkbox
             self.type_checkboxes_layout.addWidget(checkbox)
         self.type_label = QLabel()
@@ -597,6 +599,28 @@ class MainWindow(QMainWindow):
             if checkbox.isChecked()
         ]
 
+    def on_project_type_selection_changed(self) -> None:
+        """Persist selected project types and refresh the batch preview."""
+
+        self._save_selected_project_types()
+        self.refresh_preview()
+
+    def _save_selected_project_types(self) -> None:
+        """Store the current project type checkbox state in config.json."""
+
+        if not self.config:
+            return
+        self.config = AppConfig(
+            collaborator=self.config.collaborator,
+            atu_path=self.config.atu_path,
+            his_path=self.config.his_path,
+            language=self.config.language,
+            project_types=tuple(
+                key for key, checkbox in self.type_checkboxes.items() if checkbox.isChecked()
+            ),
+        )
+        save_config(self.config_path, self.config)
+
     def _selected_stage(self) -> str | None:
         """Return selected fixed stage or normalized free description."""
 
@@ -672,6 +696,7 @@ class MainWindow(QMainWindow):
                 atu_path=self.config.atu_path,
                 his_path=self.config.his_path,
                 language=self.language,
+                project_types=self.config.project_types,
             )
             save_config(self.config_path, self.config)
         self.retranslate_ui()

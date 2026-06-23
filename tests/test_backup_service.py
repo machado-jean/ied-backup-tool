@@ -360,6 +360,34 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
         assert "SE-GVM_20260619_1200.dz5" not in manifest
 
 
+def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
+    tmp_path: Path,
+) -> None:
+    project_dir = tmp_path / "IED-DES"
+    atu = tmp_path / "IED-ATU"
+    his = tmp_path / "IED-HIS"
+    project_dir.mkdir()
+    timestamp = datetime(2026, 6, 19, 12, 30)
+    rdb = project_dir / "SE-GVM.rdb"
+    rdb.write_text("Saved with Main Shell Version: 7.5.3.10", encoding="utf-8")
+    os.utime(rdb, (timestamp.timestamp(), timestamp.timestamp()))
+
+    plans = plan_grouped_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="JEAN-CARLOS-MACHADO",
+        stage=BackupStage.TAF,
+        project_types=[get_project_type("digsi5"), get_project_type("sel")],
+    )
+
+    assert len(plans) == 1
+    assert plans[0].backup_name == (
+        "SEL-QS7.5.3.10_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
+    )
+    assert plans[0].manifest_text is None
+
+
 def create_dz5(path: Path, mtime: datetime) -> Path:
     with ZipFile(path, "w") as archive:
         archive.writestr(f"{path.stem}.dp5v100", "DIGSI project")

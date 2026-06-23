@@ -319,6 +319,24 @@ def plan_grouped_backups(
     plans = []
     current_by_key = virtual_current if virtual_current is not None else {}
     for project, entries in sorted(grouped_sources.items()):
+        if len(entries) == 1:
+            project_type, project_file, _, _ = entries[0]
+            plan = plan_backup_file(
+                project_file=project_file,
+                atu_path=atu_path,
+                his_path=his_path,
+                collaborator=collaborator,
+                stage=stage,
+                project_type=project_type,
+                software_version_override=software_version_override,
+                current_override=current_by_key,
+            )
+            plans.append(plan)
+            planned_info = parse_backup_filename(Path(plan.backup_name))
+            if plan.status in {STATUS_STORED, STATUS_REPLACED_CURRENT, STATUS_ALREADY_CURRENT}:
+                current_by_key[planned_info.key] = plan.destination_path
+            continue
+
         source_files = _unique_paths(path for _, _, files, _ in entries for path in files)
         primary_files = [project_file for _, project_file, _, _ in entries]
         versions = _unique_text(version for _, _, _, version in entries)

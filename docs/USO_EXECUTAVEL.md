@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.1.0.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.1.2.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
 (`.dz5`) e SEL (`.rdb`).
 
@@ -13,7 +13,7 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.1.0.exe
+├─ IED Backup Manager v1.1.2.exe
 ├─ config.json
 ├─ SE-GVM_20260529_1624.dz5
 ├─ SE-GVM_20260529_1625.dz5
@@ -45,7 +45,8 @@ Exemplo de `config.json`:
   "colaborador": "JEAN-CARLOS-MACHADO",
   "atu_path": "C:/Users/Jean/OneDrive/BKP/ATU",
   "his_path": "C:/Users/Jean/OneDrive/BKP/HIS",
-  "language": "pt_BR"
+  "language": "pt_BR",
+  "project_types": ["digsi5", "sel"]
 }
 ```
 
@@ -56,7 +57,17 @@ ingles.
 
 A preferencia fica salva no `config.json`.
 
-## 4. Selecionar etapa
+## 4. Selecionar tipos de IED
+
+Marque os tipos de IED que deseja processar.
+
+As opcoes marcadas ficam salvas no `config.json`. Ao abrir o programa novamente,
+a selecao anterior sera restaurada.
+
+Se nenhuma preferencia estiver salva, o programa inicia sem tipo selecionado.
+Selecione ao menos um tipo para liberar a previa do lote.
+
+## 5. Selecionar etapa
 
 Antes de gerar backups, selecione a etapa da entrega.
 
@@ -80,7 +91,7 @@ pode ser preenchido manualmente, por exemplo para indicar um backup antes de uma
 grande alteracao, ou pode ficar vazio quando o caso nao se enquadrar nas etapas
 anteriores.
 
-## 5. Tipos de arquivo suportados
+## 6. Tipos de arquivo suportados
 
 ### DIGSI 5
 
@@ -113,9 +124,13 @@ backup.
 Quando apenas um tipo de IED estiver selecionado, o programa gera backups
 individuais daquele tipo.
 
-Quando dois ou mais tipos estiverem selecionados, o programa agrupa os arquivos
+Quando dois ou mais tipos estiverem selecionados, o programa avalia os arquivos
 por subestacao/projeto. Assim, se a pasta tiver arquivos DIGSI e SEL da mesma
 subestacao, e ambos os tipos estiverem marcados, eles entram no mesmo ZIP.
+
+Se apenas um tipo for encontrado para uma subestacao, mesmo com varios tipos
+marcados, o nome do backup continua sendo o nome individual daquele tipo. Nesse
+caso, ele nao usa `IED-PACK`.
 
 Exemplo:
 
@@ -148,7 +163,7 @@ lista:
 - versoes detectadas por tipo;
 - arquivos incluidos no ZIP.
 
-## 6. Padrao de nome dos arquivos de origem
+## 7. Padrao de nome dos arquivos de origem
 
 Para os tipos suportados, o programa identifica o projeto/subestacao pelo nome
 do arquivo. Pela politica atual, o projeto e sempre o primeiro bloco antes do
@@ -193,7 +208,7 @@ Cuidados:
   `DEV_SE-CTU_20260619_0013.dz5` sera identificado como projeto `DEV`.
 - Confira sempre a coluna `Projeto` na previa antes de gerar backups.
 
-## 7. Conferir a previa do lote
+## 8. Conferir a previa do lote
 
 Depois de selecionar a etapa, a tela mostra uma previa dos arquivos suportados
 encontrados na pasta.
@@ -216,7 +231,7 @@ Status possiveis:
 - `Ignorado`: o arquivo e antigo e ja existe no historico.
 - `Ja atual`: o arquivo ja corresponde ao backup atual em `ATU`.
 
-## 8. Modo de processamento
+## 9. Modo de processamento
 
 A opcao `Processar apenas a partir do backup atual` evita reprocessar arquivos
 antigos que vieram antes do backup atual ja existente em `ATU`.
@@ -224,7 +239,7 @@ antigos que vieram antes do backup atual ja existente em `ATU`.
 Use essa opcao quando a pasta tiver muitos arquivos antigos e voce quiser
 processar somente o backup atual e os arquivos mais novos.
 
-## 9. Gerar backups
+## 10. Gerar backups
 
 Clique em `Gerar backups`.
 
@@ -244,7 +259,7 @@ Ao final, sera exibido um resumo com:
 - Arquivos ignorados por serem antigos.
 - Arquivos que ja estavam atuais.
 
-## 10. Resultado dos arquivos
+## 11. Resultado dos arquivos
 
 O nome final do backup segue o padrao:
 
@@ -267,7 +282,7 @@ Regras principais:
 - A comparacao tecnica considera `SOFTWARE_PROJETO_DATAHORA`.
 - Mudancas apenas de colaborador ou etapa nao criam duplicidade tecnica.
 
-## 11. Abrir pastas ATU e HIS
+## 12. Abrir pastas ATU e HIS
 
 Use os botoes:
 
@@ -276,7 +291,7 @@ Use os botoes:
 
 Eles abrem as pastas configuradas diretamente no Windows Explorer.
 
-## 12. Cuidados recomendados
+## 13. Cuidados recomendados
 
 - Feche o DIGSI antes de gerar backups, para evitar arquivo bloqueado.
 - Feche QuickSet/Architect antes de gerar backups SEL, para evitar arquivo
@@ -287,7 +302,7 @@ Eles abrem as pastas configuradas diretamente no Windows Explorer.
   confirmar a correcao.
 - Mantenha o `config.json` junto do executavel.
 
-## 13. Atualizacao de versao
+## 14. Atualizacao de versao
 
 Quando receber uma nova versao do executavel:
 
