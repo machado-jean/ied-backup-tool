@@ -51,7 +51,7 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
     assert [result.status for result in results] == ["stored"]
     [zip_path] = list(atu.glob("*.zip"))
     assert zip_path.name == (
-        "SEL-QS7.5.3.10-AA2.4.2.34_SE-SEL_20260619-0013_"
+        "SEL-QS-V7.5.3.10-AA-V2.4.2.34_SE-SEL_20260619-0013_"
         "JEAN-CARLOS-MACHADO_TAF.zip"
     )
     with zipfile.ZipFile(zip_path) as archive:
@@ -82,7 +82,7 @@ def test_sel_version_fallback_is_used_when_quickset_is_missing(tmp_path: Path) -
     )
 
     assert [path.name for path in atu.glob("*.zip")] == [
-        "SEL-V7.5.2.3_SE-SEL_20260619-0013_JEAN-CARLOS-MACHADO_DEV.zip"
+        "SEL-QS-V7.5.2.3_SE-SEL_20260619-0013_JEAN-CARLOS-MACHADO_DEV.zip"
     ]
 
 

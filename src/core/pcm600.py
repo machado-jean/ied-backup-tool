@@ -35,16 +35,14 @@ def extract_pcm600_version(project_path: Path) -> str:
             ) from exc
 
     values = _parse_ini_values(content)
-    product_name = values.get("ProductName")
     product_version = values.get("ProductVersion")
-    if not product_name or not product_version:
+    if not product_version:
         raise Pcm600VersionError(
-            f"ProductName/ProductVersion nao encontrados em {VERSIONS_INI_NAME}: {project_path}"
+            f"ProductVersion nao encontrado em {VERSIONS_INI_NAME}: {project_path}"
         )
 
-    safe_name = sanitize_filename_part(product_name)
     safe_version = sanitize_filename_part(product_version)
-    return f"{safe_name}-V{safe_version}"
+    return f"PCM600-V{safe_version}"
 
 
 def _find_versions_ini(archive: zipfile.ZipFile) -> zipfile.ZipInfo | None:

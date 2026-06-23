@@ -52,10 +52,10 @@ class SelProjectType(BaseProjectType):
                 project_file=project_file,
             )
 
-        parts = [f"SEL-QS{quickset_version}"]
+        parts = [f"SEL-QS-V{quickset_version}"]
         architect_version = self._get_architect_version(project_file)
         if architect_version:
-            parts.append(f"AA{architect_version}")
+            parts.append(f"AA-V{architect_version}")
         return "-".join(parts)
 
     def get_related_files(self, project_file: Path) -> list[Path]:
@@ -102,7 +102,7 @@ def _manual_sel_version(version: str) -> str:
         )
     if normalized.upper().startswith("SEL-"):
         return normalized.upper()
-    return f"SEL-V{normalized.upper()}"
+    return f"SEL-QS-V{normalized.upper()}"
 
 
 SEL_PROJECT_TYPE = SelProjectType()

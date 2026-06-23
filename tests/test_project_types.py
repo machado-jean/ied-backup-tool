@@ -84,5 +84,5 @@ def test_backup_service_accepts_pcm600_project_type(tmp_path: Path) -> None:
 
     assert [result.status for result in results] == ["stored"]
     assert [path.name for path in atu.glob("*.zip")] == [
-        "PCM600-210-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
+        "PCM600-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
     ]

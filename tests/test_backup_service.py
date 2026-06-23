@@ -340,7 +340,7 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
     assert plans[0].backup_name == (
         "IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
     )
-    assert plans[0].software == "DIGSI-V100 + SEL-QS7.5.3.10-AA2.4.2.34"
+    assert plans[0].software == "DIGSI-V100 + SEL-QS-V7.5.3.10-AA-V2.4.2.34"
     assert plans[0].source_files == (dz5, rdb, scd)
 
     result = execute_backup_plan(plan=plans[0], atu_path=atu, his_path=his)
@@ -356,7 +356,7 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
         ]
         manifest = archive.read("IED-PACK-MANIFEST.txt").decode("utf-8")
         assert "DIGSI 5 (.dz5): DIGSI-V100 (SE-GVM_20260619_1230.dz5)" in manifest
-        assert "SEL (.rdb): SEL-QS7.5.3.10-AA2.4.2.34 (SE-GVM.rdb)" in manifest
+        assert "SEL (.rdb): SEL-QS-V7.5.3.10-AA-V2.4.2.34 (SE-GVM.rdb)" in manifest
         assert "SE-GVM_20260619_1200.dz5" not in manifest
 
 
@@ -383,7 +383,7 @@ def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
 
     assert len(plans) == 1
     assert plans[0].backup_name == (
-        "SEL-QS7.5.3.10_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
+        "SEL-QS-V7.5.3.10_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
     )
     assert plans[0].manifest_text is None
 

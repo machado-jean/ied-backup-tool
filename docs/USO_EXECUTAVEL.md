@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.2.0.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.2.1.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
 (`.dz5`), SEL (`.rdb`) e ABB PCM600 (`.pcmp`).
 
@@ -13,7 +13,7 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.2.0.exe
+├─ IED Backup Manager v1.2.1.exe
 ├─ config.json
 ├─ SE-GVM_20260529_1624.dz5
 ├─ SE-GVM_20260529_1625.dz5
@@ -140,7 +140,7 @@ ProductVersion=2.10
 O exemplo acima gera o prefixo:
 
 ```text
-PCM600-210-V2.10
+PCM600-V2.10
 ```
 
 ### Agrupamento por subestacao
@@ -295,8 +295,8 @@ Exemplo:
 
 ```text
 DIGSI-V100_SE-GVM_20260529-1625_JEAN-CARLOS-MACHADO_TAF.zip
-SEL-QS7.5.3.10-AA2.4.2.34_ESD-PDO_20260623-0031_JEAN-CARLOS-MACHADO_TAF.zip
-PCM600-210-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+SEL-QS-V7.5.3.10-AA-V2.4.2.34_ESD-PDO_20260623-0031_JEAN-CARLOS-MACHADO_TAF.zip
+PCM600-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 ```
 

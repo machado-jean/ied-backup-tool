@@ -14,7 +14,7 @@ def test_extract_pcm600_version_from_versions_ini(tmp_path: Path) -> None:
             "ProductName=PCM600_210\nProductVersion=2.10\n",
         )
 
-    assert extract_pcm600_version(pcmp) == "PCM600-210-V2.10"
+    assert extract_pcm600_version(pcmp) == "PCM600-V2.10"
 
 
 def test_extract_pcm600_version_finds_versions_ini_in_nested_folder(tmp_path: Path) -> None:
@@ -25,7 +25,7 @@ def test_extract_pcm600_version_finds_versions_ini_in_nested_folder(tmp_path: Pa
             "ProductName=PCM600_210\nProductVersion=2.10\n",
         )
 
-    assert extract_pcm600_version(pcmp) == "PCM600-210-V2.10"
+    assert extract_pcm600_version(pcmp) == "PCM600-V2.10"
 
 
 def test_extract_pcm600_version_rejects_non_zip(tmp_path: Path) -> None:
