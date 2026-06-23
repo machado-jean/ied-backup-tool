@@ -1,8 +1,8 @@
 # IED Backup Manager
 
 Aplicacao Windows para geracao padronizada de backups de projetos de protecao
-eletrica, com suporte inicial a Siemens DIGSI 5 (`.dz5`) e SEL QuickSet
-(`.rdb` com Architect opcional).
+eletrica, com suporte inicial a Siemens DIGSI 5 (`.dz5`), SEL QuickSet
+(`.rdb` com Architect opcional) e ABB PCM600 (`.pcmp`).
 
 Status: base funcional em desenvolvimento.
 
@@ -14,6 +14,8 @@ Status: base funcional em desenvolvimento.
 - Tratar o `.dz5` como ZIP para localizar a versao do DIGSI.
 - Tratar o `.rdb` SEL como arquivo principal e incluir `.scd` ou `.selaprj`
   de mesmo nome-base quando existir.
+- Tratar o `.pcmp` ABB PCM600 como pacote ZIP para localizar
+  `ProjectDataServer%versions.ini` e extrair `ProductName`/`ProductVersion`.
 - Agrupar arquivos por subestacao em um unico ZIP quando mais de um tipo de IED
   estiver selecionado na GUI.
 - Incluir `IED-PACK-MANIFEST.txt` nos pacotes agrupados com versoes detectadas
@@ -54,7 +56,7 @@ Crie `config.json` ao lado do executavel:
 .\.venv\Scripts\python.exe -m src.gui.app
 ```
 
-Versao atual do aplicativo: `1.1.2`.
+Versao atual do aplicativo: `1.2.0`.
 
 Manual de uso do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md).
 
@@ -138,8 +140,9 @@ tecnica) fica em `src/core/backup_service.py`.
 
 As regras especificas de cada software/IED ficam em `src/core/project_types/`.
 Atualmente existem os tipos `digsi5`, implementado em
-`src/core/project_types/digsi.py`, e `sel`, implementado em
-`src/core/project_types/sel.py`.
+`src/core/project_types/digsi.py`, `sel`, implementado em
+`src/core/project_types/sel.py`, e `pcm600`, implementado em
+`src/core/project_types/pcm600.py`.
 
 Para adicionar outro tipo, a ideia e criar um novo modulo nessa pasta
 implementando:

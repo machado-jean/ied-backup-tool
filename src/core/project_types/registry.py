@@ -4,9 +4,14 @@ from __future__ import annotations
 
 from src.core.project_types.base import ProjectType
 from src.core.project_types.digsi import DIGSI_PROJECT_TYPE
+from src.core.project_types.pcm600 import PCM600_PROJECT_TYPE
 from src.core.project_types.sel import SEL_PROJECT_TYPE
 
-PROJECT_TYPES: tuple[ProjectType, ...] = (DIGSI_PROJECT_TYPE, SEL_PROJECT_TYPE)
+PROJECT_TYPES: tuple[ProjectType, ...] = (
+    DIGSI_PROJECT_TYPE,
+    SEL_PROJECT_TYPE,
+    PCM600_PROJECT_TYPE,
+)
 DEFAULT_PROJECT_TYPE = DIGSI_PROJECT_TYPE
 
 

@@ -1,8 +1,8 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.1.2.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.2.0.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
-(`.dz5`) e SEL (`.rdb`).
+(`.dz5`), SEL (`.rdb`) e ABB PCM600 (`.pcmp`).
 
 ## 1. Estrutura esperada
 
@@ -13,12 +13,13 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.1.2.exe
+├─ IED Backup Manager v1.2.0.exe
 ├─ config.json
 ├─ SE-GVM_20260529_1624.dz5
 ├─ SE-GVM_20260529_1625.dz5
 ├─ ESD-PDO.rdb
 ├─ ESD-PDO.scd
+├─ SE-ABB_20260619_1230.pcmp
 ```
 
 O programa nao precisa que a pasta `BKPs` exista quando estiver em uso real.
@@ -118,6 +119,29 @@ O programa tenta detectar automaticamente:
 Se a versao QuickSet nao for encontrada, um campo `Versão do software` aparece
 na tela. Preencha a versao manualmente para liberar a previa e a geracao do
 backup.
+
+### ABB PCM600
+
+O backup ABB PCM600 usa o arquivo `.pcmp`.
+
+O programa trata o `.pcmp` como pacote ZIP e procura o arquivo:
+
+```text
+ProjectDataServer%versions.ini
+```
+
+Dentro desse arquivo, o programa usa:
+
+```text
+ProductName=PCM600_210
+ProductVersion=2.10
+```
+
+O exemplo acima gera o prefixo:
+
+```text
+PCM600-210-V2.10
+```
 
 ### Agrupamento por subestacao
 
@@ -272,6 +296,7 @@ Exemplo:
 ```text
 DIGSI-V100_SE-GVM_20260529-1625_JEAN-CARLOS-MACHADO_TAF.zip
 SEL-QS7.5.3.10-AA2.4.2.34_ESD-PDO_20260623-0031_JEAN-CARLOS-MACHADO_TAF.zip
+PCM600-210-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 ```
 

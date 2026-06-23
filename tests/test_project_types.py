@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from datetime import datetime
 from pathlib import Path
+from zipfile import ZipFile
 
 from src.core.backup_service import process_all_backups
 from src.core.naming import BackupStage
@@ -30,6 +31,7 @@ def test_default_project_type_is_digsi() -> None:
     assert DEFAULT_PROJECT_TYPE.key == "digsi5"
     assert DEFAULT_PROJECT_TYPE.extensions == (".dz5",)
     assert get_project_type("digsi5") is DEFAULT_PROJECT_TYPE
+    assert get_project_type("pcm600").extensions == (".pcmp",)
 
 
 def test_backup_service_accepts_custom_project_type(tmp_path: Path) -> None:
@@ -54,4 +56,33 @@ def test_backup_service_accepts_custom_project_type(tmp_path: Path) -> None:
     assert [result.status for result in results] == ["stored"]
     assert [path.name for path in atu.glob("*.zip")] == [
         "FAKE-V1_SEL-751_20260618-1030_JEAN-CARLOS-MACHADO_TAF.zip"
+    ]
+
+
+def test_backup_service_accepts_pcm600_project_type(tmp_path: Path) -> None:
+    project_dir = tmp_path / "IED-DES"
+    atu = tmp_path / "IED-ATU"
+    his = tmp_path / "IED-HIS"
+    project_dir.mkdir()
+    project_file = project_dir / "SE-ABB_20260619_1230.pcmp"
+    with ZipFile(project_file, "w") as archive:
+        archive.writestr(
+            "ProjectDataServer%versions.ini",
+            "ProductName=PCM600_210\nProductVersion=2.10\n",
+        )
+    timestamp = datetime(2026, 6, 19, 12, 30).timestamp()
+    os.utime(project_file, (timestamp, timestamp))
+
+    results = process_all_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="JEAN-CARLOS-MACHADO",
+        stage=BackupStage.TAF,
+        project_type=get_project_type("pcm600"),
+    )
+
+    assert [result.status for result in results] == ["stored"]
+    assert [path.name for path in atu.glob("*.zip")] == [
+        "PCM600-210-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
     ]
