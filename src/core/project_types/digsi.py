@@ -21,7 +21,11 @@ class DigsiProjectType(BaseProjectType):
 
         return get_project_id(project_file.name)
 
-    def get_software_version(self, project_file: Path) -> str:
+    def get_software_version(
+        self,
+        project_file: Path,
+        fallback_version: str | None = None,
+    ) -> str:
         """Inspect the `.dz5` archive and return the DIGSI version prefix."""
 
         return extract_digsi_version(project_file)

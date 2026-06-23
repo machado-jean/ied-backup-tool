@@ -20,7 +20,7 @@ logs/*.log
 # Local config and real backup samples
 config.json
 config/config.json
-BKPs/
+IED-DES/
 IED-ATU/
 IED-HIS/
 

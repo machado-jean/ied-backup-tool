@@ -88,6 +88,9 @@ UI_TEXT = {
         "required_fields": "Campos obrigatórios",
         "required_stage": "Selecione a etapa antes de gerar backup.",
         "required_type": "Selecione ao menos um tipo de arquivo suportado.",
+        "required_software_version": (
+            "Não foi possível detectar a versão de {file}. Informe a versão do software."
+        ),
         "save": "Salvar",
         "select": "Selecionar",
         "settings": "Configurações",
@@ -106,6 +109,8 @@ UI_TEXT = {
         "summary_skipped_line": "Ignorados por serem antigos: {count}",
         "summary_stored_line": "Novos backups criados: {count}",
         "summary_total_line": "Total analisado: {total}",
+        "software_version": "Versão do software",
+        "software_version_placeholder": "Informe somente quando a versão não for detectada",
         "timestamp": "Data/Hora",
         "total": "Total",
         "type": "Tipos",
@@ -162,6 +167,9 @@ UI_TEXT = {
         "required_fields": "Required fields",
         "required_stage": "Select the stage before generating backup.",
         "required_type": "Select at least one supported file type.",
+        "required_software_version": (
+            "Could not detect the version of {file}. Enter the software version."
+        ),
         "save": "Save",
         "select": "Select",
         "settings": "Settings",
@@ -180,6 +188,8 @@ UI_TEXT = {
         "summary_skipped_line": "Skipped because older: {count}",
         "summary_stored_line": "New backups created: {count}",
         "summary_total_line": "Total analyzed: {total}",
+        "software_version": "Software version",
+        "software_version_placeholder": "Enter only when the version is not detected",
         "timestamp": "Date/Time",
         "total": "Total",
         "type": "Types",

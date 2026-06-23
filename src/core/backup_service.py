@@ -16,7 +16,7 @@ from src.core.naming import (
     build_backup_name,
     get_file_timestamp,
 )
-from src.core.project_types.base import ProjectType
+from src.core.project_types.base import ProjectDetectionError, ProjectType
 from src.core.project_types.registry import DEFAULT_PROJECT_TYPE
 from src.core.storage import (
     BackupFileInfo,
@@ -36,6 +36,9 @@ STATUS_ATU_DUPLICATE = "atu_duplicate"
 STATUS_SKIPPED_OLDER = "skipped_older"
 STATUS_ALREADY_CURRENT = "already_current"
 StageValue = BackupStage | str
+GROUPED_PROJECT_TYPE_KEY = "ied-package"
+GROUPED_PROJECT_TYPE_LABEL = "Pacote por SE"
+GROUPED_SOFTWARE_PREFIX = "IED-PACK"
 
 
 @dataclass(frozen=True)
@@ -46,6 +49,7 @@ class BackupResult:
     backup_name: str
     final_path: Path
     status: str = STATUS_STORED
+    source_files: tuple[Path, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -65,6 +69,8 @@ class BackupPlan:
     project_type_label: str
     current_backup: Path | None = None
     history_path: Path | None = None
+    source_files: tuple[Path, ...] = ()
+    manifest_text: str | None = None
 
 
 @dataclass(frozen=True)
@@ -117,6 +123,7 @@ def process_latest_backup(
     collaborator: str,
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
+    software_version_override: str | None = None,
 ) -> BackupResult:
     """Process only the newest file for the selected project type."""
 
@@ -127,6 +134,7 @@ def process_latest_backup(
         collaborator=collaborator,
         stage=stage,
         project_type=project_type,
+        software_version_override=software_version_override,
     )
 
 
@@ -138,6 +146,7 @@ def process_all_backups(
     collaborator: str,
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
+    software_version_override: str | None = None,
 ) -> list[BackupResult]:
     """Plan and process all supported files in chronological order."""
 
@@ -150,6 +159,7 @@ def process_all_backups(
         collaborator=collaborator,
         stage=stage,
         project_type=project_type,
+        software_version_override=software_version_override,
         virtual_current=virtual_current,
     ):
         if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
@@ -159,6 +169,7 @@ def process_all_backups(
                     backup_name=plan.backup_name,
                     final_path=plan.destination_path,
                     status=plan.status,
+                    source_files=plan.source_files,
                 )
             )
             continue
@@ -168,6 +179,9 @@ def process_all_backups(
                 project_file=plan.source_file,
                 backup_name=plan.backup_name,
                 his_path=his_path,
+                project_type=project_type,
+                source_files=plan.source_files,
+                manifest_text=plan.manifest_text,
             )
             results.append(
                 BackupResult(
@@ -175,6 +189,7 @@ def process_all_backups(
                     backup_name=plan.backup_name,
                     final_path=final_path,
                     status=plan.status,
+                    source_files=plan.source_files,
                 )
             )
             continue
@@ -186,6 +201,7 @@ def process_all_backups(
             collaborator=collaborator,
             stage=stage,
             project_type=project_type,
+            software_version_override=software_version_override,
         )
         results.append(
             BackupResult(
@@ -193,6 +209,7 @@ def process_all_backups(
                 backup_name=result.backup_name,
                 final_path=result.final_path,
                 status=plan.status,
+                source_files=result.source_files,
             )
         )
     return results
@@ -206,6 +223,7 @@ def process_backup_plans(
     collaborator: str,
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
+    software_version_override: str | None = None,
 ) -> list[BackupResult]:
     """Execute a previously computed list of plans."""
 
@@ -218,6 +236,7 @@ def process_backup_plans(
                     backup_name=plan.backup_name,
                     final_path=plan.destination_path,
                     status=plan.status,
+                    source_files=plan.source_files,
                 )
             )
             continue
@@ -227,6 +246,9 @@ def process_backup_plans(
                 project_file=plan.source_file,
                 backup_name=plan.backup_name,
                 his_path=his_path,
+                project_type=project_type,
+                source_files=plan.source_files,
+                manifest_text=plan.manifest_text,
             )
             results.append(
                 BackupResult(
@@ -234,6 +256,7 @@ def process_backup_plans(
                     backup_name=plan.backup_name,
                     final_path=final_path,
                     status=plan.status,
+                    source_files=plan.source_files,
                 )
             )
             continue
@@ -245,6 +268,7 @@ def process_backup_plans(
             collaborator=collaborator,
             stage=stage,
             project_type=project_type,
+            software_version_override=software_version_override,
         )
         results.append(
             BackupResult(
@@ -252,9 +276,137 @@ def process_backup_plans(
                 backup_name=result.backup_name,
                 final_path=result.final_path,
                 status=plan.status,
+                source_files=result.source_files,
             )
         )
     return results
+
+
+def plan_grouped_backups(
+    *,
+    project_dir: Path,
+    atu_path: Path,
+    his_path: Path,
+    collaborator: str,
+    stage: StageValue,
+    project_types: list[ProjectType],
+    software_version_override: str | None = None,
+    virtual_current: dict[str, Path] | None = None,
+) -> list[BackupPlan]:
+    """Build one backup package per substation using all selected project types."""
+
+    grouped_sources: dict[str, list[tuple[ProjectType, Path, tuple[Path, ...], str]]] = {}
+    for project_type in project_types:
+        try:
+            project_files = project_type.find_files(project_dir)
+        except ProjectDetectionError:
+            continue
+
+        latest_by_project: dict[str, Path] = {}
+        for project_file in project_files:
+            project = project_type.get_project_id(project_file)
+            current = latest_by_project.get(project)
+            if current is None or get_file_timestamp(project_file) > get_file_timestamp(current):
+                latest_by_project[project] = project_file
+
+        for project, project_file in latest_by_project.items():
+            version = project_type.get_software_version(project_file, software_version_override)
+            source_files = tuple(project_type.get_related_files(project_file))
+            grouped_sources.setdefault(project, []).append(
+                (project_type, project_file, source_files, version)
+            )
+
+    plans = []
+    current_by_key = virtual_current if virtual_current is not None else {}
+    for project, entries in sorted(grouped_sources.items()):
+        source_files = _unique_paths(path for _, _, files, _ in entries for path in files)
+        primary_files = [project_file for _, project_file, _, _ in entries]
+        versions = _unique_text(version for _, _, _, version in entries)
+        timestamp = max(get_file_timestamp(path) for path in source_files)
+        backup_name = build_backup_name(
+            software_version=GROUPED_SOFTWARE_PREFIX,
+            project_id=project,
+            timestamp=timestamp,
+            collaborator=collaborator,
+            stage=stage,
+        )
+        plan = _plan_backup_name(
+            source_file=max(primary_files, key=get_file_timestamp),
+            source_files=tuple(source_files),
+            backup_name=backup_name,
+            atu_path=atu_path,
+            his_path=his_path,
+            current_override=current_by_key,
+            software_display=" + ".join(versions),
+            project_type_key=GROUPED_PROJECT_TYPE_KEY,
+            project_type_label=GROUPED_PROJECT_TYPE_LABEL,
+            manifest_text=_build_group_manifest(
+                backup_name=backup_name,
+                project=project,
+                timestamp=timestamp,
+                collaborator=collaborator,
+                stage=stage,
+                entries=entries,
+                source_files=source_files,
+            ),
+        )
+        plans.append(plan)
+
+        planned_info = parse_backup_filename(Path(plan.backup_name))
+        if plan.status in {STATUS_STORED, STATUS_REPLACED_CURRENT, STATUS_ALREADY_CURRENT}:
+            current_by_key[planned_info.key] = plan.destination_path
+
+    return sorted(plans, key=lambda plan: (plan.project, plan.timestamp_text))
+
+
+def execute_backup_plan(*, plan: BackupPlan, atu_path: Path, his_path: Path) -> BackupResult:
+    """Execute a previously computed plan without recalculating its metadata."""
+
+    if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
+        return BackupResult(
+            source_file=plan.source_file,
+            backup_name=plan.backup_name,
+            final_path=plan.destination_path,
+            status=plan.status,
+            source_files=plan.source_files,
+        )
+
+    if plan.status == STATUS_ARCHIVED_HISTORY:
+        final_path = archive_history_backup(
+            project_file=plan.source_file,
+            backup_name=plan.backup_name,
+            his_path=his_path,
+            source_files=plan.source_files,
+            manifest_text=plan.manifest_text,
+        )
+        return BackupResult(
+            source_file=plan.source_file,
+            backup_name=plan.backup_name,
+            final_path=final_path,
+            status=plan.status,
+            source_files=plan.source_files,
+        )
+
+    with tempfile.TemporaryDirectory(prefix="ied-backup-") as staging:
+        staged_zip = create_backup_zip(
+            plan.source_files or (plan.source_file,),
+            plan.backup_name,
+            output_dir=Path(staging),
+            manifest_text=plan.manifest_text,
+        )
+        final_path = update_storage(
+            new_backup=staged_zip,
+            atu_path=atu_path,
+            his_path=his_path,
+        )
+
+    return BackupResult(
+        source_file=plan.source_file,
+        backup_name=plan.backup_name,
+        final_path=final_path,
+        status=plan.status,
+        source_files=plan.source_files,
+    )
 
 
 def plan_atu_duplicate_fixes(*, atu_path: Path, his_path: Path) -> list[AtuDuplicatePlan]:
@@ -289,6 +441,7 @@ def plan_latest_backup(
     collaborator: str,
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
+    software_version_override: str | None = None,
 ) -> BackupPlan:
     """Plan only the newest file for the selected project type."""
 
@@ -299,6 +452,7 @@ def plan_latest_backup(
         collaborator=collaborator,
         stage=stage,
         project_type=project_type,
+        software_version_override=software_version_override,
     )
 
 
@@ -310,6 +464,7 @@ def plan_all_backups(
     collaborator: str,
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
+    software_version_override: str | None = None,
     virtual_current: dict[str, Path] | None = None,
 ) -> list[BackupPlan]:
     """Build an ordered plan for every supported project file."""
@@ -324,6 +479,7 @@ def plan_all_backups(
             collaborator=collaborator,
             stage=stage,
             project_type=project_type,
+            software_version_override=software_version_override,
             current_override=current_by_key,
         )
         plans.append(plan)
@@ -358,6 +514,7 @@ def process_backup_file(
     collaborator: str,
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
+    software_version_override: str | None = None,
 ) -> BackupResult:
     """Create a staged zip and move it into ATU/HIS using the storage rules."""
 
@@ -368,10 +525,15 @@ def process_backup_file(
         collaborator=collaborator,
         stage=stage,
         project_type=project_type,
+        software_version_override=software_version_override,
     )
 
     with tempfile.TemporaryDirectory(prefix="ied-backup-") as staging:
-        staged_zip = create_backup_zip(project_file, plan.backup_name, output_dir=Path(staging))
+        staged_zip = create_backup_zip(
+            plan.source_files,
+            plan.backup_name,
+            output_dir=Path(staging),
+        )
         final_path = update_storage(
             new_backup=staged_zip,
             atu_path=atu_path,
@@ -383,6 +545,7 @@ def process_backup_file(
         backup_name=plan.backup_name,
         final_path=final_path,
         status=plan.status,
+        source_files=plan.source_files,
     )
 
 
@@ -394,6 +557,7 @@ def plan_backup_file(
     collaborator: str,
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
+    software_version_override: str | None = None,
     current_override: dict[str, Path] | None = None,
 ) -> BackupPlan:
     """Plan how a single project file should interact with ATU and HIS."""
@@ -403,7 +567,37 @@ def plan_backup_file(
         collaborator=collaborator,
         stage=stage,
         project_type=project_type,
+        software_version_override=software_version_override,
     )
+    source_files = tuple(project_type.get_related_files(project_file))
+    return _plan_backup_name(
+        source_file=project_file,
+        source_files=source_files,
+        backup_name=backup_name,
+        atu_path=atu_path,
+        his_path=his_path,
+        current_override=current_override,
+        software_display=None,
+        project_type_key=project_type.key,
+        project_type_label=project_type.label,
+    )
+
+
+def _plan_backup_name(
+    *,
+    source_file: Path,
+    source_files: tuple[Path, ...],
+    backup_name: str,
+    atu_path: Path,
+    his_path: Path,
+    current_override: dict[str, Path] | None,
+    software_display: str | None,
+    project_type_key: str,
+    project_type_label: str,
+    manifest_text: str | None = None,
+) -> BackupPlan:
+    """Plan storage behavior for an already built backup filename."""
+
     planned_info = parse_backup_filename(Path(backup_name))
     current = _find_current_for_plan(
         atu_path=atu_path,
@@ -411,6 +605,7 @@ def plan_backup_file(
         current_override=current_override,
     )
     destination = atu_path / backup_name
+    software = software_display or planned_info.software
 
     if current and current.timestamp > planned_info.timestamp:
         history_path = find_backup_by_identity(his_path, planned_info.identity)
@@ -418,87 +613,105 @@ def plan_backup_file(
             # Older files missing from HIS are archived without touching ATU.
             history_path = his_path / backup_name
             return BackupPlan(
-                source_file=project_file,
+                source_file=source_file,
                 backup_name=backup_name,
                 destination_path=history_path,
                 status=STATUS_ARCHIVED_HISTORY,
-                software=planned_info.software,
+                software=software,
                 project=planned_info.project,
                 timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
                 collaborator=planned_info.collaborator,
                 stage=planned_info.stage,
-                project_type_key=project_type.key,
-                project_type_label=project_type.label,
+                project_type_key=project_type_key,
+                project_type_label=project_type_label,
                 current_backup=current.path,
                 history_path=history_path,
+                source_files=source_files,
+                manifest_text=manifest_text,
             )
 
         return BackupPlan(
-            source_file=project_file,
+            source_file=source_file,
             backup_name=backup_name,
             destination_path=current.path,
             status=STATUS_SKIPPED_OLDER,
-            software=planned_info.software,
+            software=software,
             project=planned_info.project,
             timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
             collaborator=planned_info.collaborator,
             stage=planned_info.stage,
-            project_type_key=project_type.key,
-            project_type_label=project_type.label,
+            project_type_key=project_type_key,
+            project_type_label=project_type_label,
             current_backup=current.path,
+            source_files=source_files,
+            manifest_text=manifest_text,
         )
 
     if current and current.identity == planned_info.identity:
         # Collaborator/stage differences do not create a new technical backup.
         return BackupPlan(
-            source_file=project_file,
+            source_file=source_file,
             backup_name=backup_name,
             destination_path=current.path,
             status=STATUS_ALREADY_CURRENT,
-            software=planned_info.software,
+            software=software,
             project=planned_info.project,
             timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
             collaborator=planned_info.collaborator,
             stage=planned_info.stage,
-            project_type_key=project_type.key,
-            project_type_label=project_type.label,
+            project_type_key=project_type_key,
+            project_type_label=project_type_label,
             current_backup=current.path,
+            source_files=source_files,
+            manifest_text=manifest_text,
         )
 
     if current:
         # A newer file replaces the current ATU backup and sends the old one to HIS.
         return BackupPlan(
-            source_file=project_file,
+            source_file=source_file,
             backup_name=backup_name,
             destination_path=destination,
             status=STATUS_REPLACED_CURRENT,
-            software=planned_info.software,
+            software=software,
             project=planned_info.project,
             timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
             collaborator=planned_info.collaborator,
             stage=planned_info.stage,
-            project_type_key=project_type.key,
-            project_type_label=project_type.label,
+            project_type_key=project_type_key,
+            project_type_label=project_type_label,
             current_backup=current.path,
             history_path=his_path / current.path.name,
+            source_files=source_files,
+            manifest_text=manifest_text,
         )
 
     return BackupPlan(
-        source_file=project_file,
+        source_file=source_file,
         backup_name=backup_name,
         destination_path=destination,
         status=STATUS_STORED,
-        software=planned_info.software,
+        software=software,
         project=planned_info.project,
         timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
         collaborator=planned_info.collaborator,
         stage=planned_info.stage,
-        project_type_key=project_type.key,
-        project_type_label=project_type.label,
+        project_type_key=project_type_key,
+        project_type_label=project_type_label,
+        source_files=source_files,
+        manifest_text=manifest_text,
     )
 
 
-def archive_history_backup(*, project_file: Path, backup_name: str, his_path: Path) -> Path:
+def archive_history_backup(
+    *,
+    project_file: Path,
+    backup_name: str,
+    his_path: Path,
+    project_type: ProjectType = DEFAULT_PROJECT_TYPE,
+    source_files: tuple[Path, ...] | None = None,
+    manifest_text: str | None = None,
+) -> Path:
     """Create a missing historical backup directly in HIS."""
 
     his_path.mkdir(parents=True, exist_ok=True)
@@ -509,7 +722,76 @@ def archive_history_backup(*, project_file: Path, backup_name: str, his_path: Pa
     destination = his_path / backup_name
     if destination.exists():
         return destination
-    return create_backup_zip(project_file, backup_name, output_dir=his_path)
+    files_to_zip = source_files or tuple(project_type.get_related_files(project_file))
+    return create_backup_zip(
+        files_to_zip,
+        backup_name,
+        output_dir=his_path,
+        manifest_text=manifest_text,
+    )
+
+
+def _unique_paths(paths) -> list[Path]:
+    """Return paths without duplicates while preserving discovery order."""
+
+    seen = set()
+    unique = []
+    for path in paths:
+        key = path.resolve()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(path)
+    return unique
+
+
+def _unique_text(values) -> list[str]:
+    """Return non-empty text values without duplicates while preserving order."""
+
+    seen = set()
+    unique = []
+    for value in values:
+        if not value or value in seen:
+            continue
+        seen.add(value)
+        unique.append(value)
+    return unique
+
+
+def _build_group_manifest(
+    *,
+    backup_name: str,
+    project: str,
+    timestamp,
+    collaborator: str,
+    stage: StageValue,
+    entries: list[tuple[ProjectType, Path, tuple[Path, ...], str]],
+    source_files: list[Path],
+) -> str:
+    """Build a human-readable manifest for grouped IED packages."""
+
+    stage_text = stage.value if isinstance(stage, BackupStage) else str(stage)
+    lines = [
+        "IED Backup Manager - Package Manifest",
+        "",
+        f"Backup: {backup_name}",
+        f"Project: {project}",
+        f"Package timestamp: {timestamp.strftime('%Y%m%d-%H%M')}",
+        f"Collaborator: {collaborator}",
+        f"Stage: {stage_text}",
+        "",
+        "Detected versions:",
+    ]
+    for project_type, project_file, _, version in entries:
+        lines.append(f"- {project_type.label}: {version} ({project_file.name})")
+
+    lines.extend(["", "Included files:"])
+    for path in source_files:
+        lines.append(
+            f"- {path.name} | modified {get_file_timestamp(path).strftime('%Y%m%d-%H%M')}"
+        )
+
+    return "\n".join(lines) + "\n"
 
 
 def _find_current_for_plan(
@@ -531,11 +813,12 @@ def build_project_backup_name(
     collaborator: str,
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
+    software_version_override: str | None = None,
 ) -> str:
     """Build a backup filename using the selected project type adapter."""
 
     project_id = project_type.get_project_id(project_file)
-    version = project_type.get_software_version(project_file)
+    version = project_type.get_software_version(project_file, software_version_override)
     timestamp = get_file_timestamp(project_file)
     return build_backup_name(
         software_version=version,

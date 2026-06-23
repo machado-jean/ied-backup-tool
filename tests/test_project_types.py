@@ -18,7 +18,11 @@ class FakeProjectType(BaseProjectType):
     def get_project_id(self, project_file: Path) -> str:
         return project_file.stem
 
-    def get_software_version(self, project_file: Path) -> str:
+    def get_software_version(
+        self,
+        project_file: Path,
+        fallback_version: str | None = None,
+    ) -> str:
         return "FAKE-V1"
 
 

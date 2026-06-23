@@ -1,8 +1,8 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.0.7.exe` para gerar backups
-padronizados de projetos de IED. Nesta versao, o tipo disponivel e DIGSI 5
-(`.dz5`).
+Este guia explica como usar o `IED Backup Manager v1.1.0.exe` para gerar backups
+padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
+(`.dz5`) e SEL (`.rdb`).
 
 ## 1. Estrutura esperada
 
@@ -13,10 +13,12 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.0.0.exe
+├─ IED Backup Manager v1.1.0.exe
 ├─ config.json
 ├─ SE-GVM_20260529_1624.dz5
 ├─ SE-GVM_20260529_1625.dz5
+├─ ESD-PDO.rdb
+├─ ESD-PDO.scd
 ```
 
 O programa nao precisa que a pasta `BKPs` exista quando estiver em uso real.
@@ -78,13 +80,81 @@ pode ser preenchido manualmente, por exemplo para indicar um backup antes de uma
 grande alteracao, ou pode ficar vazio quando o caso nao se enquadrar nas etapas
 anteriores.
 
-## 5. Padrao de nome dos arquivos de origem
+## 5. Tipos de arquivo suportados
 
-Para o DIGSI 5 (`.dz5`), o programa identifica o projeto/subestacao pelo nome
+### DIGSI 5
+
+O backup DIGSI 5 usa o arquivo `.dz5`.
+
+### SEL
+
+O backup SEL sempre usa o arquivo `.rdb` gerado pelo QuickSet.
+
+Quando existir um arquivo Architect com o mesmo nome-base do `.rdb`, ele tambem
+sera incluido no ZIP final:
+
+```text
+ESD-PDO.rdb      -> entra no ZIP
+ESD-PDO.scd      -> entra no ZIP, se existir
+ESD-PDO.selaprj  -> entra no ZIP, se existir
+```
+
+O programa tenta detectar automaticamente:
+
+- versao QuickSet no `.rdb`;
+- versao AcSELerator Architect no `.scd` ou `.selaprj`, quando existir.
+
+Se a versao QuickSet nao for encontrada, um campo `Versão do software` aparece
+na tela. Preencha a versao manualmente para liberar a previa e a geracao do
+backup.
+
+### Agrupamento por subestacao
+
+Quando apenas um tipo de IED estiver selecionado, o programa gera backups
+individuais daquele tipo.
+
+Quando dois ou mais tipos estiverem selecionados, o programa agrupa os arquivos
+por subestacao/projeto. Assim, se a pasta tiver arquivos DIGSI e SEL da mesma
+subestacao, e ambos os tipos estiverem marcados, eles entram no mesmo ZIP.
+
+Exemplo:
+
+```text
+SE-GVM_20260619_1200.dz5
+SE-GVM.rdb
+SE-GVM.scd
+```
+
+Com `DIGSI 5` e `SEL` selecionados, o resultado sera um unico pacote:
+
+```text
+IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+```
+
+Dentro do ZIP ficarao somente os arquivos dos tipos selecionados. Se `SEL` nao
+estiver marcado, o `.rdb` e o `.scd` nao entram no pacote.
+
+Se existir mais de um arquivo principal do mesmo tipo para a mesma subestacao,
+o pacote usa somente o mais recente daquele tipo. Exemplo: dois `.dz5` da mesma
+SE resultam em apenas o `.dz5` mais recente dentro do pacote.
+
+Todo pacote `IED-PACK` inclui tambem o arquivo `IED-PACK-MANIFEST.txt`, que
+lista:
+
+- nome do backup;
+- projeto/subestacao;
+- data/hora usada no pacote;
+- colaborador e etapa;
+- versoes detectadas por tipo;
+- arquivos incluidos no ZIP.
+
+## 6. Padrao de nome dos arquivos de origem
+
+Para os tipos suportados, o programa identifica o projeto/subestacao pelo nome
 do arquivo. Pela politica atual, o projeto e sempre o primeiro bloco antes do
 primeiro `_`.
 
-O padrao recomendado e:
+Para DIGSI 5, o padrao recomendado e:
 
 ```text
 SE-XXXXXX_OUTROS-TEXTOS_AAAAMMDD_HHMM.dz5
@@ -100,11 +170,17 @@ Exemplos:
 SE-GVM_20260529_1624.dz5           -> Projeto: SE-GVM
 SE-CTU_DEV_01_20260619_0013.dz5    -> Projeto: SE-CTU
 SE-ABC_REVISAO_FINAL_20260619_1015.dz5 -> Projeto: SE-ABC
+ESD-PDO.rdb                        -> Projeto: ESD-PDO
 ```
+
+Para SEL, o mesmo criterio do primeiro bloco antes do `_` e usado quando o nome
+tem textos adicionais. Se o arquivo nao tiver `_`, o nome-base inteiro sera usado
+como projeto.
 
 Cuidados:
 
-- O nome deve terminar com data e hora no formato `_AAAAMMDD_HHMM`.
+- Para DIGSI 5, mantenha o nome terminando com data e hora no formato
+  `_AAAAMMDD_HHMM`.
 - Textos adicionais devem ficar depois do primeiro `_` e antes da data/hora.
 - Evite usar a data/hora no meio do nome se ela nao for o sufixo final.
 - Mesmo quando houver textos intermediarios, o projeto sera sempre apenas o
@@ -117,16 +193,16 @@ Cuidados:
   `DEV_SE-CTU_20260619_0013.dz5` sera identificado como projeto `DEV`.
 - Confira sempre a coluna `Projeto` na previa antes de gerar backups.
 
-## 6. Conferir a previa do lote
+## 7. Conferir a previa do lote
 
 Depois de selecionar a etapa, a tela mostra uma previa dos arquivos suportados
 encontrados na pasta.
 
 Colunas principais:
 
-- `Arquivo`: arquivo `.dz5` de origem.
+- `Arquivo`: arquivo principal de origem (`.dz5` ou `.rdb`).
 - `Projeto`: identificador do projeto.
-- `Versao`: versao DIGSI encontrada no arquivo.
+- `Versao`: versao encontrada no arquivo ou conjunto de versoes do pacote.
 - `Data/Hora`: data do arquivo usada no nome do backup.
 - `Acao`: o que o programa pretende fazer.
 - `Destino`: pasta ou arquivo de destino previsto.
@@ -140,7 +216,7 @@ Status possiveis:
 - `Ignorado`: o arquivo e antigo e ja existe no historico.
 - `Ja atual`: o arquivo ja corresponde ao backup atual em `ATU`.
 
-## 7. Modo de processamento
+## 8. Modo de processamento
 
 A opcao `Processar apenas a partir do backup atual` evita reprocessar arquivos
 antigos que vieram antes do backup atual ja existente em `ATU`.
@@ -148,7 +224,7 @@ antigos que vieram antes do backup atual ja existente em `ATU`.
 Use essa opcao quando a pasta tiver muitos arquivos antigos e voce quiser
 processar somente o backup atual e os arquivos mais novos.
 
-## 8. Gerar backups
+## 9. Gerar backups
 
 Clique em `Gerar backups`.
 
@@ -168,7 +244,7 @@ Ao final, sera exibido um resumo com:
 - Arquivos ignorados por serem antigos.
 - Arquivos que ja estavam atuais.
 
-## 9. Resultado dos arquivos
+## 10. Resultado dos arquivos
 
 O nome final do backup segue o padrao:
 
@@ -180,6 +256,8 @@ Exemplo:
 
 ```text
 DIGSI-V100_SE-GVM_20260529-1625_JEAN-CARLOS-MACHADO_TAF.zip
+SEL-QS7.5.3.10-AA2.4.2.34_ESD-PDO_20260623-0031_JEAN-CARLOS-MACHADO_TAF.zip
+IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 ```
 
 Regras principais:
@@ -189,7 +267,7 @@ Regras principais:
 - A comparacao tecnica considera `SOFTWARE_PROJETO_DATAHORA`.
 - Mudancas apenas de colaborador ou etapa nao criam duplicidade tecnica.
 
-## 10. Abrir pastas ATU e HIS
+## 11. Abrir pastas ATU e HIS
 
 Use os botoes:
 
@@ -198,16 +276,18 @@ Use os botoes:
 
 Eles abrem as pastas configuradas diretamente no Windows Explorer.
 
-## 11. Cuidados recomendados
+## 12. Cuidados recomendados
 
 - Feche o DIGSI antes de gerar backups, para evitar arquivo bloqueado.
+- Feche QuickSet/Architect antes de gerar backups SEL, para evitar arquivo
+  bloqueado.
 - Confira a previa antes de clicar em `Gerar backups`.
 - Nao altere manualmente arquivos dentro de `ATU`, a menos que seja necessario.
 - Se aparecer `Corrigir ATU`, leia o arquivo problematico informado antes de
   confirmar a correcao.
 - Mantenha o `config.json` junto do executavel.
 
-## 12. Atualizacao de versao
+## 13. Atualizacao de versao
 
 Quando receber uma nova versao do executavel:
 

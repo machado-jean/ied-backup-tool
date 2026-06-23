@@ -6,14 +6,17 @@ from pathlib import Path
 from zipfile import ZipFile
 
 from src.core.backup_service import (
+    execute_backup_plan,
     filter_current_and_newer_plans,
     fix_atu_duplicate_backups,
     plan_all_backups,
     plan_atu_duplicate_fixes,
+    plan_grouped_backups,
     process_all_backups,
     summarize_results,
 )
 from src.core.naming import BackupStage
+from src.core.project_types.registry import get_project_type
 
 
 def test_process_all_backups_versions_atu_and_his(tmp_path: Path) -> None:
@@ -302,6 +305,59 @@ def test_plan_all_backups_does_not_create_atu_or_his(tmp_path: Path) -> None:
     assert plans[1].history_path == his / plans[0].backup_name
     assert not atu.exists()
     assert not his.exists()
+
+
+def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) -> None:
+    project_dir = tmp_path / "IED-DES"
+    atu = tmp_path / "IED-ATU"
+    his = tmp_path / "IED-HIS"
+    project_dir.mkdir()
+    timestamp = datetime(2026, 6, 19, 12, 30)
+
+    create_dz5(project_dir / "SE-GVM_20260619_1200.dz5", datetime(2026, 6, 19, 12, 0))
+    dz5 = create_dz5(project_dir / "SE-GVM_20260619_1230.dz5", timestamp)
+    rdb = project_dir / "SE-GVM.rdb"
+    scd = project_dir / "SE-GVM.scd"
+    rdb.write_text("Saved with Main Shell Version: 7.5.3.10", encoding="utf-8")
+    scd.write_text(
+        '<Header id="ESD_PDO" version="388" revision="1.0" '
+        'toolID="AcSELerator Architect 2.4.2.34" />',
+        encoding="utf-8",
+    )
+    os.utime(rdb, (timestamp.timestamp(), timestamp.timestamp()))
+    os.utime(scd, (timestamp.timestamp(), timestamp.timestamp()))
+
+    plans = plan_grouped_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="JEAN-CARLOS-MACHADO",
+        stage=BackupStage.TAF,
+        project_types=[get_project_type("digsi5"), get_project_type("sel")],
+    )
+
+    assert len(plans) == 1
+    assert plans[0].backup_name == (
+        "IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
+    )
+    assert plans[0].software == "DIGSI-V100 + SEL-QS7.5.3.10-AA2.4.2.34"
+    assert plans[0].source_files == (dz5, rdb, scd)
+
+    result = execute_backup_plan(plan=plans[0], atu_path=atu, his_path=his)
+
+    assert result.status == "stored"
+    [zip_path] = list(atu.glob("*.zip"))
+    with ZipFile(zip_path) as archive:
+        assert archive.namelist() == [
+            "IED-PACK-MANIFEST.txt",
+            "SE-GVM_20260619_1230.dz5",
+            "SE-GVM.rdb",
+            "SE-GVM.scd",
+        ]
+        manifest = archive.read("IED-PACK-MANIFEST.txt").decode("utf-8")
+        assert "DIGSI 5 (.dz5): DIGSI-V100 (SE-GVM_20260619_1230.dz5)" in manifest
+        assert "SEL (.rdb): SEL-QS7.5.3.10-AA2.4.2.34 (SE-GVM.rdb)" in manifest
+        assert "SE-GVM_20260619_1200.dz5" not in manifest
 
 
 def create_dz5(path: Path, mtime: datetime) -> Path:

@@ -20,6 +20,7 @@ from src.core.digsi import DigsiVersionError
 from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label
 from src.core.logger import get_logger
 from src.core.naming import BackupStage
+from src.core.project_types.base import ProjectVersionRequiredError
 from src.core.project_types.registry import DEFAULT_PROJECT_TYPE, PROJECT_TYPES, get_project_type
 from src.core.storage import StorageError
 from src.core.zipper import BackupZipError
@@ -82,6 +83,10 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_LANGUAGE,
         choices=["pt_BR", "en_US"],
         help="Idioma das mensagens.",
+    )
+    parser.add_argument(
+        "--software-version",
+        help="Versao manual quando o tipo de projeto nao conseguir detectar automaticamente.",
     )
     return parser.parse_args()
 
@@ -153,6 +158,7 @@ def main() -> int:
                     collaborator=runtime_config.collaborator,
                     stage=stage,
                     project_type=project_type,
+                    software_version_override=args.software_version,
                 )
                 if args.process_all
                 else [
@@ -163,6 +169,7 @@ def main() -> int:
                         collaborator=runtime_config.collaborator,
                         stage=stage,
                         project_type=project_type,
+                        software_version_override=args.software_version,
                     )
                 ]
             )
@@ -183,6 +190,7 @@ def main() -> int:
                 collaborator=runtime_config.collaborator,
                 stage=stage,
                 project_type=project_type,
+                software_version_override=args.software_version,
             )
             for result in results:
                 logger.info("Backup processado: %s -> %s", result.source_file, result.final_path)
@@ -201,6 +209,7 @@ def main() -> int:
             collaborator=runtime_config.collaborator,
             stage=stage,
             project_type=project_type,
+            software_version_override=args.software_version,
         )
 
     except (
@@ -208,6 +217,7 @@ def main() -> int:
         ConfigError,
         Dz5DetectionError,
         DigsiVersionError,
+        ProjectVersionRequiredError,
         StorageError,
         ValueError,
     ) as exc:

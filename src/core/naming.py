@@ -10,6 +10,7 @@ from pathlib import Path
 
 PROJECT_FILENAME_PATTERN = re.compile(r"^(?P<project>.+)_\d{8}_\d{4}$")
 STAGE_ALLOWED_CHARS_PATTERN = re.compile(r"[^A-Z0-9-]+")
+FILENAME_ALLOWED_CHARS_PATTERN = re.compile(r"[^A-Z0-9.-]+")
 
 
 class BackupStage(str, Enum):
@@ -63,6 +64,17 @@ def normalize_stage(stage: BackupStage | str) -> str:
     normalized = ascii_stage.strip().upper().replace("_", "-")
     normalized = "-".join(normalized.split())
     normalized = STAGE_ALLOWED_CHARS_PATTERN.sub("-", normalized)
+    normalized = re.sub(r"-{2,}", "-", normalized).strip("-")
+    return normalized
+
+
+def sanitize_filename_part(value: str) -> str:
+    """Normalize a free-text filename segment without introducing underscores."""
+
+    ascii_value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+    normalized = ascii_value.strip().upper().replace("_", "-")
+    normalized = "-".join(normalized.split())
+    normalized = FILENAME_ALLOWED_CHARS_PATTERN.sub("-", normalized)
     normalized = re.sub(r"-{2,}", "-", normalized).strip("-")
     return normalized
 

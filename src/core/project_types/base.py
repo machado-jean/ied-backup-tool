@@ -19,12 +19,31 @@ class ProjectType(Protocol):
     def get_project_id(self, project_file: Path) -> str:
         """Return the project identifier used in the backup name."""
 
-    def get_software_version(self, project_file: Path) -> str:
+    def get_software_version(
+        self,
+        project_file: Path,
+        fallback_version: str | None = None,
+    ) -> str:
         """Return the software/version prefix used in the backup name."""
+
+    def get_related_files(self, project_file: Path) -> list[Path]:
+        """Return every source file that must be included in the backup zip."""
 
 
 class ProjectDetectionError(RuntimeError):
     pass
+
+
+class ProjectVersionRequiredError(ProjectDetectionError):
+    """Raised when a project type needs a manual software version fallback."""
+
+    def __init__(self, *, project_type_label: str, project_file: Path) -> None:
+        self.project_type_label = project_type_label
+        self.project_file = project_file
+        super().__init__(
+            f"Nao foi possivel detectar a versao de {project_file.name}. "
+            "Informe a versao do software."
+        )
 
 
 class BaseProjectType:
@@ -58,3 +77,8 @@ class BaseProjectType:
         """Return the newest supported file in a project folder."""
 
         return self.find_files(project_dir)[-1]
+
+    def get_related_files(self, project_file: Path) -> list[Path]:
+        """Return only the primary file for single-file project types."""
+
+        return [project_file]

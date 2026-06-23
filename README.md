@@ -1,7 +1,8 @@
 # IED Backup Manager
 
 Aplicacao Windows para geracao padronizada de backups de projetos de protecao
-eletrica, inicialmente focada em projetos Siemens DIGSI 5 (`.dz5`).
+eletrica, com suporte inicial a Siemens DIGSI 5 (`.dz5`) e SEL QuickSet
+(`.rdb` com Architect opcional).
 
 Status: base funcional em desenvolvimento.
 
@@ -11,7 +12,13 @@ Status: base funcional em desenvolvimento.
 - Extrair o identificador do projeto pelo trecho antes do sufixo
   `_AAAAMMDD_HHMM`.
 - Tratar o `.dz5` como ZIP para localizar a versao do DIGSI.
-- Usar a data/hora de ultima modificacao do `.dz5` na nomenclatura.
+- Tratar o `.rdb` SEL como arquivo principal e incluir `.scd` ou `.selaprj`
+  de mesmo nome-base quando existir.
+- Agrupar arquivos por subestacao em um unico ZIP quando mais de um tipo de IED
+  estiver selecionado na GUI.
+- Incluir `IED-PACK-MANIFEST.txt` nos pacotes agrupados com versoes detectadas
+  e arquivos incluídos.
+- Usar a data/hora de ultima modificacao do arquivo principal na nomenclatura.
 - Gerar ZIP no padrao:
   `SOFTWARE_PROJETO_DATAHORA_COLABORADOR_ETAPA.zip`
 - Atualizar as pastas `ATU` e `HIS` mantendo apenas o backup mais recente em
@@ -47,7 +54,7 @@ Crie `config.json` ao lado do executavel:
 .\.venv\Scripts\python.exe -m src.gui.app
 ```
 
-Versao atual do aplicativo: `1.0.7`.
+Versao atual do aplicativo: `1.1.0`.
 
 Manual de uso do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md).
 
@@ -57,10 +64,10 @@ Para gerar o executavel versionado:
 .\scripts\release.ps1
 ```
 
-Para avaliar a GUI usando a pasta de amostras durante o desenvolvimento:
+Para avaliar a GUI usando uma pasta de amostras durante o desenvolvimento:
 
 ```powershell
-.\.venv\Scripts\python.exe -m src.gui.app --project-dir ".\BKPs"
+.\.venv\Scripts\python.exe -m src.gui.app --project-dir ".\IED-DES"
 ```
 
 A tela principal mostra a pasta atual, uma tabela de pre-visualizacao do lote,
@@ -70,22 +77,32 @@ suportados e o modo `Processar apenas a partir do backup atual`. Use
 `config.json`.
 
 Na GUI, a pasta processada e sempre a pasta atual do executavel/processo. A tela
-pre-visualiza todos os `.dz5` encontrados nessa pasta e o botao `Gerar backups`
-executa o lote completo seguindo as regras `ATU/HIS`. Antes de executar, a GUI
-exibe uma confirmacao com a quantidade de backups novos/substituidos. Apos a
-execucao, os botoes `Abrir ATU` e `Abrir HIS` permitem acessar as pastas no
-Explorer.
+pre-visualiza todos os arquivos suportados encontrados nessa pasta e o botao
+`Gerar backups` executa o lote completo seguindo as regras `ATU/HIS`. Quando
+mais de um tipo de IED estiver marcado, os arquivos sao agrupados por
+subestacao/projeto em um pacote `IED-PACK`. O pacote usa somente o arquivo
+principal mais recente de cada tipo selecionado e inclui um manifesto `.txt`
+com as versoes detectadas. Antes de executar, a GUI exibe uma confirmacao com a
+quantidade de backups novos/substituidos. Apos a execucao, os botoes `Abrir ATU`
+e `Abrir HIS` permitem acessar as pastas no Explorer.
 
-Para processar todos os `.dz5` de uma pasta em ordem cronologica:
+Para processar todos os arquivos suportados de uma pasta em ordem cronologica:
 
 ```powershell
 .\.venv\Scripts\python.exe -m src.main --project-dir ".\BKPs" --process-all --collaborator "JEAN-CARLOS-MACHADO" --atu-path ".\IED-ATU" --his-path ".\IED-HIS"
 ```
 
+Para processar arquivos SEL via CLI, selecione o tipo `sel`. Quando a versao
+nao for detectada automaticamente, informe `--software-version`:
+
+```powershell
+.\.venv\Scripts\python.exe -m src.main --project-dir ".\IED-DES" --project-type sel --process-all --software-version "7.5.2.3" --collaborator "JEAN-CARLOS-MACHADO" --atu-path ".\IED-ATU" --his-path ".\IED-HIS"
+```
+
 Para visualizar a acao prevista sem criar ZIP nem mover arquivos:
 
 ```powershell
-.\.venv\Scripts\python.exe -m src.main --project-dir ".\BKPs" --process-all --dry-run --collaborator "JEAN-CARLOS-MACHADO" --atu-path ".\IED-ATU" --his-path ".\IED-HIS"
+.\.venv\Scripts\python.exe -m src.main --project-dir ".\IED-DES" --project-type sel --process-all --dry-run --collaborator "JEAN-CARLOS-MACHADO" --atu-path ".\IED-ATU" --his-path ".\IED-HIS"
 ```
 
 Status possiveis:
@@ -118,14 +135,16 @@ A regra geral de backup (`ATU/HIS`, nomenclatura, historico e duplicidade
 tecnica) fica em `src/core/backup_service.py`.
 
 As regras especificas de cada software/IED ficam em `src/core/project_types/`.
-Atualmente existe o tipo `digsi5`, implementado em
-`src/core/project_types/digsi.py`.
+Atualmente existem os tipos `digsi5`, implementado em
+`src/core/project_types/digsi.py`, e `sel`, implementado em
+`src/core/project_types/sel.py`.
 
-Para adicionar outro tipo, como SEL (`.rdb`), a ideia e criar um novo modulo
-nessa pasta implementando:
+Para adicionar outro tipo, a ideia e criar um novo modulo nessa pasta
+implementando:
 
 - extensoes suportadas;
 - identificador do projeto;
 - software/versao usada no nome do backup.
+- arquivos relacionados que devem entrar no ZIP, quando houver.
 
 Depois, o novo tipo deve ser registrado em `src/core/project_types/registry.py`.

@@ -30,23 +30,20 @@ from PySide6.QtWidgets import (
 
 from src.config.config_manager import AppConfig, load_config, save_config
 from src.core.backup_service import (
-    STATUS_ALREADY_CURRENT,
-    STATUS_ARCHIVED_HISTORY,
-    STATUS_SKIPPED_OLDER,
     AtuDuplicatePlan,
     BackupPlan,
     BackupResult,
-    archive_history_backup,
+    execute_backup_plan,
     filter_current_and_newer_plans,
     fix_atu_duplicate_backups,
     plan_all_backups,
     plan_atu_duplicate_fixes,
-    process_backup_file,
+    plan_grouped_backups,
     summarize_results,
 )
 from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
 from src.core.naming import BackupStage, normalize_stage
-from src.core.project_types.base import ProjectType
+from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
 from src.gui.resources import app_icon_path
 from src.gui.settings_window import SettingsWindow
@@ -193,6 +190,12 @@ class MainWindow(QMainWindow):
         form.addRow(self.stage_description_label, self.stage_description_input)
         self._set_stage_description_visible(False)
 
+        self.software_version_label = QLabel()
+        self.software_version_input = QLineEdit()
+        self.software_version_input.textChanged.connect(self.refresh_preview)
+        form.addRow(self.software_version_label, self.software_version_input)
+        self._set_software_version_visible(False)
+
         self.type_checkboxes: dict[str, QCheckBox] = {}
         self.type_checkboxes_layout = QVBoxLayout()
         for project_type in PROJECT_TYPES:
@@ -290,22 +293,45 @@ class MainWindow(QMainWindow):
                 his_path=self.config.his_path,
             )
             plans: list[BackupPlan] = []
-            for project_type in selected_project_types:
-                plans.extend(
-                    plan_all_backups(
-                        project_dir=self.project_dir,
-                        atu_path=self.config.atu_path,
-                        his_path=self.config.his_path,
-                        collaborator=self.config.collaborator,
-                        stage=selected_stage,
-                        project_type=project_type,
-                    )
+            if len(selected_project_types) > 1:
+                plans = plan_grouped_backups(
+                    project_dir=self.project_dir,
+                    atu_path=self.config.atu_path,
+                    his_path=self.config.his_path,
+                    collaborator=self.config.collaborator,
+                    stage=selected_stage,
+                    project_types=selected_project_types,
+                    software_version_override=self._software_version_override(),
                 )
+            else:
+                for project_type in selected_project_types:
+                    plans.extend(
+                        plan_all_backups(
+                            project_dir=self.project_dir,
+                            atu_path=self.config.atu_path,
+                            his_path=self.config.his_path,
+                            collaborator=self.config.collaborator,
+                            stage=selected_stage,
+                            project_type=project_type,
+                            software_version_override=self._software_version_override(),
+                        )
+                    )
             self.current_plans = (
                 filter_current_and_newer_plans(plans)
                 if self.latest_only_checkbox.isChecked()
                 else plans
             )
+            self._set_software_version_visible(False)
+        except ProjectVersionRequiredError as exc:
+            self.current_plans = []
+            self.atu_duplicate_plans = []
+            self._set_software_version_visible(True)
+            self._clear_preview(
+                ui_text("required_software_version", self.language).format(
+                    file=exc.project_file.name
+                )
+            )
+            return
         except Exception as exc:
             self.current_plans = []
             self.atu_duplicate_plans = []
@@ -393,7 +419,8 @@ class MainWindow(QMainWindow):
         for result in results:
             self.log_output.appendPlainText(
                 f"{message_label('executed', self.language)}: "
-                f"{result.source_file.name} -> {result.final_path.name} "
+                f"{self._source_files_text(result.source_files or (result.source_file,))} "
+                f"-> {result.final_path.name} "
                 f"[{status_label(result.status, self.language)}]"
             )
         summary = summarize_results([*results, *duplicate_results])
@@ -454,7 +481,7 @@ class MainWindow(QMainWindow):
             for plan in plans:
                 progress.setLabelText(
                     ui_text("progress_processing_file", self.language).format(
-                        file=plan.source_file.name
+                        file=self._source_files_text(plan.source_files or (plan.source_file,))
                     )
                 )
                 QApplication.processEvents()
@@ -478,40 +505,10 @@ class MainWindow(QMainWindow):
         if not self.config:
             raise RuntimeError(ui_text("settings_required", self.language))
 
-        if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
-            return BackupResult(
-                source_file=plan.source_file,
-                backup_name=plan.backup_name,
-                final_path=plan.destination_path,
-                status=plan.status,
-            )
-
-        if plan.status == STATUS_ARCHIVED_HISTORY:
-            final_path = archive_history_backup(
-                project_file=plan.source_file,
-                backup_name=plan.backup_name,
-                his_path=self.config.his_path,
-            )
-            return BackupResult(
-                source_file=plan.source_file,
-                backup_name=plan.backup_name,
-                final_path=final_path,
-                status=plan.status,
-            )
-
-        result = process_backup_file(
-            project_file=plan.source_file,
+        return execute_backup_plan(
+            plan=plan,
             atu_path=self.config.atu_path,
             his_path=self.config.his_path,
-            collaborator=self.config.collaborator,
-            stage=self._selected_stage() or "",
-            project_type=get_project_type(plan.project_type_key),
-        )
-        return BackupResult(
-            source_file=result.source_file,
-            backup_name=result.backup_name,
-            final_path=result.final_path,
-            status=plan.status,
         )
 
     def _show_plans(
@@ -542,7 +539,8 @@ class MainWindow(QMainWindow):
         for plan in plans:
             self.log_output.appendPlainText(
                 f"{message_label('planned', self.language)}: "
-                f"{plan.source_file.name} -> {plan.destination_path.name} "
+                f"{self._source_files_text(plan.source_files or (plan.source_file,))} "
+                f"-> {plan.destination_path.name} "
                 f"[{status_label(plan.status, self.language)}]"
             )
 
@@ -565,7 +563,7 @@ class MainWindow(QMainWindow):
                 software = plan.software
                 timestamp = plan.timestamp_text
             values = [
-                plan.source_file.name,
+                self._source_files_text(plan.source_files or (plan.source_file,)),
                 project,
                 software,
                 timestamp,
@@ -620,6 +618,25 @@ class MainWindow(QMainWindow):
 
         self.stage_description_label.setVisible(visible)
         self.stage_description_input.setVisible(visible)
+
+    def _software_version_override(self) -> str | None:
+        """Return the optional manual software version used as detection fallback."""
+
+        version = self.software_version_input.text().strip()
+        return version or None
+
+    def _set_software_version_visible(self, visible: bool) -> None:
+        """Toggle the manual software version fallback controls."""
+
+        self.software_version_label.setVisible(visible)
+        self.software_version_input.setVisible(visible)
+
+    def _source_files_text(self, files: tuple[Path, ...]) -> str:
+        """Format one or more source files for preview, logs, and progress text."""
+
+        if len(files) <= 1:
+            return files[0].name if files else "-"
+        return f"{files[0].name} + {len(files) - 1}"
 
     def _summary_text(self, summary) -> str:
         """Format a human-readable summary for dialogs and logs."""
@@ -710,6 +727,10 @@ class MainWindow(QMainWindow):
         self.stage_description_label.setText(ui_text("stage_description", self.language))
         self.stage_description_input.setPlaceholderText(
             ui_text("stage_description_placeholder", self.language)
+        )
+        self.software_version_label.setText(ui_text("software_version", self.language))
+        self.software_version_input.setPlaceholderText(
+            ui_text("software_version_placeholder", self.language)
         )
         manual_index = self.stage_input.count() - 1
         self.stage_input.setItemText(
