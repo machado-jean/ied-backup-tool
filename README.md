@@ -59,7 +59,7 @@ Crie `config.json` ao lado do executavel:
 .\.venv\Scripts\python.exe -m src.gui.app
 ```
 
-Versao atual do aplicativo: `1.3.0`.
+Versao atual do aplicativo: `1.3.1`.
 
 Manual de uso do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md).
 
@@ -157,3 +157,4 @@ implementando:
 - arquivos relacionados que devem entrar no ZIP, quando houver.
 
 Depois, o novo tipo deve ser registrado em `src/core/project_types/registry.py`.
+

@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.3.0.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.3.1.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
 (`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
 
@@ -13,7 +13,7 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.3.0.exe
+├─ IED Backup Manager v1.3.1.exe
 ├─ config.json
 ├─ SE-GVM_20260529_1624.dz5
 ├─ SE-GVM_20260529_1625.dz5
@@ -101,6 +101,16 @@ anteriores.
 
 O backup DIGSI 5 usa o arquivo `.dz5`.
 
+O programa le o marcador interno `.dp5v###` ou `.dp4v###` dentro do `.dz5` para
+identificar a familia e a versao do DIGSI. Exemplos:
+
+```text
+UHESN_20260622_1350.dp5v100 -> DIGSI5-V10.00
+UHESN_20260622_1350.dp5v75  -> DIGSI5-V7.50
+UHESN_20260622_1350.dp5v98  -> DIGSI5-V9.80
+UHESN_20260622_1350.dp4v75  -> DIGSI4-V7.50
+```
+
 ### SEL
 
 O backup SEL sempre usa o arquivo `.rdb` gerado pelo QuickSet.
@@ -160,10 +170,10 @@ apenas o numero da versao, por exemplo:
 ```
 
 Essa versao fica salva no `config.json` em `software_versions.ingeteam` e gera
-o prefixo:
+o prefixo de software:
 
 ```text
-INGETEAM-V5.5.4
+INGESYS-V5.5.4
 ```
 
 ### Agrupamento por subestacao
@@ -317,10 +327,10 @@ SOFTWARE_PROJETO_DATAHORA_COLABORADOR_ETAPA.zip
 Exemplo:
 
 ```text
-DIGSI-V100_SE-GVM_20260529-1625_JEAN-CARLOS-MACHADO_TAF.zip
-SEL-QS-V7.5.3.10-AA-V2.4.2.34_ESD-PDO_20260623-0031_JEAN-CARLOS-MACHADO_TAF.zip
+DIGSI5-V10.00_SE-GVM_20260529-1625_JEAN-CARLOS-MACHADO_TAF.zip
+QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ESD-PDO_20260623-0031_JEAN-CARLOS-MACHADO_TAF.zip
 PCM600-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
-INGETEAM-V5.5.4_SE-ING_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+INGESYS-V5.5.4_SE-ING_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 ```
 
@@ -361,3 +371,4 @@ Quando receber uma nova versao do executavel:
 4. Abra o novo executavel.
 
 O arquivo `config.json` nao precisa ser recriado a cada versao.
+

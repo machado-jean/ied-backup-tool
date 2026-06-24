@@ -32,16 +32,16 @@ class IngeteamProjectType(BaseProjectType):
         project_file: Path,
         fallback_version: str | None = None,
     ) -> str:
-        """Return the configured INGETEAM software version prefix."""
+        """Return the configured INGESYS software version prefix."""
 
         if fallback_version:
             normalized = sanitize_filename_part(fallback_version)
             if normalized:
-                if normalized.startswith("INGETEAM-"):
+                if normalized.startswith("INGESYS-"):
                     return normalized
                 if normalized.startswith("V"):
-                    return f"INGETEAM-{normalized}"
-                return f"INGETEAM-V{normalized}"
+                    return f"INGESYS-{normalized}"
+                return f"INGESYS-V{normalized}"
 
         raise ProjectVersionRequiredError(
             project_type_label=self.label,

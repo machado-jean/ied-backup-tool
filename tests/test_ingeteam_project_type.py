@@ -27,7 +27,7 @@ def test_ingeteam_formats_manual_version(tmp_path: Path) -> None:
 
     assert (
         INGETEAM_PROJECT_TYPE.get_software_version(project_file, "5.5.4")
-        == "INGETEAM-V5.5.4"
+        == "INGESYS-V5.5.4"
     )
 
 
@@ -49,4 +49,5 @@ def test_ingeteam_plan_uses_configured_version(tmp_path: Path) -> None:
         software_version_override="5.5.4",
     )
 
-    assert plan.backup_name.startswith("INGETEAM-V5.5.4_SE-ING_")
+    assert plan.backup_name.startswith("INGESYS-V5.5.4_SE-ING_")
+

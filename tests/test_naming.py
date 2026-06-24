@@ -29,19 +29,19 @@ def test_get_project_id_uses_first_block_even_without_timestamp_suffix() -> None
 
 def test_build_backup_name_uses_required_pattern() -> None:
     result = build_backup_name(
-        software_version="DIGSI-V100",
+        software_version="DIGSI5-V10.00",
         project_id="SE-CTU",
         timestamp=datetime(2026, 6, 12, 17, 39),
         collaborator="Jean Carlos Machado",
         stage=BackupStage.DEV,
     )
 
-    assert result == "DIGSI-V100_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
+    assert result == "DIGSI5-V10.00_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
 
 
 def test_build_backup_name_accepts_free_stage_description() -> None:
     result = build_backup_name(
-        software_version="DIGSI-V100",
+        software_version="DIGSI5-V10.00",
         project_id="SE-CTU",
         timestamp=datetime(2026, 6, 12, 17, 39),
         collaborator="Jean Carlos Machado",
@@ -50,22 +50,23 @@ def test_build_backup_name_accepts_free_stage_description() -> None:
 
     assert (
         result
-        == "DIGSI-V100_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_"
+        == "DIGSI5-V10.00_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_"
         "BACKUP-ANTES-DE-GRANDE-ALTERACAO.zip"
     )
 
 
 def test_build_backup_name_accepts_empty_stage_description() -> None:
     result = build_backup_name(
-        software_version="DIGSI-V100",
+        software_version="DIGSI5-V10.00",
         project_id="SE-CTU",
         timestamp=datetime(2026, 6, 12, 17, 39),
         collaborator="Jean Carlos Machado",
         stage="",
     )
 
-    assert result == "DIGSI-V100_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_.zip"
+    assert result == "DIGSI5-V10.00_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_.zip"
 
 
 def test_normalize_stage_removes_filename_unsafe_separators() -> None:
     assert normalize_stage(" grande_alteracao / fase 2 ") == "GRANDE-ALTERACAO-FASE-2"
+

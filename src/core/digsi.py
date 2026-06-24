@@ -12,7 +12,7 @@ class DigsiVersionError(RuntimeError):
 
 
 VERSION_PATTERN = re.compile(r"\b(\d{1,2})\.(\d{1,2})\.(\d{1,3})\b")
-DP5_VERSION_PATTERN = re.compile(r"\.dp5v(\d+)\b", re.IGNORECASE)
+DP_VERSION_PATTERN = re.compile(r"\.dp(?P<family>[45])v(?P<version>\d+)\b", re.IGNORECASE)
 
 
 def extract_digsi_version(dz5_path: Path) -> str:
@@ -47,10 +47,16 @@ def extract_digsi_version(dz5_path: Path) -> str:
 
 
 def _dp5_version_from_name(name: str) -> str | None:
-    """Read the preferred `.dp5v###` version marker from an archive member name."""
+    """Read the preferred `.dp4v###`/`.dp5v###` marker from an archive member name."""
 
-    match = DP5_VERSION_PATTERN.search(name)
-    return f"DIGSI-V{int(match.group(1))}" if match else None
+    match = DP_VERSION_PATTERN.search(name)
+    if not match:
+        return None
+    family = match.group("family")
+    raw_version = int(match.group("version"))
+    major = raw_version // 10
+    minor = (raw_version % 10) * 10
+    return f"DIGSI{family}-V{major}.{minor:02d}"
 
 
 def _version_from_name(name: str) -> str | None:
@@ -75,8 +81,5 @@ def _version_from_member(archive: zipfile.ZipFile, info: zipfile.ZipInfo) -> str
 def _format_version(match: re.Match[str]) -> str:
     """Convert a matched DIGSI version into the backup prefix format."""
 
-    major, minor, patch = match.groups()
-    version = f"{int(major)}{int(minor)}"
-    if int(patch) != 0:
-        version += str(int(patch))
-    return f"DIGSI-V{version}"
+    major, minor, _patch = match.groups()
+    return f"DIGSI5-V{int(major)}.{int(minor):02d}"
