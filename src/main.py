@@ -98,6 +98,7 @@ class RuntimeConfig:
     collaborator: str
     atu_path: Path
     his_path: Path
+    software_versions: dict[str, str]
 
 
 def resolve_runtime_config(args: argparse.Namespace) -> RuntimeConfig:
@@ -107,6 +108,7 @@ def resolve_runtime_config(args: argparse.Namespace) -> RuntimeConfig:
     collaborator = args.collaborator or (config.collaborator if config else None)
     atu_path = args.atu_path or (config.atu_path if config else None)
     his_path = args.his_path or (config.his_path if config else None)
+    software_versions = dict(config.software_versions or {}) if config else {}
 
     missing = [
         name
@@ -127,6 +129,7 @@ def resolve_runtime_config(args: argparse.Namespace) -> RuntimeConfig:
         collaborator=str(collaborator),
         atu_path=Path(atu_path),
         his_path=Path(his_path),
+        software_versions=software_versions,
     )
 
 
@@ -148,6 +151,10 @@ def main() -> int:
         runtime_config = resolve_runtime_config(args)
         stage = BackupStage(args.stage)
         project_type = get_project_type(args.project_type)
+        software_version = (
+            args.software_version
+            or runtime_config.software_versions.get(project_type.key)
+        )
 
         if args.dry_run:
             plans = (
@@ -158,7 +165,7 @@ def main() -> int:
                     collaborator=runtime_config.collaborator,
                     stage=stage,
                     project_type=project_type,
-                    software_version_override=args.software_version,
+                    software_version_override=software_version,
                 )
                 if args.process_all
                 else [
@@ -169,7 +176,7 @@ def main() -> int:
                         collaborator=runtime_config.collaborator,
                         stage=stage,
                         project_type=project_type,
-                        software_version_override=args.software_version,
+                        software_version_override=software_version,
                     )
                 ]
             )
@@ -190,7 +197,7 @@ def main() -> int:
                 collaborator=runtime_config.collaborator,
                 stage=stage,
                 project_type=project_type,
-                software_version_override=args.software_version,
+                software_version_override=software_version,
             )
             for result in results:
                 logger.info("Backup processado: %s -> %s", result.source_file, result.final_path)
@@ -209,7 +216,7 @@ def main() -> int:
             collaborator=runtime_config.collaborator,
             stage=stage,
             project_type=project_type,
-            software_version_override=args.software_version,
+            software_version_override=software_version,
         )
 
     except (

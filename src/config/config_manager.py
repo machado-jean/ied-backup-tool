@@ -23,6 +23,7 @@ class AppConfig:
     his_path: Path
     language: str = DEFAULT_LANGUAGE
     project_types: tuple[str, ...] = ()
+    software_versions: dict[str, str] | None = None
 
 
 def load_config(path: Path) -> AppConfig:
@@ -52,6 +53,7 @@ def save_config(path: Path, config: AppConfig) -> None:
         "his_path": str(config.his_path),
         "language": config.language,
         "project_types": list(config.project_types),
+        "software_versions": config.software_versions or {},
     }
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -68,6 +70,9 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
     project_types = raw.get("project_types", [])
     if not isinstance(project_types, list):
         project_types = []
+    software_versions = raw.get("software_versions", {})
+    if not isinstance(software_versions, dict):
+        software_versions = {}
 
     return AppConfig(
         collaborator=collaborator.strip().upper().replace(" ", "-"),
@@ -75,6 +80,11 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
         his_path=his_path,
         language=language,
         project_types=tuple(item for item in project_types if isinstance(item, str)),
+        software_versions={
+            key: value.strip()
+            for key, value in software_versions.items()
+            if isinstance(key, str) and isinstance(value, str) and value.strip()
+        },
     )
 
 

@@ -2,7 +2,8 @@
 
 Aplicacao Windows para geracao padronizada de backups de projetos de protecao
 eletrica, com suporte inicial a Siemens DIGSI 5 (`.dz5`), SEL QuickSet
-(`.rdb` com Architect opcional) e ABB PCM600 (`.pcmp`).
+(`.rdb` com Architect opcional), ABB PCM600 (`.pcmp`) e INGETEAM
+(`.efsPro`/`.ITPro2`).
 
 Status: base funcional em desenvolvimento.
 
@@ -16,6 +17,8 @@ Status: base funcional em desenvolvimento.
   de mesmo nome-base quando existir.
 - Tratar o `.pcmp` ABB PCM600 como pacote ZIP para localizar
   `ProjectDataServer%versions.ini` e extrair `ProductName`/`ProductVersion`.
+- Processar arquivos INGETEAM `.efsPro` e `.ITPro2` usando a versao informada
+  pelo usuario e salva em `config.json`.
 - Agrupar arquivos por subestacao em um unico ZIP quando mais de um tipo de IED
   estiver selecionado na GUI.
 - Incluir `IED-PACK-MANIFEST.txt` nos pacotes agrupados com versoes detectadas
@@ -56,7 +59,7 @@ Crie `config.json` ao lado do executavel:
 .\.venv\Scripts\python.exe -m src.gui.app
 ```
 
-Versao atual do aplicativo: `1.2.1`.
+Versao atual do aplicativo: `1.3.0`.
 
 Manual de uso do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md).
 
@@ -141,8 +144,9 @@ tecnica) fica em `src/core/backup_service.py`.
 As regras especificas de cada software/IED ficam em `src/core/project_types/`.
 Atualmente existem os tipos `digsi5`, implementado em
 `src/core/project_types/digsi.py`, `sel`, implementado em
-`src/core/project_types/sel.py`, e `pcm600`, implementado em
-`src/core/project_types/pcm600.py`.
+`src/core/project_types/sel.py`, `pcm600`, implementado em
+`src/core/project_types/pcm600.py`, e `ingeteam`, implementado em
+`src/core/project_types/ingeteam.py`.
 
 Para adicionar outro tipo, a ideia e criar um novo modulo nessa pasta
 implementando:

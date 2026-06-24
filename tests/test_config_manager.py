@@ -46,6 +46,19 @@ def test_parse_config_accepts_project_types() -> None:
     assert config.project_types == ("digsi5", "sel")
 
 
+def test_parse_config_accepts_software_versions() -> None:
+    config = parse_config(
+        {
+            "colaborador": "Jean",
+            "atu_path": "C:/BKP/ATU",
+            "his_path": "C:/BKP/HIS",
+            "software_versions": {"ingeteam": "5.5.4", "empty": " "},
+        }
+    )
+
+    assert config.software_versions == {"ingeteam": "5.5.4"}
+
+
 def test_parse_config_requires_paths() -> None:
     with pytest.raises(ConfigError, match="his_path"):
         parse_config({"colaborador": "Jean", "atu_path": "C:/BKP/ATU"})

@@ -75,10 +75,23 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(APP_DISPLAY_NAME)
         self.setWindowIcon(QIcon(str(app_icon_path())))
         self.setMinimumSize(920, 620)
+        self._resize_to_available_screen()
         self._build_ui()
+        self._load_manual_software_version(self._manual_version_project_type())
         if not self.config:
             QTimer.singleShot(0, self.open_settings)
         self.refresh_preview()
+
+    def _resize_to_available_screen(self) -> None:
+        """Start wider on normal desktops while respecting the minimum size."""
+
+        screen = QApplication.primaryScreen()
+        if screen is None:
+            return
+        available = screen.availableGeometry()
+        width = max(self.minimumWidth(), int(available.width() * 0.75))
+        height = max(self.minimumHeight(), min(available.height(), 720))
+        self.resize(width, height)
 
     def _build_ui(self) -> None:
         """Create the static layout used by the application."""
@@ -190,12 +203,6 @@ class MainWindow(QMainWindow):
         form.addRow(self.stage_description_label, self.stage_description_input)
         self._set_stage_description_visible(False)
 
-        self.software_version_label = QLabel()
-        self.software_version_input = QLineEdit()
-        self.software_version_input.textChanged.connect(self.refresh_preview)
-        form.addRow(self.software_version_label, self.software_version_input)
-        self._set_software_version_visible(False)
-
         self.type_checkboxes: dict[str, QCheckBox] = {}
         self.type_checkboxes_layout = QVBoxLayout()
         for project_type in PROJECT_TYPES:
@@ -205,9 +212,22 @@ class MainWindow(QMainWindow):
             )
             checkbox.stateChanged.connect(self.on_project_type_selection_changed)
             self.type_checkboxes[project_type.key] = checkbox
-            self.type_checkboxes_layout.addWidget(checkbox)
+            if getattr(project_type, "manual_version_required", False):
+                self.software_version_label = QLabel()
+                self.software_version_input = QLineEdit()
+                self.software_version_input.setMaximumWidth(150)
+                self.software_version_input.textChanged.connect(self.on_software_version_changed)
+                version_row = QHBoxLayout()
+                version_row.addWidget(checkbox)
+                version_row.addStretch()
+                version_row.addWidget(self.software_version_label)
+                version_row.addWidget(self.software_version_input)
+                self.type_checkboxes_layout.addLayout(version_row)
+            else:
+                self.type_checkboxes_layout.addWidget(checkbox)
         self.type_label = QLabel()
         form.addRow(self.type_label, self.type_checkboxes_layout)
+        self._set_software_version_visible(False)
 
         self.latest_only_checkbox = QCheckBox()
         self.latest_only_checkbox.setChecked(False)
@@ -263,6 +283,7 @@ class MainWindow(QMainWindow):
         self.config = config
         self.language = config.language
         self.language_button.setText(self._language_flag())
+        self._load_manual_software_version(self._manual_version_project_type())
         self.retranslate_ui()
         self.refresh_preview()
 
@@ -276,6 +297,8 @@ class MainWindow(QMainWindow):
             return
 
         selected_project_types = self._selected_project_types()
+        manual_project_type = self._manual_version_project_type(selected_project_types)
+        self._set_software_version_visible(manual_project_type is not None)
         if not selected_project_types:
             self.current_plans = []
             self.atu_duplicate_plans = []
@@ -287,6 +310,16 @@ class MainWindow(QMainWindow):
             self.current_plans = []
             self.atu_duplicate_plans = []
             self._clear_preview(ui_text("required_stage", self.language))
+            return
+
+        if manual_project_type is not None and not self._software_version_override():
+            self.current_plans = []
+            self.atu_duplicate_plans = []
+            self._clear_preview(
+                ui_text("required_manual_software_version", self.language).format(
+                    type=manual_project_type.label
+                )
+            )
             return
 
         try:
@@ -304,6 +337,7 @@ class MainWindow(QMainWindow):
                     stage=selected_stage,
                     project_types=selected_project_types,
                     software_version_override=self._software_version_override(),
+                    software_version_overrides=self._software_version_overrides(),
                 )
             else:
                 for project_type in selected_project_types:
@@ -323,7 +357,7 @@ class MainWindow(QMainWindow):
                 if self.latest_only_checkbox.isChecked()
                 else plans
             )
-            self._set_software_version_visible(False)
+            self._set_software_version_visible(manual_project_type is not None)
         except ProjectVersionRequiredError as exc:
             self.current_plans = []
             self.atu_duplicate_plans = []
@@ -603,6 +637,7 @@ class MainWindow(QMainWindow):
         """Persist selected project types and refresh the batch preview."""
 
         self._save_selected_project_types()
+        self._load_manual_software_version(self._manual_version_project_type())
         self.refresh_preview()
 
     def _save_selected_project_types(self) -> None:
@@ -618,6 +653,7 @@ class MainWindow(QMainWindow):
             project_types=tuple(
                 key for key, checkbox in self.type_checkboxes.items() if checkbox.isChecked()
             ),
+            software_versions=self.config.software_versions,
         )
         save_config(self.config_path, self.config)
 
@@ -649,9 +685,79 @@ class MainWindow(QMainWindow):
         version = self.software_version_input.text().strip()
         return version or None
 
+    def _manual_version_project_type(
+        self,
+        selected_project_types: list[ProjectType] | None = None,
+    ) -> ProjectType | None:
+        """Return the selected project type that requires a configured version."""
+
+        if selected_project_types is None and not hasattr(self, "type_checkboxes"):
+            return None
+        for project_type in selected_project_types or self._selected_project_types():
+            if getattr(project_type, "manual_version_required", False):
+                return project_type
+        return None
+
+    def _load_manual_software_version(self, project_type: ProjectType | None) -> None:
+        """Load the persisted manual software version into the input field."""
+
+        if project_type is None:
+            if self.software_version_input.text():
+                self.software_version_input.blockSignals(True)
+                self.software_version_input.clear()
+                self.software_version_input.blockSignals(False)
+            return
+        if not self.config or project_type is None:
+            return
+        version = (self.config.software_versions or {}).get(project_type.key, "")
+        if self.software_version_input.text() == version:
+            return
+        self.software_version_input.blockSignals(True)
+        self.software_version_input.setText(version)
+        self.software_version_input.blockSignals(False)
+
+    def on_software_version_changed(self) -> None:
+        """Persist manual software versions and refresh the current preview."""
+
+        project_type = self._manual_version_project_type()
+        if self.config and project_type is not None:
+            software_versions = dict(self.config.software_versions or {})
+            version = self.software_version_input.text().strip()
+            if version:
+                software_versions[project_type.key] = version
+            else:
+                software_versions.pop(project_type.key, None)
+            self.config = AppConfig(
+                collaborator=self.config.collaborator,
+                atu_path=self.config.atu_path,
+                his_path=self.config.his_path,
+                language=self.config.language,
+                project_types=self.config.project_types,
+                software_versions=software_versions,
+            )
+            save_config(self.config_path, self.config)
+        self.refresh_preview()
+
+    def _software_version_overrides(self) -> dict[str, str]:
+        """Return manual software versions keyed by project type."""
+
+        software_versions = dict(self.config.software_versions or {}) if self.config else {}
+        project_type = self._manual_version_project_type()
+        version = self._software_version_override()
+        if project_type is not None and version:
+            software_versions[project_type.key] = version
+        return software_versions
+
     def _set_software_version_visible(self, visible: bool) -> None:
         """Toggle the manual software version fallback controls."""
 
+        project_type = self._manual_version_project_type()
+        label_key = (
+            "ingeteam_software_version"
+            if project_type is not None and project_type.key == "ingeteam"
+            else "software_version"
+        )
+        self.software_version_label.setText(ui_text(label_key, self.language))
         self.software_version_label.setVisible(visible)
         self.software_version_input.setVisible(visible)
 
@@ -697,6 +803,7 @@ class MainWindow(QMainWindow):
                 his_path=self.config.his_path,
                 language=self.language,
                 project_types=self.config.project_types,
+                software_versions=self.config.software_versions,
             )
             save_config(self.config_path, self.config)
         self.retranslate_ui()
@@ -753,7 +860,7 @@ class MainWindow(QMainWindow):
         self.stage_description_input.setPlaceholderText(
             ui_text("stage_description_placeholder", self.language)
         )
-        self.software_version_label.setText(ui_text("software_version", self.language))
+        self._set_software_version_visible(self.software_version_input.isVisible())
         self.software_version_input.setPlaceholderText(
             ui_text("software_version_placeholder", self.language)
         )

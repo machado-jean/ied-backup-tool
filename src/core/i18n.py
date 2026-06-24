@@ -91,6 +91,7 @@ UI_TEXT = {
         "required_software_version": (
             "Não foi possível detectar a versão de {file}. Informe a versão do software."
         ),
+        "required_manual_software_version": "Informe a versão do software para {type}.",
         "save": "Salvar",
         "select": "Selecionar",
         "settings": "Configurações",
@@ -110,7 +111,8 @@ UI_TEXT = {
         "summary_stored_line": "Novos backups criados: {count}",
         "summary_total_line": "Total analisado: {total}",
         "software_version": "Versão do software",
-        "software_version_placeholder": "Informe somente quando a versão não for detectada",
+        "ingeteam_software_version": "v",
+        "software_version_placeholder": "Ex.: 5.5.4",
         "timestamp": "Data/Hora",
         "total": "Total",
         "type": "Tipos",
@@ -170,6 +172,7 @@ UI_TEXT = {
         "required_software_version": (
             "Could not detect the version of {file}. Enter the software version."
         ),
+        "required_manual_software_version": "Enter the software version for {type}.",
         "save": "Save",
         "select": "Select",
         "settings": "Settings",
@@ -189,7 +192,8 @@ UI_TEXT = {
         "summary_stored_line": "New backups created: {count}",
         "summary_total_line": "Total analyzed: {total}",
         "software_version": "Software version",
-        "software_version_placeholder": "Enter only when the version is not detected",
+        "ingeteam_software_version": "v",
+        "software_version_placeholder": "Example: 5.5.4",
         "timestamp": "Date/Time",
         "total": "Total",
         "type": "Types",

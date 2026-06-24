@@ -1,8 +1,8 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.2.1.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.3.0.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
-(`.dz5`), SEL (`.rdb`) e ABB PCM600 (`.pcmp`).
+(`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
 
 ## 1. Estrutura esperada
 
@@ -13,7 +13,7 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.2.1.exe
+├─ IED Backup Manager v1.3.0.exe
 ├─ config.json
 ├─ SE-GVM_20260529_1624.dz5
 ├─ SE-GVM_20260529_1625.dz5
@@ -47,7 +47,10 @@ Exemplo de `config.json`:
   "atu_path": "C:/Users/Jean/OneDrive/BKP/ATU",
   "his_path": "C:/Users/Jean/OneDrive/BKP/HIS",
   "language": "pt_BR",
-  "project_types": ["digsi5", "sel"]
+  "project_types": ["digsi5", "sel"],
+  "software_versions": {
+    "ingeteam": "5.5.4"
+  }
 }
 ```
 
@@ -141,6 +144,26 @@ O exemplo acima gera o prefixo:
 
 ```text
 PCM600-V2.10
+```
+
+### INGETEAM
+
+O backup INGETEAM usa arquivos `.efsPro` ou `.ITPro2`.
+
+Como esses formatos podem conter varias versoes internas de componentes, a
+versao do software INGETEAM deve ser informada pelo usuario. Ao marcar
+`INGETEAM (.efsPro, .ITPro2)`, um campo `v` aparece na mesma linha. Preencha
+apenas o numero da versao, por exemplo:
+
+```text
+5.5.4
+```
+
+Essa versao fica salva no `config.json` em `software_versions.ingeteam` e gera
+o prefixo:
+
+```text
+INGETEAM-V5.5.4
 ```
 
 ### Agrupamento por subestacao
@@ -297,6 +320,7 @@ Exemplo:
 DIGSI-V100_SE-GVM_20260529-1625_JEAN-CARLOS-MACHADO_TAF.zip
 SEL-QS-V7.5.3.10-AA-V2.4.2.34_ESD-PDO_20260623-0031_JEAN-CARLOS-MACHADO_TAF.zip
 PCM600-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+INGETEAM-V5.5.4_SE-ING_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 ```
 

@@ -291,6 +291,7 @@ def plan_grouped_backups(
     stage: StageValue,
     project_types: list[ProjectType],
     software_version_override: str | None = None,
+    software_version_overrides: dict[str, str] | None = None,
     virtual_current: dict[str, Path] | None = None,
 ) -> list[BackupPlan]:
     """Build one backup package per substation using all selected project types."""
@@ -310,7 +311,14 @@ def plan_grouped_backups(
                 latest_by_project[project] = project_file
 
         for project, project_file in latest_by_project.items():
-            version = project_type.get_software_version(project_file, software_version_override)
+            version = project_type.get_software_version(
+                project_file,
+                _software_version_override_for(
+                    project_type,
+                    software_version_override,
+                    software_version_overrides,
+                ),
+            )
             source_files = tuple(project_type.get_related_files(project_file))
             grouped_sources.setdefault(project, []).append(
                 (project_type, project_file, source_files, version)
@@ -328,7 +336,11 @@ def plan_grouped_backups(
                 collaborator=collaborator,
                 stage=stage,
                 project_type=project_type,
-                software_version_override=software_version_override,
+                software_version_override=_software_version_override_for(
+                    project_type,
+                    software_version_override,
+                    software_version_overrides,
+                ),
                 current_override=current_by_key,
             )
             plans.append(plan)
@@ -774,6 +786,18 @@ def _unique_text(values) -> list[str]:
         seen.add(value)
         unique.append(value)
     return unique
+
+
+def _software_version_override_for(
+    project_type: ProjectType,
+    fallback: str | None,
+    overrides: dict[str, str] | None,
+) -> str | None:
+    """Return a manual version scoped to the project type when available."""
+
+    if overrides and project_type.key in overrides:
+        return overrides[project_type.key]
+    return fallback
 
 
 def _build_group_manifest(
