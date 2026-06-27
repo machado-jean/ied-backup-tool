@@ -104,7 +104,7 @@ class SettingsWindow(QDialog):
             collaborator=collaborator.upper().replace(" ", "-"),
             atu_path=Path(atu_path),
             his_path=Path(his_path),
-            language=self.config.language if self.config else "pt_BR",
+            language=self.config.language if self.config else self.language,
             project_types=self.config.project_types if self.config else (),
             software_versions=self.config.software_versions if self.config else {},
             show_startup_instructions=(

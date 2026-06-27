@@ -6,7 +6,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtCore import QSize, Qt, QTimer, QUrl
 from PySide6.QtGui import QColor, QDesktopServices, QIcon
 from PySide6.QtWidgets import (
     QApplication,
@@ -47,7 +47,7 @@ from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
 from src.core.naming import BackupStage, normalize_stage
 from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
-from src.gui.resources import app_icon_path
+from src.gui.resources import app_icon_path, language_flag_path
 from src.gui.settings_window import SettingsWindow
 from src.version import APP_DISPLAY_NAME
 
@@ -60,6 +60,14 @@ STATUS_COLORS = {
     "already_current": QColor("#2f6f73"),
 }
 MANUAL_STAGE_DATA = "__manual_stage__"
+
+
+def configure_language_button(button: QPushButton) -> None:
+    """Set a stable compact size for language flag buttons."""
+
+    button.setFixedSize(44, 30)
+    button.setIconSize(QSize(24, 17))
+    button.setText("")
 
 
 class MainWindow(QMainWindow):
@@ -106,8 +114,8 @@ class MainWindow(QMainWindow):
         top = QHBoxLayout()
         self.project_dir_label = QLabel(str(self.project_dir))
         self.project_dir_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.language_button = QPushButton(self._language_flag())
-        self.language_button.setFixedWidth(44)
+        self.language_button = QPushButton()
+        configure_language_button(self.language_button)
         self.language_button.setToolTip(ui_text("language_tooltip", self.language))
         self.language_button.clicked.connect(self.toggle_language)
         self.refresh_button = QPushButton()
@@ -117,9 +125,9 @@ class MainWindow(QMainWindow):
         self.current_folder_title = QLabel()
         top.addWidget(self.current_folder_title)
         top.addWidget(self.project_dir_label, 1)
-        top.addWidget(self.language_button)
         top.addWidget(self.refresh_button)
         top.addWidget(self.settings_button)
+        top.addWidget(self.language_button)
         layout.addLayout(top)
 
         layout.addWidget(self._build_summary_group())
@@ -280,8 +288,9 @@ class MainWindow(QMainWindow):
         if self.config and not self.config.show_startup_instructions:
             return
 
-        dialog = StartupInstructionsDialog(parent=self)
+        dialog = StartupInstructionsDialog(language=self.language, parent=self)
         dialog.exec()
+        self._apply_startup_dialog_language(dialog.language)
         if not dialog.do_not_show_again:
             return
 
@@ -298,6 +307,27 @@ class MainWindow(QMainWindow):
             save_config(self.config_path, self.config)
         else:
             self.pending_show_startup_instructions = False
+
+    def _apply_startup_dialog_language(self, language: str) -> None:
+        """Apply the language selected in the startup instructions dialog."""
+
+        if language == self.language:
+            return
+
+        self.language = language
+        self._set_language_button_icon(self.language_button)
+        if self.config:
+            self.config = AppConfig(
+                collaborator=self.config.collaborator,
+                atu_path=self.config.atu_path,
+                his_path=self.config.his_path,
+                language=self.language,
+                project_types=self.config.project_types,
+                software_versions=self.config.software_versions,
+                show_startup_instructions=self.config.show_startup_instructions,
+            )
+            save_config(self.config_path, self.config)
+        self.retranslate_ui()
 
     def open_settings(self) -> None:
         """Open the settings dialog and refresh the preview after saving."""
@@ -328,7 +358,7 @@ class MainWindow(QMainWindow):
             save_config(self.config_path, self.config)
             self.pending_show_startup_instructions = None
         self.language = config.language
-        self.language_button.setText(self._language_flag())
+        self._set_language_button_icon(self.language_button)
         self._load_manual_software_version(self._manual_version_project_type())
         self.retranslate_ui()
         self.refresh_preview()
@@ -843,7 +873,7 @@ class MainWindow(QMainWindow):
         """Switch UI language and persist the preference when config exists."""
 
         self.language = "en_US" if self.language == "pt_BR" else "pt_BR"
-        self.language_button.setText(self._language_flag())
+        self._set_language_button_icon(self.language_button)
         if self.config:
             self.config = AppConfig(
                 collaborator=self.config.collaborator,
@@ -859,10 +889,10 @@ class MainWindow(QMainWindow):
         if self.current_plans or self.atu_duplicate_plans:
             self._show_plans(self.current_plans, self.atu_duplicate_plans)
 
-    def _language_flag(self) -> str:
-        """Return the flag shown in the language toggle button."""
+    def _set_language_button_icon(self, button: QPushButton) -> None:
+        """Show the target-language flag icon on a language button."""
 
-        return "🇺🇸" if self.language == "en_US" else "🇧🇷"
+        button.setIcon(QIcon(str(language_flag_path(self.language))))
 
     def _set_summary(self, summary) -> None:
         """Update the numeric summary strip."""
@@ -886,6 +916,7 @@ class MainWindow(QMainWindow):
 
         self.current_folder_title.setText(ui_text("current_folder", self.language))
         self.language_button.setToolTip(ui_text("language_tooltip", self.language))
+        self._set_language_button_icon(self.language_button)
         self.refresh_button.setText(ui_text("refresh", self.language))
         self.settings_button.setText(ui_text("settings", self.language))
         self.summary_group.setTitle(ui_text("summary", self.language))
@@ -939,26 +970,130 @@ class MainWindow(QMainWindow):
 class StartupInstructionsDialog(QDialog):
     """Instruction dialog shown when the application starts."""
 
-    def __init__(self, *, parent=None) -> None:
+    def __init__(self, *, language: str = DEFAULT_LANGUAGE, parent=None) -> None:
         super().__init__(parent)
+        self.language = language
         self.do_not_show_again = False
-        self.setWindowTitle("Instruções de uso")
         self.setMinimumWidth(700)
 
         layout = QVBoxLayout(self)
-        title = QLabel("<h2>Instruções de uso</h2>")
-        title.setTextFormat(Qt.TextFormat.RichText)
-        layout.addWidget(title)
+        header = QHBoxLayout()
+        self.title_label = QLabel()
+        self.title_label.setTextFormat(Qt.TextFormat.RichText)
+        self.language_button = QPushButton()
+        configure_language_button(self.language_button)
+        self.language_button.clicked.connect(self.toggle_language)
+        header.addWidget(self.title_label, 1)
+        header.addWidget(self.language_button)
+        layout.addLayout(header)
 
-        body = QLabel(
-            """
+        self.body_label = QLabel()
+        self.body_label.setTextFormat(Qt.TextFormat.RichText)
+        self.body_label.setWordWrap(True)
+        self.body_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        layout.addWidget(self.body_label)
+
+        self.checkbox = QCheckBox()
+        layout.addWidget(self.checkbox)
+
+        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        self.buttons.accepted.connect(self.accept)
+        layout.addWidget(self.buttons)
+        self.retranslate()
+
+    def toggle_language(self) -> None:
+        """Switch the instruction dialog language without closing it."""
+
+        self.language = "en_US" if self.language == "pt_BR" else "pt_BR"
+        self.retranslate()
+
+    def retranslate(self) -> None:
+        """Apply the current language to every instruction dialog label."""
+
+        texts = self._texts(self.language)
+        self.setWindowTitle(texts["title"])
+        self.title_label.setText(f"<h2>{texts['title']}</h2>")
+        self.body_label.setText(texts["body"])
+        self.checkbox.setText(texts["do_not_show_again"])
+        self.language_button.setIcon(QIcon(str(language_flag_path(self.language))))
+        self.language_button.setToolTip(texts["language_tooltip"])
+
+    def accept(self) -> None:
+        """Store the opt-out state before closing the dialog."""
+
+        self.do_not_show_again = self.checkbox.isChecked()
+        super().accept()
+
+    @staticmethod
+    def _texts(language: str) -> dict[str, str]:
+        """Return translated instruction dialog text."""
+
+        if language == "en_US":
+            return {
+                "title": "Usage Instructions",
+                "do_not_show_again": "Do not show again",
+                "language_tooltip": "Language",
+                "body": """
+                <p>This executable must stay inside the folder that contains the
+                working files for the substation, application, bay, or equipment
+                that will be processed.</p>
+
+                <p><b>Recommended structure:</b></p>
+                <pre>Local folder/
+└─ SE, ETD, bay, or equipment folder/
+   ├─ IED Backup Manager.exe
+   ├─ config.json
+   ├─ SE-XXX_GENERIC-COMMENT_20260622_1350.dz5
+   ├─ ETD-YYY_GENERIC-COMMENT_20260612_0350.dz5
+   ├─ ETD-YYY_OTHER-COMMENT.rdb
+   └─ other working files</pre>
+
+                <p><b>File naming rules:</b></p>
+                <ul>
+                  <li>The SE, ETD, bay, or equipment name must come before the
+                  first underscore <code>"_"</code>.</li>
+                  <li>Use hyphen <code>"-"</code> to separate text inside the SE,
+                  ETD, bay, or equipment name.</li>
+                  <li>All text after the first underscore <code>"_"</code> is treated
+                  as a user comment and will not be used to identify the backup.</li>
+                  <li>The backup will be grouped by the text before the first
+                  underscore <code>"_"</code>.</li>
+                </ul>
+
+                <p><b>Example 1 - Siemens backup</b></p>
+                <p>Input file:</p>
+                <pre>SE-XXX_GENERIC-COMMENT_20260622_1350.dz5</pre>
+                <p>Output:</p>
+                <pre>DIGSIn-Vmmm_SE-XXX_YYYYMMDD-HHMM_COLLABORATOR_STAGE.zip</pre>
+                <p><code>DIGSIn</code> represents the DIGSI family, for example
+                <code>DIGSI5</code>, and <code>Vmmm</code> represents the detected
+                version, for example <code>V10.00</code>.</p>
+
+                <p><b>Example 2 - Multiple IEDs from the same SE</b></p>
+                <p>Input files:</p>
+                <pre>ETD-YYY_GENERIC-COMMENT_20260612_0350.dz5
+ETD-YYY_OTHER-COMMENT.rdb</pre>
+                <p>Output:</p>
+                <pre>IED-PACK_ETD-YYY_YYYYMMDD-HHMM_COLLABORATOR_STAGE.zip</pre>
+                <p>The ZIP will include a file listing the included software versions.</p>
+
+                <p>Before generating backups, check the <b>Project</b> column in the
+                batch preview.</p>
+                """,
+            }
+
+        return {
+            "title": "Instruções de uso",
+            "do_not_show_again": "Não exibir novamente",
+            "language_tooltip": "Idioma",
+            "body": """
             <p>Este executável deve ficar dentro da pasta que contém os arquivos
             de trabalho da subestação, aplicação ou vãos/equipamentos que serão
             processados.</p>
 
             <p><b>Estrutura recomendada:</b></p>
             <pre>Pasta local/
-└─ Pasta da SE, ETD ou LT/
+└─ Pasta da SE, ETD, vão ou equipamento/
    ├─ IED Backup Manager.exe
    ├─ config.json
    ├─ SE-XXX_COMENTARIO-GENERICO_20260622_1350.dz5
@@ -968,15 +1103,14 @@ class StartupInstructionsDialog(QDialog):
 
             <p><b>Regras para nome dos arquivos:</b></p>
             <ul>
-              <li>O nome da SE, ETD, vão ou equipamento deve vir antes do
-              primeiro <code>_</code>.</li>
-              <li>Use hífen <code>-</code> para separar textos dentro do nome da SE,
+              <li>O nome da SE, ETD, vão ou equipamento deve vir antes do primeiro
+              sublinhado <code>"_"</code>.</li>
+              <li>Use hífen <code>"-"</code> para separar textos dentro do nome da SE,
               ETD, vão ou equipamento.</li>
-              <li>Todo texto depois do primeiro underline <code>_</code> é tratado
-              como comentário
-              do usuário e não será usado para identificar o backup.</li>
-              <li>O backup será agrupado pelo trecho antes do primeiro underline
-              <code>_</code>.</li>
+              <li>Todo texto depois do primeiro sublinhado <code>"_"</code> é tratado
+              como comentário do usuário e não será usado para identificar o backup.</li>
+              <li>O backup será agrupado pelo trecho antes do primeiro sublinhado
+              <code>"_"</code>.</li>
             </ul>
 
             <p><b>Exemplo 1 - Backup Siemens</b></p>
@@ -994,28 +1128,12 @@ class StartupInstructionsDialog(QDialog):
 ETD-YYY_OUTRO-COMENTARIO.rdb</pre>
             <p>Saída:</p>
             <pre>IED-PACK_ETD-YYY_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip</pre>
-            <p>Dentro do ZIP haverá um arquivo informando as versões dos softwares incluídos.</p>
+            <p>Dentro do ZIP haverá um arquivo informando as versões dos softwares
+            incluídos.</p>
 
             <p>Antes de gerar backups, confira a coluna <b>Projeto</b> na prévia do lote.</p>
-            """
-        )
-        body.setTextFormat(Qt.TextFormat.RichText)
-        body.setWordWrap(True)
-        body.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        layout.addWidget(body)
-
-        self.checkbox = QCheckBox("Não exibir novamente")
-        layout.addWidget(self.checkbox)
-
-        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
-        buttons.accepted.connect(self.accept)
-        layout.addWidget(buttons)
-
-    def accept(self) -> None:
-        """Store the opt-out state before closing the dialog."""
-
-        self.do_not_show_again = self.checkbox.isChecked()
-        super().accept()
+            """,
+        }
 
 
 def get_runtime_project_dir() -> Path:
