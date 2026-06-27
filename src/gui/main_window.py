@@ -1084,8 +1084,8 @@ class StartupInstructionsDialog(QDialog):
 ETD-YYY_OTHER-COMMENT.rdb</pre>
                 <p>Output:</p>
                 <pre>IED-PACK_ETD-YYY_YYYYMMDD-HHMM_COLLABORATOR_STAGE.zip</pre>
-                <p>The ZIP will include <code>IEDS-VERSIONS.txt</code> with the
-                included software versions.</p>
+                <p>The ZIP will include <code>IEDS-BACKUP-INFO.txt</code> with
+                versions and included file details.</p>
 
                 <p>Before generating backups, check the <b>Project</b> column in the
                 batch preview.</p>
@@ -1138,8 +1138,8 @@ ETD-YYY_OTHER-COMMENT.rdb</pre>
 ETD-YYY_OUTRO-COMENTARIO.rdb</pre>
             <p>Saída:</p>
             <pre>IED-PACK_ETD-YYY_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip</pre>
-            <p>Dentro do ZIP haverá o arquivo <code>IEDS-VERSIONS.txt</code> com as
-            versões dos softwares incluídos.</p>
+            <p>Dentro do ZIP haverá o arquivo <code>IEDS-BACKUP-INFO.txt</code> com
+            versões e detalhes dos arquivos incluídos.</p>
 
             <p>Antes de gerar backups, confira a coluna <b>Projeto</b> na prévia do lote.</p>
             """,

@@ -11,14 +11,14 @@ class BackupZipError(RuntimeError):
     pass
 
 
-PACKAGE_SUMMARY_FILENAME = "IEDS-VERSIONS.txt"
+BACKUP_INFO_FILENAME = "IEDS-BACKUP-INFO.txt"
 
 
 def create_backup_zip(
     source_file: Path | Sequence[Path],
     backup_name: str,
     output_dir: Path | None = None,
-    package_versions_text: str | None = None,
+    backup_info_text: str | None = None,
 ) -> Path:
     """Create a zip containing one or more source files under their original names."""
 
@@ -38,8 +38,8 @@ def create_backup_zip(
         ensure_source_is_readable(path)
 
     with zipfile.ZipFile(destination, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
-        if package_versions_text is not None:
-            archive.writestr(PACKAGE_SUMMARY_FILENAME, package_versions_text)
+        if backup_info_text is not None:
+            archive.writestr(BACKUP_INFO_FILENAME, backup_info_text)
         for path in source_files:
             try:
                 archive.write(path, arcname=path.name)

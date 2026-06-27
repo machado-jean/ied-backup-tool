@@ -70,7 +70,7 @@ class BackupPlan:
     current_backup: Path | None = None
     history_path: Path | None = None
     source_files: tuple[Path, ...] = ()
-    package_versions_text: str | None = None
+    backup_info_text: str | None = None
 
 
 @dataclass(frozen=True)
@@ -181,7 +181,7 @@ def process_all_backups(
                 his_path=his_path,
                 project_type=project_type,
                 source_files=plan.source_files,
-                package_versions_text=plan.package_versions_text,
+                backup_info_text=plan.backup_info_text,
             )
             results.append(
                 BackupResult(
@@ -248,7 +248,7 @@ def process_backup_plans(
                 his_path=his_path,
                 project_type=project_type,
                 source_files=plan.source_files,
-                package_versions_text=plan.package_versions_text,
+                backup_info_text=plan.backup_info_text,
             )
             results.append(
                 BackupResult(
@@ -370,15 +370,10 @@ def plan_grouped_backups(
             software_display=" + ".join(versions),
             project_type_key=GROUPED_PROJECT_TYPE_KEY,
             project_type_label=GROUPED_PROJECT_TYPE_LABEL,
-            package_versions_text=_build_group_versions_text(
-                backup_name=backup_name,
-                project=project,
-                timestamp=timestamp,
-                collaborator=collaborator,
-                stage=stage,
-                entries=entries,
-                source_files=source_files,
-            ),
+            detected_versions=[
+                (project_type.label, version, project_file)
+                for project_type, project_file, _, version in entries
+            ],
         )
         plans.append(plan)
 
@@ -407,7 +402,7 @@ def execute_backup_plan(*, plan: BackupPlan, atu_path: Path, his_path: Path) -> 
             backup_name=plan.backup_name,
             his_path=his_path,
             source_files=plan.source_files,
-            package_versions_text=plan.package_versions_text,
+            backup_info_text=plan.backup_info_text,
         )
         return BackupResult(
             source_file=plan.source_file,
@@ -422,7 +417,7 @@ def execute_backup_plan(*, plan: BackupPlan, atu_path: Path, his_path: Path) -> 
             plan.source_files or (plan.source_file,),
             plan.backup_name,
             output_dir=Path(staging),
-            package_versions_text=plan.package_versions_text,
+            backup_info_text=plan.backup_info_text,
         )
         final_path = update_storage(
             new_backup=staged_zip,
@@ -563,6 +558,7 @@ def process_backup_file(
             plan.source_files,
             plan.backup_name,
             output_dir=Path(staging),
+            backup_info_text=plan.backup_info_text,
         )
         final_path = update_storage(
             new_backup=staged_zip,
@@ -624,7 +620,7 @@ def _plan_backup_name(
     software_display: str | None,
     project_type_key: str,
     project_type_label: str,
-    package_versions_text: str | None = None,
+    detected_versions: list[tuple[str, str, Path]] | None = None,
 ) -> BackupPlan:
     """Plan storage behavior for an already built backup filename."""
 
@@ -636,6 +632,18 @@ def _plan_backup_name(
     )
     destination = atu_path / backup_name
     software = software_display or planned_info.software
+    backup_info_text = _build_backup_info_text(
+        backup_name=backup_name,
+        project=planned_info.project,
+        software=software,
+        timestamp=planned_info.timestamp,
+        collaborator=planned_info.collaborator,
+        stage=planned_info.stage,
+        project_type_label=project_type_label,
+        source_file=source_file,
+        source_files=list(source_files),
+        detected_versions=detected_versions,
+    )
 
     if current and current.timestamp > planned_info.timestamp:
         history_path = find_backup_by_identity(his_path, planned_info.identity)
@@ -657,7 +665,7 @@ def _plan_backup_name(
                 current_backup=current.path,
                 history_path=history_path,
                 source_files=source_files,
-                package_versions_text=package_versions_text,
+                backup_info_text=backup_info_text,
             )
 
         return BackupPlan(
@@ -674,7 +682,7 @@ def _plan_backup_name(
             project_type_label=project_type_label,
             current_backup=current.path,
             source_files=source_files,
-            package_versions_text=package_versions_text,
+            backup_info_text=backup_info_text,
         )
 
     if current and current.identity == planned_info.identity:
@@ -693,7 +701,7 @@ def _plan_backup_name(
             project_type_label=project_type_label,
             current_backup=current.path,
             source_files=source_files,
-            package_versions_text=package_versions_text,
+            backup_info_text=backup_info_text,
         )
 
     if current:
@@ -713,7 +721,7 @@ def _plan_backup_name(
             current_backup=current.path,
             history_path=his_path / current.path.name,
             source_files=source_files,
-            package_versions_text=package_versions_text,
+            backup_info_text=backup_info_text,
         )
 
     return BackupPlan(
@@ -729,7 +737,7 @@ def _plan_backup_name(
         project_type_key=project_type_key,
         project_type_label=project_type_label,
         source_files=source_files,
-        package_versions_text=package_versions_text,
+        backup_info_text=backup_info_text,
     )
 
 
@@ -740,7 +748,7 @@ def archive_history_backup(
     his_path: Path,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     source_files: tuple[Path, ...] | None = None,
-    package_versions_text: str | None = None,
+    backup_info_text: str | None = None,
 ) -> Path:
     """Create a missing historical backup directly in HIS."""
 
@@ -753,11 +761,25 @@ def archive_history_backup(
     if destination.exists():
         return destination
     files_to_zip = source_files or tuple(project_type.get_related_files(project_file))
+    if backup_info_text is None:
+        planned_info = parse_backup_filename(Path(backup_name))
+        backup_info_text = _build_backup_info_text(
+            backup_name=backup_name,
+            project=planned_info.project,
+            software=planned_info.software,
+            timestamp=planned_info.timestamp,
+            collaborator=planned_info.collaborator,
+            stage=planned_info.stage,
+            project_type_label=project_type.label,
+            source_file=project_file,
+            source_files=list(files_to_zip),
+            detected_versions=None,
+        )
     return create_backup_zip(
         files_to_zip,
         backup_name,
         output_dir=his_path,
-        package_versions_text=package_versions_text,
+        backup_info_text=backup_info_text,
     )
 
 
@@ -800,38 +822,47 @@ def _software_version_override_for(
     return fallback
 
 
-def _build_group_versions_text(
+def _build_backup_info_text(
     *,
     backup_name: str,
     project: str,
+    software: str,
     timestamp,
     collaborator: str,
     stage: StageValue,
-    entries: list[tuple[ProjectType, Path, tuple[Path, ...], str]],
+    project_type_label: str,
+    source_file: Path,
     source_files: list[Path],
+    detected_versions: list[tuple[str, str, Path]] | None,
 ) -> str:
-    """Build a human-readable package summary for grouped IED packages."""
+    """Build a human-readable metadata file included in every backup zip."""
 
     stage_text = stage.value if isinstance(stage, BackupStage) else str(stage)
+    versions = detected_versions or [(project_type_label, software, source_file)]
     lines = [
-        "IED Backup Manager - IED Software Versions",
+        "IED Backup Manager - Backup Information",
         "",
         f"Backup: {backup_name}",
         f"Project: {project}",
-        f"Package timestamp: {timestamp.strftime('%Y%m%d-%H%M')}",
+        f"Software: {software}",
+        f"Timestamp: {timestamp.strftime('%Y%m%d-%H%M')}",
         f"Collaborator: {collaborator}",
         f"Stage: {stage_text}",
         "",
         "Detected versions:",
     ]
-    for project_type, project_file, _, version in entries:
-        lines.append(f"- {project_type.label}: {version} ({project_file.name})")
+    for label, version, project_file in versions:
+        lines.append(f"- {label}: {version} ({project_file.name})")
 
     lines.extend(["", "Included files:"])
     for path in source_files:
         lines.append(
-            f"- {path.name} | modified {get_file_timestamp(path).strftime('%Y%m%d-%H%M')}"
+            f"- {path.name}",
         )
+        lines.append(
+            f"  Modified: {get_file_timestamp(path).strftime('%Y%m%d-%H%M')}",
+        )
+        lines.append(f"  Size: {path.stat().st_size} bytes")
 
     return "\n".join(lines) + "\n"
 

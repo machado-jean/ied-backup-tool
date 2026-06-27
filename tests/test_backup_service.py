@@ -17,6 +17,7 @@ from src.core.backup_service import (
 )
 from src.core.naming import BackupStage
 from src.core.project_types.registry import get_project_type
+from src.core.zipper import BACKUP_INFO_FILENAME
 
 
 def test_process_all_backups_versions_atu_and_his(tmp_path: Path) -> None:
@@ -48,6 +49,14 @@ def test_process_all_backups_versions_atu_and_his(tmp_path: Path) -> None:
     assert first.exists()
     assert second.exists()
     assert third.exists()
+    [current_backup] = list(atu.glob("*.zip"))
+    with ZipFile(current_backup) as archive:
+        assert BACKUP_INFO_FILENAME in archive.namelist()
+        backup_info = archive.read(BACKUP_INFO_FILENAME).decode("utf-8")
+        assert "IED Backup Manager - Backup Information" in backup_info
+        assert "Software: DIGSI5-V10.00" in backup_info
+        assert "Project: SE-GVM" in backup_info
+        assert "Size:" in backup_info
 
 
 def test_process_all_backups_skips_older_files_when_atu_has_newest(tmp_path: Path) -> None:
@@ -349,15 +358,18 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
     [zip_path] = list(atu.glob("*.zip"))
     with ZipFile(zip_path) as archive:
         assert archive.namelist() == [
-            "IEDS-VERSIONS.txt",
+            BACKUP_INFO_FILENAME,
             "SE-GVM_20260619_1230.dz5",
             "SE-GVM.rdb",
             "SE-GVM.scd",
         ]
-        versions_text = archive.read("IEDS-VERSIONS.txt").decode("utf-8")
-        assert "DIGSI 5 (.dz5): DIGSI5-V10.00 (SE-GVM_20260619_1230.dz5)" in versions_text
-        assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34 (SE-GVM.rdb)" in versions_text
-        assert "SE-GVM_20260619_1200.dz5" not in versions_text
+        backup_info = archive.read(BACKUP_INFO_FILENAME).decode("utf-8")
+        assert "IED Backup Manager - Backup Information" in backup_info
+        assert "Software: DIGSI5-V10.00 + QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34" in backup_info
+        assert "DIGSI 5 (.dz5): DIGSI5-V10.00 (SE-GVM_20260619_1230.dz5)" in backup_info
+        assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34 (SE-GVM.rdb)" in backup_info
+        assert "Size:" in backup_info
+        assert "SE-GVM_20260619_1200.dz5" not in backup_info
 
 
 def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
@@ -385,7 +397,8 @@ def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
     assert plans[0].backup_name == (
         "QUICKSET-V7.5.3.10_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
     )
-    assert plans[0].package_versions_text is None
+    assert plans[0].backup_info_text is not None
+    assert "QUICKSET-V7.5.3.10" in plans[0].backup_info_text
 
 
 def create_dz5(path: Path, mtime: datetime) -> Path:

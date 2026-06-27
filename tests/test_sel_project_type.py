@@ -12,6 +12,7 @@ from src.core.naming import BackupStage
 from src.core.project_types.base import ProjectVersionRequiredError
 from src.core.project_types.registry import get_project_type
 from src.core.project_types.sel import SEL_PROJECT_TYPE
+from src.core.zipper import BACKUP_INFO_FILENAME
 
 
 def test_sel_project_type_is_registered() -> None:
@@ -56,9 +57,12 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
     )
     with zipfile.ZipFile(zip_path) as archive:
         assert archive.namelist() == [
+            BACKUP_INFO_FILENAME,
             "SE-SEL_DEV_01_20260619_0013.rdb",
             "SE-SEL_DEV_01_20260619_0013.scd",
         ]
+        backup_info = archive.read(BACKUP_INFO_FILENAME).decode("utf-8")
+        assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34" in backup_info
 
 
 def test_sel_version_fallback_is_used_when_quickset_is_missing(tmp_path: Path) -> None:

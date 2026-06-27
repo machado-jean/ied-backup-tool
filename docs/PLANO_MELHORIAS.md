@@ -27,13 +27,13 @@ Status: implementado em `v1.4.2`.
 Objetivo: todo backup deve ser autoexplicativo e auditavel, inclusive backups
 individuais DIGSI, SEL, PCM600 e INGETEAM.
 
-Decisao tecnica proposta:
+Status: implementado em `v1.5.0`.
 
-- Criar um arquivo de informacoes dentro de todos os ZIPs.
-- Nome candidato: `IEDS-BACKUP-INFO.txt`.
-- O nome `IEDS-VERSIONS.txt` pode continuar valido para pacotes atuais, mas
-  `IEDS-BACKUP-INFO.txt` e mais amplo porque tambem cobre SHA256, tamanho e
-  outros metadados.
+- [x] Criar um arquivo de informacoes dentro de todos os ZIPs.
+- [x] Nome adotado: `IEDS-BACKUP-INFO.txt`.
+- [x] Incluir versoes detectadas, arquivos incluidos, tamanho e data de
+  modificacao.
+- [ ] Incluir SHA256 dos arquivos de origem.
 
 Conteudo minimo sugerido:
 
@@ -51,7 +51,6 @@ Included files:
 - SE-XXX_COMENTARIO-GENERICO_20260622_1350.dz5
   Modified: 20260622-1350
   Size: 12345678 bytes
-  SHA256: ABCDEF...
 ```
 
 Para `IED-PACK`, manter tambem uma secao de versoes detectadas:
@@ -65,6 +64,8 @@ Detected versions:
 ### SHA256 dos Arquivos de Origem
 
 Objetivo: registrar a impressao digital dos arquivos incluidos no ZIP.
+
+Status: planejado para versao posterior a `v1.5.0`.
 
 Vantagens:
 
