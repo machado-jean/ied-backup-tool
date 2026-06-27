@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 
 from src.config.config_manager import AppConfig, save_config
 from src.core.i18n import DEFAULT_LANGUAGE, ui_text
+from src.gui.storage_paths import confirm_storage_paths_ready
 
 
 class SettingsWindow(QDialog):
@@ -100,10 +101,20 @@ class SettingsWindow(QDialog):
             )
             return
 
+        atu = Path(atu_path)
+        his = Path(his_path)
+        if not confirm_storage_paths_ready(
+            parent=self,
+            atu_path=atu,
+            his_path=his,
+            language=self.language,
+        ):
+            return
+
         config = AppConfig(
             collaborator=collaborator.upper().replace(" ", "-"),
-            atu_path=Path(atu_path),
-            his_path=Path(his_path),
+            atu_path=atu,
+            his_path=his,
             language=self.config.language if self.config else self.language,
             project_types=self.config.project_types if self.config else (),
             software_versions=self.config.software_versions if self.config else {},

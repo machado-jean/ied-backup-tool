@@ -4,7 +4,7 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um
 backup atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.4.1`
+Versao atual: `1.4.2`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 
@@ -32,6 +32,7 @@ arquivos finais.
 - Pacote `IED-PACK` quando mais de um tipo de IED selecionado pertence ao mesmo
   projeto.
 - Resumo `IEDS-VERSIONS.txt` com versoes detectadas e arquivos incluidos.
+- Validacao das pastas `ATU` e `HIS`, com criacao assistida quando faltarem.
 - Atualizacao automatica de `ATU` e arquivamento do backup anterior em `HIS`.
 - Deteccao de duplicidades em `ATU`, com aviso do arquivo problematico.
 - Barra de progresso durante a geracao dos backups.
@@ -173,8 +174,6 @@ Validar qualidade e testes:
 
 Itens desejados para evolucoes futuras:
 
-- Validar existencia, diferenca e disponibilidade das pastas `ATU` e `HIS`
-  antes da execucao.
 - Criar arquivo interno de metadados em todos os ZIPs, com versao, arquivos
   incluidos, tamanho, data de modificacao e SHA256.
 - Usar SHA256 para alertar quando houver mesma identidade tecnica com conteudo

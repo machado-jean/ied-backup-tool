@@ -10,16 +10,16 @@ sem depender apenas do historico de conversa.
 
 Objetivo: reduzir risco operacional antes de criar ou mover backups.
 
-TODO:
+Status: implementado em `v1.4.2`.
 
-- Validar, na tela de configuracoes, se `ATU` e `HIS` existem.
-- Se alguma pasta nao existir, perguntar se o usuario deseja cria-la.
-- Validar novamente antes de `Gerar backups`, pois uma pasta pode ter sido
+- [x] Validar, na tela de configuracoes, se `ATU` e `HIS` existem.
+- [x] Se alguma pasta nao existir, perguntar se o usuario deseja cria-la.
+- [x] Validar novamente antes de `Gerar backups`, pois uma pasta pode ter sido
   apagada, desconectada ou ficar indisponivel depois da configuracao.
-- Bloquear execucao quando `ATU` e `HIS` apontarem para a mesma pasta.
-- Avisar quando uma pasta estiver dentro da outra, por exemplo `HIS` dentro de
+- [x] Bloquear execucao quando `ATU` e `HIS` apontarem para a mesma pasta.
+- [x] Avisar quando uma pasta estiver dentro da outra, por exemplo `HIS` dentro de
   `ATU`.
-- Considerar aviso quando `ATU` ou `HIS` estiverem em pasta sincronizada, como
+- [ ] Considerar aviso quando `ATU` ou `HIS` estiverem em pasta sincronizada, como
   OneDrive, SharePoint ou similar.
 
 ### Metadados em Todos os ZIPs
@@ -128,4 +128,3 @@ TODO:
 - Separar `src/core/backup_service.py` em planejamento, execucao, agrupamento e
   resumo.
 - Expandir testes de GUI com inicializacao em modo offscreen.
-

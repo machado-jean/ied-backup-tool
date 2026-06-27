@@ -98,6 +98,16 @@ UI_TEXT = {
         "settings_invalid": "Configuração inválida",
         "settings_pending": "Configuração pendente",
         "settings_required": "Salve as configurações antes de gerar backup.",
+        "storage_paths_create_failed": "Não foi possível criar ou validar as pastas: {error}",
+        "storage_paths_invalid_title": "Pastas ATU/HIS inválidas",
+        "storage_paths_missing_message": (
+            "As seguintes pastas não existem:\n\n{paths}\n\nDeseja criá-las agora?"
+        ),
+        "storage_paths_missing_title": "Criar pastas ATU/HIS",
+        "storage_paths_nested_message": (
+            "{detail}\n\nEssa configuração pode confundir o versionamento. Deseja continuar?"
+        ),
+        "storage_paths_nested_title": "Atenção aos caminhos ATU/HIS",
         "stage": "Etapa",
         "stage_description": "Descrição",
         "stage_description_option": "Descrição livre",
@@ -179,6 +189,16 @@ UI_TEXT = {
         "settings_invalid": "Invalid settings",
         "settings_pending": "Pending settings",
         "settings_required": "Save settings before generating backup.",
+        "storage_paths_create_failed": "Could not create or validate the folders: {error}",
+        "storage_paths_invalid_title": "Invalid ATU/HIS folders",
+        "storage_paths_missing_message": (
+            "The following folders do not exist:\n\n{paths}\n\nDo you want to create them now?"
+        ),
+        "storage_paths_missing_title": "Create ATU/HIS folders",
+        "storage_paths_nested_message": (
+            "{detail}\n\nThis configuration may confuse versioning. Do you want to continue?"
+        ),
+        "storage_paths_nested_title": "Check ATU/HIS paths",
         "stage": "Stage",
         "stage_description": "Description",
         "stage_description_option": "Free description",

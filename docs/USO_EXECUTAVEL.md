@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.4.1.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.4.2.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
 (`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
 
@@ -13,7 +13,7 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.4.1.exe
+├─ IED Backup Manager v1.4.2.exe
 ├─ config.json
 ├─ SE-GVM_20260529_1624.dz5
 ├─ SE-GVM_20260529_1625.dz5
@@ -46,6 +46,13 @@ Depois clique em `Salvar`.
 
 O programa criara ou atualizara o arquivo `config.json` ao lado do executavel.
 Nao e necessario criar uma pasta `config`.
+
+Ao salvar, o programa tambem valida `Pasta ATU` e `Pasta HIS`:
+
+- se alguma pasta nao existir, sera perguntado se deseja cria-la;
+- `ATU` e `HIS` nao podem apontar para a mesma pasta;
+- se uma pasta estiver dentro da outra, o programa mostra um aviso antes de
+  continuar.
 
 Exemplo de `config.json`:
 
@@ -317,6 +324,10 @@ Clique em `Gerar backups`.
 
 Antes de executar, o programa mostra uma confirmacao com a quantidade de
 arquivos que serao processados.
+
+Nesse momento, o programa revalida `ATU` e `HIS`. Se alguma pasta tiver sido
+apagada, desconectada ou ficar indisponivel depois da configuracao, a execucao
+sera bloqueada ate o usuario corrigir ou recriar a pasta.
 
 Durante a execucao, uma barra de progresso mostra o arquivo atual. Aguarde a
 conclusao antes de fechar o programa.

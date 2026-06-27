@@ -49,6 +49,7 @@ from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
 from src.gui.resources import app_icon_path, language_flag_path
 from src.gui.settings_window import SettingsWindow
+from src.gui.storage_paths import confirm_storage_paths_ready
 from src.version import APP_DISPLAY_NAME
 
 STATUS_COLORS = {
@@ -461,6 +462,14 @@ class MainWindow(QMainWindow):
                 ui_text("settings_pending", self.language),
                 ui_text("settings_required", self.language),
             )
+            return
+
+        if not confirm_storage_paths_ready(
+            parent=self,
+            atu_path=self.config.atu_path,
+            his_path=self.config.his_path,
+            language=self.language,
+        ):
             return
 
         if not self.current_plans:
