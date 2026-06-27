@@ -4,7 +4,7 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um
 backup atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.4.0`
+Versao atual: `1.4.1`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 
@@ -29,7 +29,7 @@ arquivos finais.
 - Processamento individual ou agrupado por subestacao/projeto.
 - Pacote `IED-PACK` quando mais de um tipo de IED selecionado pertence ao mesmo
   projeto.
-- Manifesto `IED-PACK-MANIFEST.txt` com versoes detectadas e arquivos incluidos.
+- Resumo `IEDS-VERSIONS.txt` com versoes detectadas e arquivos incluidos.
 - Atualizacao automatica de `ATU` e arquivamento do backup anterior em `HIS`.
 - Deteccao de duplicidades em `ATU`, com aviso do arquivo problematico.
 - Barra de progresso durante a geracao dos backups.
@@ -58,7 +58,7 @@ Exemplos:
 DIGSI5-V10.00_SE-XXX_20260622-1350_JEAN-CARLOS-MACHADO_TAF.zip
 QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-YYY_20260612-0350_JEAN-CARLOS-MACHADO_TAF.zip
 PCM600-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
-INGESYS-V5.5.4_LT-ZZZ_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+INGESYS-V5.5.4_VAO-ZZZ_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
 IED-PACK_ETD-YYY_20260612-0350_JEAN-CARLOS-MACHADO_TAF.zip
 ```
 

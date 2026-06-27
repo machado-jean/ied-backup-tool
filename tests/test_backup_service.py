@@ -349,15 +349,15 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
     [zip_path] = list(atu.glob("*.zip"))
     with ZipFile(zip_path) as archive:
         assert archive.namelist() == [
-            "IED-PACK-MANIFEST.txt",
+            "IEDS-VERSIONS.txt",
             "SE-GVM_20260619_1230.dz5",
             "SE-GVM.rdb",
             "SE-GVM.scd",
         ]
-        manifest = archive.read("IED-PACK-MANIFEST.txt").decode("utf-8")
-        assert "DIGSI 5 (.dz5): DIGSI5-V10.00 (SE-GVM_20260619_1230.dz5)" in manifest
-        assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34 (SE-GVM.rdb)" in manifest
-        assert "SE-GVM_20260619_1200.dz5" not in manifest
+        versions_text = archive.read("IEDS-VERSIONS.txt").decode("utf-8")
+        assert "DIGSI 5 (.dz5): DIGSI5-V10.00 (SE-GVM_20260619_1230.dz5)" in versions_text
+        assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34 (SE-GVM.rdb)" in versions_text
+        assert "SE-GVM_20260619_1200.dz5" not in versions_text
 
 
 def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
@@ -385,7 +385,7 @@ def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
     assert plans[0].backup_name == (
         "QUICKSET-V7.5.3.10_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
     )
-    assert plans[0].manifest_text is None
+    assert plans[0].package_versions_text is None
 
 
 def create_dz5(path: Path, mtime: datetime) -> Path:
@@ -394,4 +394,5 @@ def create_dz5(path: Path, mtime: datetime) -> Path:
     timestamp = mtime.timestamp()
     os.utime(path, (timestamp, timestamp))
     return path
+
 

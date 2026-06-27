@@ -11,11 +11,14 @@ class BackupZipError(RuntimeError):
     pass
 
 
+PACKAGE_SUMMARY_FILENAME = "IEDS-VERSIONS.txt"
+
+
 def create_backup_zip(
     source_file: Path | Sequence[Path],
     backup_name: str,
     output_dir: Path | None = None,
-    manifest_text: str | None = None,
+    package_versions_text: str | None = None,
 ) -> Path:
     """Create a zip containing one or more source files under their original names."""
 
@@ -35,8 +38,8 @@ def create_backup_zip(
         ensure_source_is_readable(path)
 
     with zipfile.ZipFile(destination, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
-        if manifest_text is not None:
-            archive.writestr("IED-PACK-MANIFEST.txt", manifest_text)
+        if package_versions_text is not None:
+            archive.writestr(PACKAGE_SUMMARY_FILENAME, package_versions_text)
         for path in source_files:
             try:
                 archive.write(path, arcname=path.name)
@@ -60,3 +63,4 @@ def ensure_source_is_readable(source_file: Path) -> None:
             f"Nao foi possivel ler o arquivo. Verifique se ele esta aberto "
             f"ou indisponivel: {source_file}"
         ) from exc
+

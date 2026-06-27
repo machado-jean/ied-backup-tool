@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.4.0.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.4.1.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
 (`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
 
@@ -13,7 +13,7 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.4.0.exe
+├─ IED Backup Manager v1.4.1.exe
 ├─ config.json
 ├─ SE-GVM_20260529_1624.dz5
 ├─ SE-GVM_20260529_1625.dz5
@@ -223,7 +223,7 @@ Se existir mais de um arquivo principal do mesmo tipo para a mesma subestacao,
 o pacote usa somente o mais recente daquele tipo. Exemplo: dois `.dz5` da mesma
 SE resultam em apenas o `.dz5` mais recente dentro do pacote.
 
-Todo pacote `IED-PACK` inclui tambem o arquivo `IED-PACK-MANIFEST.txt`, que
+Todo pacote `IED-PACK` inclui tambem o arquivo `IEDS-VERSIONS.txt`, que
 lista:
 
 - nome do backup;
@@ -286,7 +286,8 @@ encontrados na pasta.
 
 Colunas principais:
 
-- `Arquivo`: arquivo principal de origem (`.dz5` ou `.rdb`).
+- `Arquivo`: arquivo principal de origem (`.dz5`, `.rdb`, `.pcmp`, `.efsPro`,
+  `.ITPro2`) ou primeiro arquivo do pacote agrupado.
 - `Projeto`: identificador do projeto.
 - `Versao`: versao encontrada no arquivo ou conjunto de versoes do pacote.
 - `Data/Hora`: data do arquivo usada no nome do backup.

@@ -70,7 +70,7 @@ class BackupPlan:
     current_backup: Path | None = None
     history_path: Path | None = None
     source_files: tuple[Path, ...] = ()
-    manifest_text: str | None = None
+    package_versions_text: str | None = None
 
 
 @dataclass(frozen=True)
@@ -181,7 +181,7 @@ def process_all_backups(
                 his_path=his_path,
                 project_type=project_type,
                 source_files=plan.source_files,
-                manifest_text=plan.manifest_text,
+                package_versions_text=plan.package_versions_text,
             )
             results.append(
                 BackupResult(
@@ -248,7 +248,7 @@ def process_backup_plans(
                 his_path=his_path,
                 project_type=project_type,
                 source_files=plan.source_files,
-                manifest_text=plan.manifest_text,
+                package_versions_text=plan.package_versions_text,
             )
             results.append(
                 BackupResult(
@@ -370,7 +370,7 @@ def plan_grouped_backups(
             software_display=" + ".join(versions),
             project_type_key=GROUPED_PROJECT_TYPE_KEY,
             project_type_label=GROUPED_PROJECT_TYPE_LABEL,
-            manifest_text=_build_group_manifest(
+            package_versions_text=_build_group_versions_text(
                 backup_name=backup_name,
                 project=project,
                 timestamp=timestamp,
@@ -407,7 +407,7 @@ def execute_backup_plan(*, plan: BackupPlan, atu_path: Path, his_path: Path) -> 
             backup_name=plan.backup_name,
             his_path=his_path,
             source_files=plan.source_files,
-            manifest_text=plan.manifest_text,
+            package_versions_text=plan.package_versions_text,
         )
         return BackupResult(
             source_file=plan.source_file,
@@ -422,7 +422,7 @@ def execute_backup_plan(*, plan: BackupPlan, atu_path: Path, his_path: Path) -> 
             plan.source_files or (plan.source_file,),
             plan.backup_name,
             output_dir=Path(staging),
-            manifest_text=plan.manifest_text,
+            package_versions_text=plan.package_versions_text,
         )
         final_path = update_storage(
             new_backup=staged_zip,
@@ -624,7 +624,7 @@ def _plan_backup_name(
     software_display: str | None,
     project_type_key: str,
     project_type_label: str,
-    manifest_text: str | None = None,
+    package_versions_text: str | None = None,
 ) -> BackupPlan:
     """Plan storage behavior for an already built backup filename."""
 
@@ -657,7 +657,7 @@ def _plan_backup_name(
                 current_backup=current.path,
                 history_path=history_path,
                 source_files=source_files,
-                manifest_text=manifest_text,
+                package_versions_text=package_versions_text,
             )
 
         return BackupPlan(
@@ -674,7 +674,7 @@ def _plan_backup_name(
             project_type_label=project_type_label,
             current_backup=current.path,
             source_files=source_files,
-            manifest_text=manifest_text,
+            package_versions_text=package_versions_text,
         )
 
     if current and current.identity == planned_info.identity:
@@ -693,7 +693,7 @@ def _plan_backup_name(
             project_type_label=project_type_label,
             current_backup=current.path,
             source_files=source_files,
-            manifest_text=manifest_text,
+            package_versions_text=package_versions_text,
         )
 
     if current:
@@ -713,7 +713,7 @@ def _plan_backup_name(
             current_backup=current.path,
             history_path=his_path / current.path.name,
             source_files=source_files,
-            manifest_text=manifest_text,
+            package_versions_text=package_versions_text,
         )
 
     return BackupPlan(
@@ -729,7 +729,7 @@ def _plan_backup_name(
         project_type_key=project_type_key,
         project_type_label=project_type_label,
         source_files=source_files,
-        manifest_text=manifest_text,
+        package_versions_text=package_versions_text,
     )
 
 
@@ -740,7 +740,7 @@ def archive_history_backup(
     his_path: Path,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     source_files: tuple[Path, ...] | None = None,
-    manifest_text: str | None = None,
+    package_versions_text: str | None = None,
 ) -> Path:
     """Create a missing historical backup directly in HIS."""
 
@@ -757,7 +757,7 @@ def archive_history_backup(
         files_to_zip,
         backup_name,
         output_dir=his_path,
-        manifest_text=manifest_text,
+        package_versions_text=package_versions_text,
     )
 
 
@@ -800,7 +800,7 @@ def _software_version_override_for(
     return fallback
 
 
-def _build_group_manifest(
+def _build_group_versions_text(
     *,
     backup_name: str,
     project: str,
@@ -810,11 +810,11 @@ def _build_group_manifest(
     entries: list[tuple[ProjectType, Path, tuple[Path, ...], str]],
     source_files: list[Path],
 ) -> str:
-    """Build a human-readable manifest for grouped IED packages."""
+    """Build a human-readable package summary for grouped IED packages."""
 
     stage_text = stage.value if isinstance(stage, BackupStage) else str(stage)
     lines = [
-        "IED Backup Manager - Package Manifest",
+        "IED Backup Manager - IED Software Versions",
         "",
         f"Backup: {backup_name}",
         f"Project: {project}",
@@ -869,3 +869,4 @@ def build_project_backup_name(
         collaborator=collaborator,
         stage=stage,
     )
+
