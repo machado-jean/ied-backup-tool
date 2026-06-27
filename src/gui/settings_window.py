@@ -107,6 +107,9 @@ class SettingsWindow(QDialog):
             language=self.config.language if self.config else "pt_BR",
             project_types=self.config.project_types if self.config else (),
             software_versions=self.config.software_versions if self.config else {},
+            show_startup_instructions=(
+                self.config.show_startup_instructions if self.config else True
+            ),
         )
         save_config(self.config_path, config)
         self.saved.emit(config)

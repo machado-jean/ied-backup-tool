@@ -12,6 +12,8 @@ from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
     QComboBox,
+    QDialog,
+    QDialogButtonBox,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -71,6 +73,7 @@ class MainWindow(QMainWindow):
         self.current_plans: list[BackupPlan] = []
         self.atu_duplicate_plans: list[AtuDuplicatePlan] = []
         self.language = self.config.language if self.config else DEFAULT_LANGUAGE
+        self.pending_show_startup_instructions: bool | None = None
 
         self.setWindowTitle(APP_DISPLAY_NAME)
         self.setWindowIcon(QIcon(str(app_icon_path())))
@@ -78,8 +81,7 @@ class MainWindow(QMainWindow):
         self._resize_to_available_screen()
         self._build_ui()
         self._load_manual_software_version(self._manual_version_project_type())
-        if not self.config:
-            QTimer.singleShot(0, self.open_settings)
+        QTimer.singleShot(0, self._run_startup_dialogs)
         self.refresh_preview()
 
     def _resize_to_available_screen(self) -> None:
@@ -265,6 +267,38 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, ui_text("settings_invalid", self.language), str(exc))
             return None
 
+    def _run_startup_dialogs(self) -> None:
+        """Show first-run guidance and then request settings when needed."""
+
+        self._show_startup_instructions_if_needed()
+        if not self.config:
+            self.open_settings()
+
+    def _show_startup_instructions_if_needed(self) -> None:
+        """Show usage guidance unless the user opted out in config.json."""
+
+        if self.config and not self.config.show_startup_instructions:
+            return
+
+        dialog = StartupInstructionsDialog(parent=self)
+        dialog.exec()
+        if not dialog.do_not_show_again:
+            return
+
+        if self.config:
+            self.config = AppConfig(
+                collaborator=self.config.collaborator,
+                atu_path=self.config.atu_path,
+                his_path=self.config.his_path,
+                language=self.config.language,
+                project_types=self.config.project_types,
+                software_versions=self.config.software_versions,
+                show_startup_instructions=False,
+            )
+            save_config(self.config_path, self.config)
+        else:
+            self.pending_show_startup_instructions = False
+
     def open_settings(self) -> None:
         """Open the settings dialog and refresh the preview after saving."""
 
@@ -281,6 +315,18 @@ class MainWindow(QMainWindow):
         """Update in-memory configuration after the settings dialog saves."""
 
         self.config = config
+        if self.pending_show_startup_instructions is not None:
+            self.config = AppConfig(
+                collaborator=config.collaborator,
+                atu_path=config.atu_path,
+                his_path=config.his_path,
+                language=config.language,
+                project_types=config.project_types,
+                software_versions=config.software_versions,
+                show_startup_instructions=self.pending_show_startup_instructions,
+            )
+            save_config(self.config_path, self.config)
+            self.pending_show_startup_instructions = None
         self.language = config.language
         self.language_button.setText(self._language_flag())
         self._load_manual_software_version(self._manual_version_project_type())
@@ -654,6 +700,7 @@ class MainWindow(QMainWindow):
                 key for key, checkbox in self.type_checkboxes.items() if checkbox.isChecked()
             ),
             software_versions=self.config.software_versions,
+            show_startup_instructions=self.config.show_startup_instructions,
         )
         save_config(self.config_path, self.config)
 
@@ -734,6 +781,7 @@ class MainWindow(QMainWindow):
                 language=self.config.language,
                 project_types=self.config.project_types,
                 software_versions=software_versions,
+                show_startup_instructions=self.config.show_startup_instructions,
             )
             save_config(self.config_path, self.config)
         self.refresh_preview()
@@ -804,6 +852,7 @@ class MainWindow(QMainWindow):
                 language=self.language,
                 project_types=self.config.project_types,
                 software_versions=self.config.software_versions,
+                show_startup_instructions=self.config.show_startup_instructions,
             )
             save_config(self.config_path, self.config)
         self.retranslate_ui()
@@ -885,6 +934,88 @@ class MainWindow(QMainWindow):
             return
         folder.mkdir(parents=True, exist_ok=True)
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder.resolve())))
+
+
+class StartupInstructionsDialog(QDialog):
+    """Instruction dialog shown when the application starts."""
+
+    def __init__(self, *, parent=None) -> None:
+        super().__init__(parent)
+        self.do_not_show_again = False
+        self.setWindowTitle("Instruções de uso")
+        self.setMinimumWidth(700)
+
+        layout = QVBoxLayout(self)
+        title = QLabel("<h2>Instruções de uso</h2>")
+        title.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(title)
+
+        body = QLabel(
+            """
+            <p>Este executável deve ficar dentro da pasta que contém os arquivos
+            de trabalho da subestação, aplicação ou vãos/equipamentos que serão
+            processados.</p>
+
+            <p><b>Estrutura recomendada:</b></p>
+            <pre>Pasta local/
+└─ Pasta da SE, ETD ou LT/
+   ├─ IED Backup Manager.exe
+   ├─ config.json
+   ├─ SE-XXX_COMENTARIO-GENERICO_20260622_1350.dz5
+   ├─ ETD-YYY_COMENTARIO-GENERICO_20260612_0350.dz5
+   ├─ ETD-YYY_OUTRO-COMENTARIO.rdb
+   └─ outros arquivos de trabalho</pre>
+
+            <p><b>Regras para nome dos arquivos:</b></p>
+            <ul>
+              <li>O nome da SE, ETD, vão ou equipamento deve vir antes do
+              primeiro <code>_</code>.</li>
+              <li>Use hífen <code>-</code> para separar textos dentro do nome da SE,
+              ETD, vão ou equipamento.</li>
+              <li>Todo texto depois do primeiro underline <code>_</code> é tratado
+              como comentário
+              do usuário e não será usado para identificar o backup.</li>
+              <li>O backup será agrupado pelo trecho antes do primeiro underline
+              <code>_</code>.</li>
+            </ul>
+
+            <p><b>Exemplo 1 - Backup Siemens</b></p>
+            <p>Arquivo de entrada:</p>
+            <pre>SE-XXX_COMENTARIO-GENERICO_20260622_1350.dz5</pre>
+            <p>Saída:</p>
+            <pre>DIGSIn-Vmmm_SE-XXX_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip</pre>
+            <p>Onde <code>DIGSIn</code> representa a família do DIGSI, por exemplo
+            <code>DIGSI5</code>, e <code>Vmmm</code> representa a versão detectada,
+            por exemplo <code>V10.00</code>.</p>
+
+            <p><b>Exemplo 2 - Múltiplos IEDs da mesma SE</b></p>
+            <p>Arquivos de entrada:</p>
+            <pre>ETD-YYY_COMENTARIO-GENERICO_20260612_0350.dz5
+ETD-YYY_OUTRO-COMENTARIO.rdb</pre>
+            <p>Saída:</p>
+            <pre>IED-PACK_ETD-YYY_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip</pre>
+            <p>Dentro do ZIP haverá um arquivo informando as versões dos softwares incluídos.</p>
+
+            <p>Antes de gerar backups, confira a coluna <b>Projeto</b> na prévia do lote.</p>
+            """
+        )
+        body.setTextFormat(Qt.TextFormat.RichText)
+        body.setWordWrap(True)
+        body.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        layout.addWidget(body)
+
+        self.checkbox = QCheckBox("Não exibir novamente")
+        layout.addWidget(self.checkbox)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        buttons.accepted.connect(self.accept)
+        layout.addWidget(buttons)
+
+    def accept(self) -> None:
+        """Store the opt-out state before closing the dialog."""
+
+        self.do_not_show_again = self.checkbox.isChecked()
+        super().accept()
 
 
 def get_runtime_project_dir() -> Path:

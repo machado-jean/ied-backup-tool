@@ -59,7 +59,7 @@ Crie `config.json` ao lado do executavel:
 .\.venv\Scripts\python.exe -m src.gui.app
 ```
 
-Versao atual do aplicativo: `1.3.1`.
+Versao atual do aplicativo: `1.4.0`.
 
 Manual de uso do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md).
 
@@ -80,6 +80,10 @@ contadores de resumo, selecao obrigatoria de etapa, idioma, tipos de arquivo
 suportados e o modo `Processar apenas a partir do backup atual`. Use
 `Configuracoes` para salvar colaborador, pasta `ATU` e pasta `HIS` em
 `config.json`.
+
+Ao abrir, a GUI exibe uma tela de instrucoes com orientacoes de pasta e nome dos
+arquivos. O usuario pode marcar `Nao exibir novamente`; a preferencia fica salva
+em `config.json`.
 
 Na GUI, a pasta processada e sempre a pasta atual do executavel/processo. A tela
 pre-visualiza todos os arquivos suportados encontrados nessa pasta e o botao

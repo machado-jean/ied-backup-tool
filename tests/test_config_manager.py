@@ -59,6 +59,19 @@ def test_parse_config_accepts_software_versions() -> None:
     assert config.software_versions == {"ingeteam": "5.5.4"}
 
 
+def test_parse_config_accepts_startup_instruction_preference() -> None:
+    config = parse_config(
+        {
+            "colaborador": "Jean",
+            "atu_path": "C:/BKP/ATU",
+            "his_path": "C:/BKP/HIS",
+            "show_startup_instructions": False,
+        }
+    )
+
+    assert config.show_startup_instructions is False
+
+
 def test_parse_config_requires_paths() -> None:
     with pytest.raises(ConfigError, match="his_path"):
         parse_config({"colaborador": "Jean", "atu_path": "C:/BKP/ATU"})
