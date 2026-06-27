@@ -27,8 +27,16 @@ Ele sempre processa a pasta onde o executavel esta localizado.
 
 ## 2. Primeira abertura
 
-Ao abrir o executavel pela primeira vez, a tela de configuracoes sera exibida.
-Preencha:
+Ao abrir o executavel pela primeira vez, a tela de instrucoes sera exibida. Ela
+mostra a estrutura recomendada de pastas e as regras de nomes dos arquivos.
+
+Nessa tela, voce pode:
+
+- Alternar o idioma entre portugues e ingles pelo botao de bandeira.
+- Marcar `Nao exibir novamente` para nao mostrar essa tela nas proximas
+  aberturas.
+
+Depois, a tela de configuracoes sera exibida. Preencha:
 
 - `Colaborador`: nome usado no arquivo final do backup.
 - `Pasta ATU`: pasta onde ficara o backup atual de cada projeto.
@@ -61,8 +69,8 @@ Ao abrir o programa, uma tela de instrucoes apresenta a estrutura recomendada de
 pastas e as regras de nomes dos arquivos. Se marcar `Nao exibir novamente`, essa
 preferencia sera salva no `config.json`.
 
-Use o botao de bandeira no canto superior para alternar entre portugues e
-ingles.
+Use o botao de bandeira para alternar entre portugues e ingles. Ele existe na
+tela de instrucoes e tambem na tela principal, ao lado de `Configuracoes`.
 
 A preferencia fica salva no `config.json`.
 
@@ -229,7 +237,7 @@ lista:
 
 Para os tipos suportados, o programa identifica o projeto/subestacao pelo nome
 do arquivo. Pela politica atual, o projeto e sempre o primeiro bloco antes do
-primeiro `_`.
+primeiro sublinhado `"_"`.
 
 Para DIGSI 5, o padrao recomendado e:
 
@@ -238,8 +246,8 @@ SE-XXXXXX_OUTROS-TEXTOS_AAAAMMDD_HHMM.dz5
 ```
 
 O programa considera como `Projeto` apenas `SE-XXXXXX`. Textos depois do
-primeiro `_` sao ignorados para identificar o projeto, mas podem continuar no
-nome do arquivo de origem para controle interno da equipe.
+primeiro sublinhado `"_"` sao ignorados para identificar o projeto, mas podem
+continuar no nome do arquivo de origem para controle interno da equipe.
 
 Exemplos:
 
@@ -250,19 +258,20 @@ SE-ABC_REVISAO_FINAL_20260619_1015.dz5 -> Projeto: SE-ABC
 ESD-PDO.rdb                        -> Projeto: ESD-PDO
 ```
 
-Para SEL, o mesmo criterio do primeiro bloco antes do `_` e usado quando o nome
-tem textos adicionais. Se o arquivo nao tiver `_`, o nome-base inteiro sera usado
-como projeto.
+Para SEL, o mesmo criterio do primeiro bloco antes do sublinhado `"_"` e usado
+quando o nome tem textos adicionais. Se o arquivo nao tiver sublinhado `"_"`, o
+nome-base inteiro sera usado como projeto.
 
 Cuidados:
 
 - Para DIGSI 5, mantenha o nome terminando com data e hora no formato
   `_AAAAMMDD_HHMM`.
-- Textos adicionais devem ficar depois do primeiro `_` e antes da data/hora.
+- Textos adicionais devem ficar depois do primeiro sublinhado `"_"` e antes da
+  data/hora.
 - Evite usar a data/hora no meio do nome se ela nao for o sufixo final.
 - Mesmo quando houver textos intermediarios, o projeto sera sempre apenas o
-  primeiro bloco antes do primeiro `_`.
-- Nao coloque `_` dentro do nome da subestacao/projeto. Exemplo:
+  primeiro bloco antes do primeiro sublinhado `"_"`.
+- Nao coloque sublinhado `"_"` dentro do nome da subestacao/projeto. Exemplo:
   `SE_CTU_20260619_0013.dz5` sera identificado como projeto `SE`, nao `SE_CTU`.
 - Nao coloque textos antes da subestacao/projeto. Exemplo:
   `CLIENTE_SE-CTU_20260619_0013.dz5` sera identificado como projeto `CLIENTE`.
