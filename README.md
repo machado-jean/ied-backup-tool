@@ -8,6 +8,8 @@ Versao atual: `1.4.1`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 
+Backlog tecnico: [docs/PLANO_MELHORIAS.md](docs/PLANO_MELHORIAS.md)
+
 ## Visao Geral
 
 O IED Backup Manager processa os arquivos de trabalho que estao na mesma pasta
@@ -171,6 +173,12 @@ Validar qualidade e testes:
 
 Itens desejados para evolucoes futuras:
 
+- Validar existencia, diferenca e disponibilidade das pastas `ATU` e `HIS`
+  antes da execucao.
+- Criar arquivo interno de metadados em todos os ZIPs, com versao, arquivos
+  incluidos, tamanho, data de modificacao e SHA256.
+- Usar SHA256 para alertar quando houver mesma identidade tecnica com conteudo
+  diferente.
 - Adicionar novos tipos de IED conforme surgirem arquivos reais de teste.
 - Criar ferramenta de limpeza controlada para backups antigos.
 - Permitir politicas de limpeza por idade, por exemplo backups com mais de 30
