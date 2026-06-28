@@ -2,7 +2,7 @@
 
 Este guia explica como usar o `IED Backup Manager v1.5.2.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
-(`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
+(`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`/`.apcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
 
 ## 1. Estrutura esperada
 
@@ -20,6 +20,7 @@ Pasta do projeto/
 ├─ ESD-AAA.rdb
 ├─ ESD-AAA.scd
 ├─ SE-DDD_20260619_1230.pcmp
+├─ SE-EEE_20260619_1230.apcmp
 ```
 
 O programa nao precisa que a pasta `BKPs` exista quando estiver em uso real.
@@ -155,9 +156,9 @@ backup.
 
 ### ABB PCM600
 
-O backup ABB PCM600 usa o arquivo `.pcmp`.
+O backup ABB PCM600 usa arquivos `.pcmp` ou `.apcmp`.
 
-O programa trata o `.pcmp` como pacote ZIP e procura o arquivo:
+O programa trata `.pcmp` e `.apcmp` como pacotes ZIP e procura o arquivo:
 
 ```text
 ProjectDataServer%versions.ini
@@ -296,7 +297,7 @@ encontrados na pasta.
 
 Colunas principais:
 
-- `Arquivo`: arquivo principal de origem (`.dz5`, `.rdb`, `.pcmp`, `.efsPro`,
+- `Arquivo`: arquivo principal de origem (`.dz5`, `.rdb`, `.pcmp`, `.apcmp`, `.efsPro`,
   `.ITPro2`) ou primeiro arquivo do pacote agrupado.
 - `Projeto`: identificador do projeto.
 - `Versao`: versao encontrada no arquivo ou conjunto de versoes do pacote.

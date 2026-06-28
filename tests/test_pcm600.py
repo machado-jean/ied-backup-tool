@@ -17,6 +17,17 @@ def test_extract_pcm600_version_from_versions_ini(tmp_path: Path) -> None:
     assert extract_pcm600_version(pcmp) == "PCM600-V2.10"
 
 
+def test_extract_pcm600_version_from_apcmp_package(tmp_path: Path) -> None:
+    apcmp = tmp_path / "SE-DDD_20260619_1230.apcmp"
+    with ZipFile(apcmp, "w") as archive:
+        archive.writestr(
+            "ProjectDataServer%versions.ini",
+            "ProductName=PCM600_213\nProductVersion=2.13\n",
+        )
+
+    assert extract_pcm600_version(apcmp) == "PCM600-V2.13"
+
+
 def test_extract_pcm600_version_finds_versions_ini_in_nested_folder(tmp_path: Path) -> None:
     pcmp = tmp_path / "SE-DDD_20260619_1230.pcmp"
     with ZipFile(pcmp, "w") as archive:

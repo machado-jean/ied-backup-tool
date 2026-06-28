@@ -31,7 +31,7 @@ def test_default_project_type_is_digsi() -> None:
     assert DEFAULT_PROJECT_TYPE.key == "digsi5"
     assert DEFAULT_PROJECT_TYPE.extensions == (".dz5",)
     assert get_project_type("digsi5") is DEFAULT_PROJECT_TYPE
-    assert get_project_type("pcm600").extensions == (".pcmp",)
+    assert get_project_type("pcm600").extensions == (".pcmp", ".apcmp")
 
 
 def test_backup_service_accepts_custom_project_type(tmp_path: Path) -> None:
@@ -85,4 +85,33 @@ def test_backup_service_accepts_pcm600_project_type(tmp_path: Path) -> None:
     assert [result.status for result in results] == ["stored"]
     assert [path.name for path in atu.glob("*.zip")] == [
         "PCM600-V2.10_SE-DDD_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip"
+    ]
+
+
+def test_backup_service_accepts_pcm600_apcmp_project_type(tmp_path: Path) -> None:
+    project_dir = tmp_path / "IED-DES"
+    atu = tmp_path / "IED-ATU"
+    his = tmp_path / "IED-HIS"
+    project_dir.mkdir()
+    project_file = project_dir / "SE-DDD_20260619_1230.apcmp"
+    with ZipFile(project_file, "w") as archive:
+        archive.writestr(
+            "ProjectDataServer%versions.ini",
+            "ProductName=PCM600_213\nProductVersion=2.13\n",
+        )
+    timestamp = datetime(2026, 6, 19, 12, 30).timestamp()
+    os.utime(project_file, (timestamp, timestamp))
+
+    results = process_all_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="COLABORADOR-EXEMPLO",
+        stage=BackupStage.TAF,
+        project_type=get_project_type("pcm600"),
+    )
+
+    assert [result.status for result in results] == ["stored"]
+    assert [path.name for path in atu.glob("*.zip")] == [
+        "PCM600-V2.13_SE-DDD_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip"
     ]

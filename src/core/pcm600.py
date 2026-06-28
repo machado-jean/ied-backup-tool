@@ -1,4 +1,4 @@
-"""ABB PCM600 version extraction from `.pcmp` project packages."""
+"""ABB PCM600 version extraction from project packages."""
 
 from __future__ import annotations
 
@@ -15,10 +15,10 @@ class Pcm600VersionError(RuntimeError):
 
 
 def extract_pcm600_version(project_path: Path) -> str:
-    """Extract the PCM600 product/version prefix from a `.pcmp` package."""
+    """Extract the PCM600 product/version prefix from a PCM600 package."""
 
     if not zipfile.is_zipfile(project_path):
-        raise Pcm600VersionError(f"Arquivo .pcmp nao e um pacote ZIP valido: {project_path}")
+        raise Pcm600VersionError(f"Arquivo PCM600 nao e um pacote ZIP valido: {project_path}")
 
     with zipfile.ZipFile(project_path) as archive:
         info = _find_versions_ini(archive)
