@@ -46,6 +46,14 @@ def confirm_storage_paths_ready(
         if answer != QMessageBox.StandardButton.Yes:
             return False
 
+    if validation.synced_warnings:
+        details = "\n".join(f"- {warning}" for warning in validation.synced_warnings)
+        QMessageBox.warning(
+            parent,
+            ui_text("storage_paths_synced_title", language),
+            ui_text("storage_paths_synced_message", language).format(details=details),
+        )
+
     if not validation.missing_paths:
         return True
 

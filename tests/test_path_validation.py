@@ -53,3 +53,21 @@ def test_validate_storage_paths_warns_when_one_folder_is_nested(tmp_path: Path) 
     validation = validate_storage_paths(atu, his)
 
     assert validation.nested_warning == f"HIS esta dentro de ATU: {his}"
+
+
+def test_validate_storage_paths_warns_for_synced_folders() -> None:
+    atu = Path("C:/Users/Usuario/OneDrive - Empresa/ATU")
+    his = Path("C:/Backups/HIS")
+
+    validation = validate_storage_paths(atu, his)
+
+    assert validation.synced_warnings == (f"ATU: {atu.resolve(strict=False)} (OneDrive - Empresa)",)
+
+
+def test_validate_storage_paths_does_not_warn_for_regular_folders(tmp_path: Path) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+
+    validation = validate_storage_paths(atu, his)
+
+    assert validation.synced_warnings == ()

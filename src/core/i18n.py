@@ -114,6 +114,13 @@ UI_TEXT = {
             "{detail}\n\nEssa configuração pode confundir o versionamento. Deseja continuar?"
         ),
         "storage_paths_nested_title": "Atenção aos caminhos ATU/HIS",
+        "storage_paths_synced_message": (
+            "As seguintes pastas parecem estar em diretórios sincronizados:\n\n"
+            "{details}\n\n"
+            "Se houver arquivos grandes, bloqueados ou sincronização pendente, "
+            "o backup pode demorar, falhar ou o aplicativo pode parecer travado."
+        ),
+        "storage_paths_synced_title": "Pasta sincronizada detectada",
         "stage": "Etapa",
         "stage_description": "Descrição",
         "stage_description_option": "Descrição livre",
@@ -211,6 +218,13 @@ UI_TEXT = {
             "{detail}\n\nThis configuration may confuse versioning. Do you want to continue?"
         ),
         "storage_paths_nested_title": "Check ATU/HIS paths",
+        "storage_paths_synced_message": (
+            "The following folders appear to be inside synced directories:\n\n"
+            "{details}\n\n"
+            "If files are large, locked, or waiting for sync, the backup may take longer, "
+            "fail, or the application may appear frozen."
+        ),
+        "storage_paths_synced_title": "Synced folder detected",
         "stage": "Stage",
         "stage_description": "Description",
         "stage_description_option": "Free description",

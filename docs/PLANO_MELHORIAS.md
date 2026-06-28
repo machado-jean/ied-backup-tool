@@ -21,7 +21,7 @@ Status: implementado em `v1.4.2`.
   `ATU`.
 - [x] Pedir confirmacao antes de recriar `ATU` ou `HIS` ao usar `Abrir ATU` ou
   `Abrir HIS`.
-- [ ] Considerar aviso quando `ATU` ou `HIS` estiverem em pasta sincronizada, como
+- [x] Avisar quando `ATU` ou `HIS` estiverem em pasta sincronizada, como
   OneDrive, SharePoint ou similar.
 
 ### Metadados em Todos os ZIPs

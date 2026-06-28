@@ -6,6 +6,16 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+SYNCED_FOLDER_MARKERS = (
+    "onedrive",
+    "sharepoint",
+    "dropbox",
+    "google drive",
+    "googledrive",
+    "icloud drive",
+    "icloud",
+)
+
 
 class StoragePathValidationError(ValueError):
     pass
@@ -19,6 +29,7 @@ class StoragePathValidation:
     his_path: Path
     missing_paths: tuple[Path, ...] = ()
     nested_warning: str | None = None
+    synced_warnings: tuple[str, ...] = ()
 
 
 def validate_storage_paths(atu_path: Path, his_path: Path) -> StoragePathValidation:
@@ -37,12 +48,14 @@ def validate_storage_paths(atu_path: Path, his_path: Path) -> StoragePathValidat
             )
 
     nested_warning = _nested_warning(normalized_atu, normalized_his)
+    synced_warnings = _synced_warnings(normalized_atu, normalized_his)
     missing_paths = tuple(path for path in (normalized_atu, normalized_his) if not path.exists())
     return StoragePathValidation(
         atu_path=normalized_atu,
         his_path=normalized_his,
         missing_paths=missing_paths,
         nested_warning=nested_warning,
+        synced_warnings=synced_warnings,
     )
 
 
@@ -72,6 +85,28 @@ def _nested_warning(atu_path: Path, his_path: Path) -> str | None:
         return f"HIS esta dentro de ATU: {his_path}"
     if _is_relative_to(atu_path, his_path):
         return f"ATU esta dentro de HIS: {atu_path}"
+    return None
+
+
+def _synced_warnings(atu_path: Path, his_path: Path) -> tuple[str, ...]:
+    """Return warnings for storage paths inside common synced folders."""
+
+    warnings = []
+    for label, path in (("ATU", atu_path), ("HIS", his_path)):
+        marker = _synced_folder_marker(path)
+        if marker:
+            warnings.append(f"{label}: {path} ({marker})")
+    return tuple(warnings)
+
+
+def _synced_folder_marker(path: Path) -> str | None:
+    """Detect common sync-client folder names in a path."""
+
+    for part in path.parts:
+        normalized = part.casefold()
+        for marker in SYNCED_FOLDER_MARKERS:
+            if marker in normalized:
+                return part
     return None
 
 
