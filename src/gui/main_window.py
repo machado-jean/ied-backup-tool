@@ -254,10 +254,16 @@ class MainWindow(QMainWindow):
         self.open_atu_button = QPushButton()
         self.open_his_button = QPushButton()
         self.open_atu_button.clicked.connect(
-            lambda: self.open_folder(self.config.atu_path if self.config else None)
+            lambda: self.open_folder(
+                self.config.atu_path if self.config else None,
+                "atu_folder",
+            )
         )
         self.open_his_button.clicked.connect(
-            lambda: self.open_folder(self.config.his_path if self.config else None)
+            lambda: self.open_folder(
+                self.config.his_path if self.config else None,
+                "his_folder",
+            )
         )
         open_buttons.addWidget(self.open_atu_button)
         open_buttons.addWidget(self.open_his_button)
@@ -967,13 +973,54 @@ class MainWindow(QMainWindow):
         self.open_atu_button.setText(ui_text("open_atu", self.language))
         self.open_his_button.setText(ui_text("open_his", self.language))
 
-    def open_folder(self, folder: Path | None) -> None:
-        """Create and open a configured folder in Windows Explorer."""
+    def open_folder(self, folder: Path | None, label_key: str) -> None:
+        """Open a configured folder, asking before recreating missing paths."""
 
         if not folder:
             return
-        folder.mkdir(parents=True, exist_ok=True)
-        QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder.resolve())))
+
+        label = ui_text(label_key, self.language)
+        target = folder.expanduser().resolve(strict=False)
+        if target.exists() and not target.is_dir():
+            QMessageBox.warning(
+                self,
+                ui_text("storage_paths_invalid_title", self.language),
+                ui_text("storage_folder_not_directory", self.language).format(
+                    label=label,
+                    path=target,
+                ),
+            )
+            return
+
+        if not target.exists():
+            answer = QMessageBox.question(
+                self,
+                ui_text("storage_folder_missing_title", self.language),
+                ui_text("storage_folder_missing_message", self.language).format(
+                    label=label,
+                    path=target,
+                ),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
+            if answer != QMessageBox.StandardButton.Yes:
+                return
+            try:
+                target.mkdir(parents=True, exist_ok=True)
+            except OSError as exc:
+                QMessageBox.critical(
+                    self,
+                    ui_text("storage_paths_invalid_title", self.language),
+                    ui_text("storage_paths_create_failed", self.language).format(error=exc),
+                )
+                return
+
+        if not QDesktopServices.openUrl(QUrl.fromLocalFile(str(target))):
+            QMessageBox.warning(
+                self,
+                ui_text("storage_paths_invalid_title", self.language),
+                ui_text("storage_folder_open_failed", self.language).format(path=target),
+            )
 
 
 class StartupInstructionsDialog(QDialog):

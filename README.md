@@ -4,7 +4,7 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um
 backup atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.5.0`
+Versao atual: `1.5.1`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 

@@ -19,6 +19,8 @@ Status: implementado em `v1.4.2`.
 - [x] Bloquear execucao quando `ATU` e `HIS` apontarem para a mesma pasta.
 - [x] Avisar quando uma pasta estiver dentro da outra, por exemplo `HIS` dentro de
   `ATU`.
+- [x] Pedir confirmacao antes de recriar `ATU` ou `HIS` ao usar `Abrir ATU` ou
+  `Abrir HIS`.
 - [ ] Considerar aviso quando `ATU` ou `HIS` estiverem em pasta sincronizada, como
   OneDrive, SharePoint ou similar.
 

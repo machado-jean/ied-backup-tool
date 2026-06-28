@@ -98,6 +98,12 @@ UI_TEXT = {
         "settings_invalid": "Configuração inválida",
         "settings_pending": "Configuração pendente",
         "settings_required": "Salve as configurações antes de gerar backup.",
+        "storage_folder_missing_message": (
+            "{label} não existe:\n\n{path}\n\nDeseja criá-la agora?"
+        ),
+        "storage_folder_missing_title": "Pasta não encontrada",
+        "storage_folder_not_directory": "{label} aponta para um arquivo, não uma pasta: {path}",
+        "storage_folder_open_failed": "Não foi possível abrir a pasta: {path}",
         "storage_paths_create_failed": "Não foi possível criar ou validar as pastas: {error}",
         "storage_paths_invalid_title": "Pastas ATU/HIS inválidas",
         "storage_paths_missing_message": (
@@ -189,6 +195,12 @@ UI_TEXT = {
         "settings_invalid": "Invalid settings",
         "settings_pending": "Pending settings",
         "settings_required": "Save settings before generating backup.",
+        "storage_folder_missing_message": (
+            "{label} does not exist:\n\n{path}\n\nDo you want to create it now?"
+        ),
+        "storage_folder_missing_title": "Folder not found",
+        "storage_folder_not_directory": "{label} points to a file, not a folder: {path}",
+        "storage_folder_open_failed": "Could not open the folder: {path}",
         "storage_paths_create_failed": "Could not create or validate the folders: {error}",
         "storage_paths_invalid_title": "Invalid ATU/HIS folders",
         "storage_paths_missing_message": (
