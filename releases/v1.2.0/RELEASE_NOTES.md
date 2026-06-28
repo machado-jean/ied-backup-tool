@@ -23,7 +23,7 @@ ProductVersion=2.10
 O backup individual fica:
 
 ```text
-PCM600-210-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+PCM600-210-V2.10_SE-DDD_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
 ## Validacao

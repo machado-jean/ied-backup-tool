@@ -26,25 +26,25 @@ def test_process_all_backups_versions_atu_and_his(tmp_path: Path) -> None:
     his = tmp_path / "IED-HIS"
     project_dir.mkdir()
 
-    first = create_dz5(project_dir / "SE-GVM_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
-    second = create_dz5(project_dir / "SE-GVM_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
-    third = create_dz5(project_dir / "SE-GVM_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
+    first = create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
+    second = create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
+    third = create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.DEV,
     )
 
     assert [result.source_file for result in results] == [first, second, third]
     assert [path.name for path in atu.glob("*.zip")] == [
-        "DIGSI5-V10.00_SE-GVM_20260525-1809_JEAN-CARLOS-MACHADO_DEV.zip"
+        "DIGSI5-V10.00_SE-AAA_20260525-1809_COLABORADOR-EXEMPLO_DEV.zip"
     ]
     assert sorted(path.name for path in his.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-GVM_20260525-1218_JEAN-CARLOS-MACHADO_DEV.zip",
-        "DIGSI5-V10.00_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_20260525-1218_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip",
     ]
     assert first.exists()
     assert second.exists()
@@ -55,7 +55,7 @@ def test_process_all_backups_versions_atu_and_his(tmp_path: Path) -> None:
         backup_info = archive.read(BACKUP_INFO_FILENAME).decode("utf-8")
         assert "IED Backup Manager - Backup Information" in backup_info
         assert "Software: DIGSI5-V10.00" in backup_info
-        assert "Project: SE-GVM" in backup_info
+        assert "Project: SE-AAA" in backup_info
         assert "Size:" in backup_info
         assert "SHA256:" in backup_info
 
@@ -66,22 +66,22 @@ def test_process_all_backups_skips_older_files_when_atu_has_newest(tmp_path: Pat
     his = tmp_path / "IED-HIS"
     project_dir.mkdir()
 
-    create_dz5(project_dir / "SE-GVM_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
-    create_dz5(project_dir / "SE-GVM_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
-    create_dz5(project_dir / "SE-GVM_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
+    create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
+    create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
+    create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
 
     process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.DEV,
     )
     second_run = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.DEV,
     )
 
@@ -103,17 +103,17 @@ def test_process_all_backups_archives_missing_history_when_atu_has_newest(
     project_dir.mkdir()
     atu.mkdir()
 
-    create_dz5(project_dir / "SE-GVM_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
-    create_dz5(project_dir / "SE-GVM_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
-    create_dz5(project_dir / "SE-GVM_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
-    current = atu / "DIGSI5-V10.00_SE-GVM_20260525-1809_JEAN-CARLOS-MACHADO_DEV.zip"
+    create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
+    create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
+    create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
+    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1809_COLABORADOR-EXEMPLO_DEV.zip"
     current.write_text("current", encoding="utf-8")
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.DEV,
     )
 
@@ -124,8 +124,8 @@ def test_process_all_backups_archives_missing_history_when_atu_has_newest(
     ]
     assert [path.name for path in atu.glob("*.zip")] == [current.name]
     assert sorted(path.name for path in his.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-GVM_20260525-1218_JEAN-CARLOS-MACHADO_DEV.zip",
-        "DIGSI5-V10.00_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_20260525-1218_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip",
     ]
 
 
@@ -139,17 +139,17 @@ def test_process_all_backups_does_not_archive_when_same_identity_exists_in_his(
     atu.mkdir()
     his.mkdir()
 
-    create_dz5(project_dir / "SE-GVM_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
-    current = atu / "DIGSI5-V10.00_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_TAC.zip"
+    create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
+    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_TAC.zip"
     current.write_text("current", encoding="utf-8")
-    existing_history = his / "DIGSI5-V10.00_SE-GVM_20260525-1218_OUTRO-COLABORADOR_DEV.zip"
+    existing_history = his / "DIGSI5-V10.00_SE-AAA_20260525-1218_OUTRO-COLABORADOR_DEV.zip"
     existing_history.write_text("history", encoding="utf-8")
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.TAC,
     )
 
@@ -167,15 +167,15 @@ def test_process_all_backups_treats_same_identity_in_atu_as_current(
     project_dir.mkdir()
     atu.mkdir()
 
-    create_dz5(project_dir / "SE-GVM_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
-    current = atu / "DIGSI5-V10.00_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_DEV.zip"
+    create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
+    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip"
     current.write_text("current", encoding="utf-8")
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.TAC,
     )
 
@@ -191,22 +191,22 @@ def test_process_all_backups_allows_newer_backup_with_any_stage(tmp_path: Path) 
     project_dir.mkdir()
     atu.mkdir()
 
-    create_dz5(project_dir / "SE-GVM_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
-    current = atu / "DIGSI5-V10.00_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_POS-TAC.zip"
+    create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
+    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_POS-TAC.zip"
     current.write_text("current", encoding="utf-8")
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.DEV,
     )
 
     assert [result.status for result in results] == ["replaced_current"]
     assert (his / current.name).exists()
     assert [path.name for path in atu.glob("*.zip")] == [
-        "DIGSI5-V10.00_SE-GVM_20260525-1809_JEAN-CARLOS-MACHADO_DEV.zip"
+        "DIGSI5-V10.00_SE-AAA_20260525-1809_COLABORADOR-EXEMPLO_DEV.zip"
     ]
 
 
@@ -214,8 +214,8 @@ def test_plan_and_fix_atu_duplicate_backups(tmp_path: Path) -> None:
     atu = tmp_path / "IED-ATU"
     his = tmp_path / "IED-HIS"
     atu.mkdir()
-    older = atu / "DIGSI5-V10.00_SE-GVM_20260525-1218_JEAN-CARLOS-MACHADO_DEV.zip"
-    newer = atu / "DIGSI5-V10.00_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_DEV.zip"
+    older = atu / "DIGSI5-V10.00_SE-AAA_20260525-1218_COLABORADOR-EXEMPLO_DEV.zip"
+    newer = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip"
     older.write_text("older", encoding="utf-8")
     newer.write_text("newer", encoding="utf-8")
 
@@ -241,27 +241,27 @@ def test_process_all_backups_keeps_one_current_per_project(tmp_path: Path) -> No
     his = tmp_path / "IED-HIS"
     project_dir.mkdir()
 
-    create_dz5(project_dir / "SE-GVM_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
-    create_dz5(project_dir / "SE-GVM_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
-    create_dz5(project_dir / "SE-CTU_20260526_1133.dz5", datetime(2026, 5, 26, 11, 33))
-    create_dz5(project_dir / "SE-CTU_20260526_1512.dz5", datetime(2026, 5, 26, 15, 12))
+    create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
+    create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
+    create_dz5(project_dir / "SE-BBB_20260526_1133.dz5", datetime(2026, 5, 26, 11, 33))
+    create_dz5(project_dir / "SE-BBB_20260526_1512.dz5", datetime(2026, 5, 26, 15, 12))
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.DEV,
     )
 
     assert summarize_results(results).replaced_current == 2
     assert sorted(path.name for path in atu.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-CTU_20260526-1512_JEAN-CARLOS-MACHADO_DEV.zip",
-        "DIGSI5-V10.00_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-BBB_20260526-1512_COLABORADOR-EXEMPLO_DEV.zip",
     ]
     assert sorted(path.name for path in his.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-CTU_20260526-1133_JEAN-CARLOS-MACHADO_DEV.zip",
-        "DIGSI5-V10.00_SE-GVM_20260525-1218_JEAN-CARLOS-MACHADO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_20260525-1218_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-BBB_20260526-1133_COLABORADOR-EXEMPLO_DEV.zip",
     ]
 
 
@@ -272,24 +272,24 @@ def test_filter_current_and_newer_plans_omits_previous_history(tmp_path: Path) -
     project_dir.mkdir()
     atu.mkdir()
 
-    create_dz5(project_dir / "SE-GVM_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
-    create_dz5(project_dir / "SE-GVM_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
-    create_dz5(project_dir / "SE-GVM_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
-    current = atu / "DIGSI5-V10.00_SE-GVM_20260525-1719_JEAN-CARLOS-MACHADO_DEV.zip"
+    create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
+    create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
+    create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
+    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip"
     current.write_text("current", encoding="utf-8")
 
     plans = plan_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.DEV,
     )
     filtered = filter_current_and_newer_plans(plans)
 
     assert [plan.source_file.name for plan in filtered] == [
-        "SE-GVM_20260525_1719.dz5",
-        "SE-GVM_20260525_1809.dz5",
+        "SE-AAA_20260525_1719.dz5",
+        "SE-AAA_20260525_1809.dz5",
     ]
     assert [plan.status for plan in filtered] == ["already_current", "replaced_current"]
 
@@ -300,14 +300,14 @@ def test_plan_all_backups_does_not_create_atu_or_his(tmp_path: Path) -> None:
     his = tmp_path / "IED-HIS"
     project_dir.mkdir()
 
-    create_dz5(project_dir / "SE-GVM_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
-    create_dz5(project_dir / "SE-GVM_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
+    create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
+    create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
 
     plans = plan_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.DEV,
     )
 
@@ -324,13 +324,13 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
     project_dir.mkdir()
     timestamp = datetime(2026, 6, 19, 12, 30)
 
-    create_dz5(project_dir / "SE-GVM_20260619_1200.dz5", datetime(2026, 6, 19, 12, 0))
-    dz5 = create_dz5(project_dir / "SE-GVM_20260619_1230.dz5", timestamp)
-    rdb = project_dir / "SE-GVM.rdb"
-    scd = project_dir / "SE-GVM.scd"
+    create_dz5(project_dir / "SE-AAA_20260619_1200.dz5", datetime(2026, 6, 19, 12, 0))
+    dz5 = create_dz5(project_dir / "SE-AAA_20260619_1230.dz5", timestamp)
+    rdb = project_dir / "SE-AAA.rdb"
+    scd = project_dir / "SE-AAA.scd"
     rdb.write_text("Saved with Main Shell Version: 7.5.3.10", encoding="utf-8")
     scd.write_text(
-        '<Header id="ESD_PDO" version="388" revision="1.0" '
+        '<Header id="ESD_AAA" version="388" revision="1.0" '
         'toolID="AcSELerator Architect 2.4.2.34" />',
         encoding="utf-8",
     )
@@ -341,14 +341,14 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.TAF,
         project_types=[get_project_type("digsi5"), get_project_type("sel")],
     )
 
     assert len(plans) == 1
     assert plans[0].backup_name == (
-        "IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
+        "IED-PACK_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip"
     )
     assert plans[0].software == "DIGSI5-V10.00 + QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34"
     assert plans[0].source_files == (dz5, rdb, scd)
@@ -360,18 +360,18 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
     with ZipFile(zip_path) as archive:
         assert archive.namelist() == [
             BACKUP_INFO_FILENAME,
-            "SE-GVM_20260619_1230.dz5",
-            "SE-GVM.rdb",
-            "SE-GVM.scd",
+            "SE-AAA_20260619_1230.dz5",
+            "SE-AAA.rdb",
+            "SE-AAA.scd",
         ]
         backup_info = archive.read(BACKUP_INFO_FILENAME).decode("utf-8")
         assert "IED Backup Manager - Backup Information" in backup_info
         assert "Software: DIGSI5-V10.00 + QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34" in backup_info
-        assert "DIGSI 5 (.dz5): DIGSI5-V10.00 (SE-GVM_20260619_1230.dz5)" in backup_info
-        assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34 (SE-GVM.rdb)" in backup_info
+        assert "DIGSI 5 (.dz5): DIGSI5-V10.00 (SE-AAA_20260619_1230.dz5)" in backup_info
+        assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34 (SE-AAA.rdb)" in backup_info
         assert "Size:" in backup_info
         assert "SHA256:" in backup_info
-        assert "SE-GVM_20260619_1200.dz5" not in backup_info
+        assert "SE-AAA_20260619_1200.dz5" not in backup_info
 
 
 def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
@@ -382,7 +382,7 @@ def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
     his = tmp_path / "IED-HIS"
     project_dir.mkdir()
     timestamp = datetime(2026, 6, 19, 12, 30)
-    rdb = project_dir / "SE-GVM.rdb"
+    rdb = project_dir / "SE-AAA.rdb"
     rdb.write_text("Saved with Main Shell Version: 7.5.3.10", encoding="utf-8")
     os.utime(rdb, (timestamp.timestamp(), timestamp.timestamp()))
 
@@ -390,14 +390,14 @@ def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.TAF,
         project_types=[get_project_type("digsi5"), get_project_type("sel")],
     )
 
     assert len(plans) == 1
     assert plans[0].backup_name == (
-        "QUICKSET-V7.5.3.10_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
+        "QUICKSET-V7.5.3.10_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip"
     )
     assert plans[0].backup_info_text is not None
     assert "QUICKSET-V7.5.3.10" in plans[0].backup_info_text

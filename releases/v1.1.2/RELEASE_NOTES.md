@@ -12,13 +12,13 @@
 SEL encontrado sozinho, mesmo com `DIGSI 5` e `SEL` selecionados:
 
 ```text
-SEL-QS7.5.3.10_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+SEL-QS7.5.3.10_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
 DIGSI + SEL encontrados para a mesma subestacao:
 
 ```text
-IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+IED-PACK_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
 ## Validacao

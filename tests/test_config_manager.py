@@ -8,13 +8,13 @@ from src.config.config_manager import ConfigError, parse_config
 def test_parse_config_normalizes_collaborator() -> None:
     config = parse_config(
         {
-            "colaborador": "Jean Carlos Machado",
+            "colaborador": "Colaborador Exemplo",
             "atu_path": "C:/BKP/ATU",
             "his_path": "C:/BKP/HIS",
         }
     )
 
-    assert config.collaborator == "JEAN-CARLOS-MACHADO"
+    assert config.collaborator == "COLABORADOR-EXEMPLO"
     assert config.atu_path == Path("C:/BKP/ATU")
     assert config.his_path == Path("C:/BKP/HIS")
     assert config.language == "pt_BR"

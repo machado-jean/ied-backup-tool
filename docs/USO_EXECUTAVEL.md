@@ -15,11 +15,11 @@ Exemplo:
 Pasta do projeto/
 ├─ IED Backup Manager v1.5.2.exe
 ├─ config.json
-├─ SE-GVM_20260529_1624.dz5
-├─ SE-GVM_20260529_1625.dz5
-├─ ESD-PDO.rdb
-├─ ESD-PDO.scd
-├─ SE-ABB_20260619_1230.pcmp
+├─ SE-AAA_20260529_1624.dz5
+├─ SE-AAA_20260529_1625.dz5
+├─ ESD-AAA.rdb
+├─ ESD-AAA.scd
+├─ SE-DDD_20260619_1230.pcmp
 ```
 
 O programa nao precisa que a pasta `BKPs` exista quando estiver em uso real.
@@ -58,9 +58,9 @@ Exemplo de `config.json`:
 
 ```json
 {
-  "colaborador": "JEAN-CARLOS-MACHADO",
-  "atu_path": "C:/Users/Jean/OneDrive/BKP/ATU",
-  "his_path": "C:/Users/Jean/OneDrive/BKP/HIS",
+  "colaborador": "COLABORADOR-EXEMPLO",
+  "atu_path": "C:/Backups/Exemplo/ATU",
+  "his_path": "C:/Backups/Exemplo/HIS",
   "language": "pt_BR",
   "project_types": ["digsi5", "sel"],
   "software_versions": {
@@ -125,10 +125,10 @@ O programa le o marcador interno `.dp5v###` ou `.dp4v###` dentro do `.dz5` para
 identificar a familia e a versao do DIGSI. Exemplos:
 
 ```text
-UHESN_20260622_1350.dp5v100 -> DIGSI5-V10.00
-UHESN_20260622_1350.dp5v75  -> DIGSI5-V7.50
-UHESN_20260622_1350.dp5v98  -> DIGSI5-V9.80
-UHESN_20260622_1350.dp4v75  -> DIGSI4-V7.50
+SE-ZZZ_20260622_1350.dp5v100 -> DIGSI5-V10.00
+SE-ZZZ_20260622_1350.dp5v75  -> DIGSI5-V7.50
+SE-ZZZ_20260622_1350.dp5v98  -> DIGSI5-V9.80
+SE-ZZZ_20260622_1350.dp4v75  -> DIGSI4-V7.50
 ```
 
 ### SEL
@@ -139,9 +139,9 @@ Quando existir um arquivo Architect com o mesmo nome-base do `.rdb`, ele tambem
 sera incluido no ZIP final:
 
 ```text
-ESD-PDO.rdb      -> entra no ZIP
-ESD-PDO.scd      -> entra no ZIP, se existir
-ESD-PDO.selaprj  -> entra no ZIP, se existir
+ESD-AAA.rdb      -> entra no ZIP
+ESD-AAA.scd      -> entra no ZIP, se existir
+ESD-AAA.selaprj  -> entra no ZIP, se existir
 ```
 
 O programa tenta detectar automaticamente:
@@ -212,15 +212,15 @@ caso, ele nao usa `IED-PACK`.
 Exemplo:
 
 ```text
-SE-GVM_20260619_1200.dz5
-SE-GVM.rdb
-SE-GVM.scd
+SE-AAA_20260619_1200.dz5
+SE-AAA.rdb
+SE-AAA.scd
 ```
 
 Com `DIGSI 5` e `SEL` selecionados, o resultado sera um unico pacote:
 
 ```text
-IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+IED-PACK_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
 Dentro do ZIP ficarao somente os arquivos dos tipos selecionados. Se `SEL` nao
@@ -262,10 +262,10 @@ continuar no nome do arquivo de origem para controle interno da equipe.
 Exemplos:
 
 ```text
-SE-GVM_20260529_1624.dz5           -> Projeto: SE-GVM
-SE-CTU_DEV_01_20260619_0013.dz5    -> Projeto: SE-CTU
+SE-AAA_20260529_1624.dz5           -> Projeto: SE-AAA
+SE-BBB_DEV_01_20260619_0013.dz5    -> Projeto: SE-BBB
 SE-ABC_REVISAO_FINAL_20260619_1015.dz5 -> Projeto: SE-ABC
-ESD-PDO.rdb                        -> Projeto: ESD-PDO
+ESD-AAA.rdb                        -> Projeto: ESD-AAA
 ```
 
 Para SEL, o mesmo criterio do primeiro bloco antes do sublinhado `"_"` e usado
@@ -282,11 +282,11 @@ Cuidados:
 - Mesmo quando houver textos intermediarios, o projeto sera sempre apenas o
   primeiro bloco antes do primeiro sublinhado `"_"`.
 - Nao coloque sublinhado `"_"` dentro do nome da subestacao/projeto. Exemplo:
-  `SE_CTU_20260619_0013.dz5` sera identificado como projeto `SE`, nao `SE_CTU`.
+  `SE_BBB_20260619_0013.dz5` sera identificado como projeto `SE`, nao `SE_BBB`.
 - Nao coloque textos antes da subestacao/projeto. Exemplo:
-  `CLIENTE_SE-CTU_20260619_0013.dz5` sera identificado como projeto `CLIENTE`.
+  `CLIENTE_SE-BBB_20260619_0013.dz5` sera identificado como projeto `CLIENTE`.
 - Nao use nomes que comecem com etapa/revisao antes da subestacao. Exemplo:
-  `DEV_SE-CTU_20260619_0013.dz5` sera identificado como projeto `DEV`.
+  `DEV_SE-BBB_20260619_0013.dz5` sera identificado como projeto `DEV`.
 - Confira sempre a coluna `Projeto` na previa antes de gerar backups.
 
 ## 8. Conferir a previa do lote
@@ -356,11 +356,11 @@ SOFTWARE_PROJETO_DATAHORA_COLABORADOR_ETAPA.zip
 Exemplo:
 
 ```text
-DIGSI5-V10.00_SE-GVM_20260529-1625_JEAN-CARLOS-MACHADO_TAF.zip
-QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ESD-PDO_20260623-0031_JEAN-CARLOS-MACHADO_TAF.zip
-PCM600-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
-INGESYS-V5.5.4_SE-ING_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
-IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+DIGSI5-V10.00_SE-AAA_20260529-1625_COLABORADOR-EXEMPLO_TAF.zip
+QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ESD-AAA_20260623-0031_COLABORADOR-EXEMPLO_TAF.zip
+PCM600-V2.10_SE-DDD_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
+INGESYS-V5.5.4_SE-EEE_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
+IED-PACK_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
 Regras principais:

@@ -25,15 +25,15 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
     atu = tmp_path / "IED-ATU"
     his = tmp_path / "IED-HIS"
     project_dir.mkdir()
-    rdb = project_dir / "SE-SEL_DEV_01_20260619_0013.rdb"
-    scd = project_dir / "SE-SEL_DEV_01_20260619_0013.scd"
+    rdb = project_dir / "SE-FFF_DEV_01_20260619_0013.rdb"
+    scd = project_dir / "SE-FFF_DEV_01_20260619_0013.scd"
     rdb.write_text(
         "Saved with Main Shell Version: 7.5.2.3\n"
         "Saved with Main Shell Version: 7.5.3.10\n",
         encoding="utf-8",
     )
     scd.write_text(
-        '<Header id="ESD_PDO" version="388" revision="1.0" '
+        '<Header id="ESD_AAA" version="388" revision="1.0" '
         'toolID="AcSELerator Architect 2.4.2.34" />',
         encoding="utf-8",
     )
@@ -44,7 +44,7 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.TAF,
         project_type=SEL_PROJECT_TYPE,
     )
@@ -52,14 +52,14 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
     assert [result.status for result in results] == ["stored"]
     [zip_path] = list(atu.glob("*.zip"))
     assert zip_path.name == (
-        "QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_SE-SEL_20260619-0013_"
-        "JEAN-CARLOS-MACHADO_TAF.zip"
+        "QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_SE-FFF_20260619-0013_"
+        "COLABORADOR-EXEMPLO_TAF.zip"
     )
     with zipfile.ZipFile(zip_path) as archive:
         assert archive.namelist() == [
             BACKUP_INFO_FILENAME,
-            "SE-SEL_DEV_01_20260619_0013.rdb",
-            "SE-SEL_DEV_01_20260619_0013.scd",
+            "SE-FFF_DEV_01_20260619_0013.rdb",
+            "SE-FFF_DEV_01_20260619_0013.scd",
         ]
         backup_info = archive.read(BACKUP_INFO_FILENAME).decode("utf-8")
         assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34" in backup_info
@@ -70,7 +70,7 @@ def test_sel_version_fallback_is_used_when_quickset_is_missing(tmp_path: Path) -
     atu = tmp_path / "IED-ATU"
     his = tmp_path / "IED-HIS"
     project_dir.mkdir()
-    rdb = project_dir / "SE-SEL_20260619_0013.rdb"
+    rdb = project_dir / "SE-FFF_20260619_0013.rdb"
     rdb.write_text("old sel file", encoding="utf-8")
     timestamp = datetime(2026, 6, 19, 0, 13).timestamp()
     os.utime(rdb, (timestamp, timestamp))
@@ -79,22 +79,22 @@ def test_sel_version_fallback_is_used_when_quickset_is_missing(tmp_path: Path) -
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.DEV,
         project_type=SEL_PROJECT_TYPE,
         software_version_override="7.5.2.3",
     )
 
     assert [path.name for path in atu.glob("*.zip")] == [
-        "QUICKSET-V7.5.2.3_SE-SEL_20260619-0013_JEAN-CARLOS-MACHADO_DEV.zip"
+        "QUICKSET-V7.5.2.3_SE-FFF_20260619-0013_COLABORADOR-EXEMPLO_DEV.zip"
     ]
 
 
 def test_sel_requires_manual_version_when_quickset_is_missing(tmp_path: Path) -> None:
     project_dir = tmp_path / "IED-DES"
     project_dir.mkdir()
-    (project_dir / "SE-SEL_20260619_0013.rdb").write_text("old sel file", encoding="utf-8")
+    (project_dir / "SE-FFF_20260619_0013.rdb").write_text("old sel file", encoding="utf-8")
 
     with pytest.raises(ProjectVersionRequiredError):
-        SEL_PROJECT_TYPE.get_software_version(project_dir / "SE-SEL_20260619_0013.rdb")
+        SEL_PROJECT_TYPE.get_software_version(project_dir / "SE-FFF_20260619_0013.rdb")
 

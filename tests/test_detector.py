@@ -4,7 +4,7 @@ from src.core.detector import find_project_file
 
 
 def test_find_project_file_detects_single_dz5(tmp_path: Path) -> None:
-    project = tmp_path / "SE-CTU_20260612_1736.dz5"
+    project = tmp_path / "SE-BBB_20260612_1736.dz5"
     project.write_text("content", encoding="utf-8")
 
     assert find_project_file(tmp_path) == project

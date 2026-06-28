@@ -40,6 +40,11 @@ if (-not $SkipTests) {
 New-Item -ItemType Directory -Force -Path $ReleaseDir | Out-Null
 Copy-Item -LiteralPath $ExePath -Destination $ReleaseExe -Force
 
+$SpecPath = Join-Path $Root "$ExeName.spec"
+if (Test-Path -LiteralPath $SpecPath) {
+    Remove-Item -LiteralPath $SpecPath -Force
+}
+
 if (-not (Test-Path -LiteralPath $ReleaseNotes)) {
     @"
 # IED Backup Manager $Tag

@@ -12,7 +12,7 @@ do arquivo de origem.
 - O projeto passa a ser sempre o primeiro bloco antes do primeiro `_`.
 - Textos intermediarios como etapa, revisao ou sequencial sao ignorados na
   identificacao do projeto.
-- Exemplo: `SE-CTU_DEV_01_20260619_0013.dz5` gera projeto `SE-CTU`.
+- Exemplo: `SE-BBB_DEV_01_20260619_0013.dz5` gera projeto `SE-BBB`.
 - Manual atualizado com exemplos e casos de renomeacao que violam a politica.
 - Testes adicionados para proteger a regra.
 

@@ -6,13 +6,13 @@ from src.core.storage import StorageError, parse_backup_filename, update_storage
 
 
 def test_parse_backup_filename_extracts_key_and_timestamp(tmp_path: Path) -> None:
-    path = tmp_path / "DIGSI5-V10.00_SE_GVM_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
+    path = tmp_path / "DIGSI5-V10.00_SE_AAA_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
     path.write_text("backup", encoding="utf-8")
 
     info = parse_backup_filename(path)
 
-    assert info.key == "DIGSI5-V10.00_SE_GVM"
-    assert info.project == "SE_GVM"
+    assert info.key == "DIGSI5-V10.00_SE_AAA"
+    assert info.project == "SE_AAA"
     assert info.stage == "DEV"
 
 
@@ -20,9 +20,9 @@ def test_update_storage_moves_previous_atu_backup_to_his(tmp_path: Path) -> None
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    old = atu / "DIGSI5-V10.00_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
+    old = atu / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
     old.write_text("old", encoding="utf-8")
-    new = tmp_path / "DIGSI5-V10.00_SE-CTU_20260615-0910_JEAN-CARLOS-MACHADO_DEV.zip"
+    new = tmp_path / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
     new.write_text("new", encoding="utf-8")
 
     final_path = update_storage(new_backup=new, atu_path=atu, his_path=his)
@@ -37,9 +37,9 @@ def test_update_storage_keeps_different_project_in_atu(tmp_path: Path) -> None:
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    other = atu / "DIGSI5-V10.00_SE-JDI_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
+    other = atu / "DIGSI5-V10.00_SE-GGG_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
     other.write_text("other", encoding="utf-8")
-    new = tmp_path / "DIGSI5-V10.00_SE-CTU_20260615-0910_JEAN-CARLOS-MACHADO_DEV.zip"
+    new = tmp_path / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
     new.write_text("new", encoding="utf-8")
 
     update_storage(new_backup=new, atu_path=atu, his_path=his)
@@ -53,9 +53,9 @@ def test_update_storage_rejects_older_backup(tmp_path: Path) -> None:
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    current = atu / "DIGSI5-V10.00_SE-CTU_20260615-0910_JEAN-CARLOS-MACHADO_DEV.zip"
+    current = atu / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
     current.write_text("current", encoding="utf-8")
-    older = tmp_path / "DIGSI5-V10.00_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
+    older = tmp_path / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
     older.write_text("older", encoding="utf-8")
 
     with pytest.raises(StorageError, match="mais recente"):
@@ -71,11 +71,11 @@ def test_update_storage_does_not_duplicate_identical_his_file(tmp_path: Path) ->
     his = tmp_path / "HIS"
     atu.mkdir()
     his.mkdir()
-    old = atu / "DIGSI5-V10.00_SE-CTU_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
+    old = atu / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
     old.write_text("old atu", encoding="utf-8")
     existing_his = his / old.name
     existing_his.write_text("old his", encoding="utf-8")
-    new = tmp_path / "DIGSI5-V10.00_SE-CTU_20260615-0910_JEAN-CARLOS-MACHADO_DEV.zip"
+    new = tmp_path / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
     new.write_text("new", encoding="utf-8")
 
     update_storage(new_backup=new, atu_path=atu, his_path=his)
@@ -91,9 +91,9 @@ def test_update_storage_treats_same_timestamp_with_different_stage_as_same_backu
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    current = atu / "DIGSI5-V10.00_SE-GVM_20260529-1624_JEAN-CARLOS-MACHADO_DEV.zip"
+    current = atu / "DIGSI5-V10.00_SE-AAA_20260529-1624_COLABORADOR-EXEMPLO_DEV.zip"
     current.write_text("current", encoding="utf-8")
-    same_identity = tmp_path / "DIGSI5-V10.00_SE-GVM_20260529-1624_JEAN-CARLOS-MACHADO_TAC.zip"
+    same_identity = tmp_path / "DIGSI5-V10.00_SE-AAA_20260529-1624_COLABORADOR-EXEMPLO_TAC.zip"
     same_identity.write_text("same", encoding="utf-8")
 
     final_path = update_storage(new_backup=same_identity, atu_path=atu, his_path=his)

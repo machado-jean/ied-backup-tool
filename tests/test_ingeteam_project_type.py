@@ -14,7 +14,7 @@ def test_registry_exposes_ingeteam_project_type() -> None:
 
 
 def test_ingeteam_requires_manual_version(tmp_path: Path) -> None:
-    project_file = tmp_path / "SE-ING_DEV_20260619_0013.efsPro"
+    project_file = tmp_path / "SE-EEE_DEV_20260619_0013.efsPro"
     project_file.write_text("TeamZipVer5.0", encoding="utf-8")
 
     with pytest.raises(ProjectVersionRequiredError):
@@ -22,7 +22,7 @@ def test_ingeteam_requires_manual_version(tmp_path: Path) -> None:
 
 
 def test_ingeteam_formats_manual_version(tmp_path: Path) -> None:
-    project_file = tmp_path / "SE-ING_DEV_20260619_0013.ITPro2"
+    project_file = tmp_path / "SE-EEE_DEV_20260619_0013.ITPro2"
     project_file.write_text("zip placeholder", encoding="utf-8")
 
     assert (
@@ -36,18 +36,18 @@ def test_ingeteam_plan_uses_configured_version(tmp_path: Path) -> None:
     atu = tmp_path / "IED-ATU"
     his = tmp_path / "IED-HIS"
     project_dir.mkdir()
-    project_file = project_dir / "SE-ING_DEV_20260619_0013.efsPro"
+    project_file = project_dir / "SE-EEE_DEV_20260619_0013.efsPro"
     project_file.write_text("TeamZipVer5.0", encoding="utf-8")
 
     plan = plan_latest_backup(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage="TAF",
         project_type=INGETEAM_PROJECT_TYPE,
         software_version_override="5.5.4",
     )
 
-    assert plan.backup_name.startswith("INGESYS-V5.5.4_SE-ING_")
+    assert plan.backup_name.startswith("INGESYS-V5.5.4_SE-EEE_")
 

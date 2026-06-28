@@ -25,13 +25,13 @@
 Backup SEL individual, quando apenas `SEL (.rdb)` estiver selecionado:
 
 ```text
-SEL-QS7.5.3.10-AA2.4.2.34_ESD-PDO_20260623-0031_JEAN-CARLOS-MACHADO_TAF.zip
+SEL-QS7.5.3.10-AA2.4.2.34_ESD-AAA_20260623-0031_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
 Pacote por subestacao, quando mais de um tipo de IED estiver selecionado:
 
 ```text
-IED-PACK_SE-GVM_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
+IED-PACK_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
 O pacote `IED-PACK` inclui `IED-PACK-MANIFEST.txt` dentro do ZIP com as versoes
@@ -43,4 +43,4 @@ detectadas e os arquivos incluidos.
 - `pytest`
 - Teste automatizado de pacote por subestacao com `.dz5`, `.rdb`, `.scd`,
   manifesto e selecao do arquivo principal mais recente por tipo.
-- Smoke test com os arquivos reais `IED-DES/ESD-PDO.rdb` e `IED-DES/ESD-PDO.scd`.
+- Smoke test com os arquivos reais `IED-DES/ESD-AAA.rdb` e `IED-DES/ESD-AAA.scd`.

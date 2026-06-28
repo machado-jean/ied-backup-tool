@@ -59,11 +59,11 @@ SOFTWARE_PROJETO_DATAHORA_COLABORADOR_ETAPA.zip
 Exemplos:
 
 ```text
-DIGSI5-V10.00_SE-XXX_20260622-1350_JEAN-CARLOS-MACHADO_TAF.zip
-QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-YYY_20260612-0350_JEAN-CARLOS-MACHADO_TAF.zip
-PCM600-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
-INGESYS-V5.5.4_VAO-ZZZ_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip
-IED-PACK_ETD-YYY_20260612-0350_JEAN-CARLOS-MACHADO_TAF.zip
+DIGSI5-V10.00_SE-XXX_20260622-1350_COLABORADOR-EXEMPLO_TAF.zip
+QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-YYY_20260612-0350_COLABORADOR-EXEMPLO_TAF.zip
+PCM600-V2.10_SE-DDD_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
+INGESYS-V5.5.4_VAO-ZZZ_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
+IED-PACK_ETD-YYY_20260612-0350_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
 Para identificar o projeto, o sistema usa somente o texto antes do primeiro
@@ -76,9 +76,9 @@ O `config.json` fica ao lado do executavel:
 
 ```json
 {
-  "colaborador": "JEAN-CARLOS-MACHADO",
-  "atu_path": "C:/Users/Jean/OneDrive/BKP/ATU",
-  "his_path": "C:/Users/Jean/OneDrive/BKP/HIS",
+  "colaborador": "COLABORADOR-EXEMPLO",
+  "atu_path": "C:/Backups/Exemplo/ATU",
+  "his_path": "C:/Backups/Exemplo/HIS",
   "language": "pt_BR",
   "project_types": ["digsi5", "sel"],
   "software_versions": {
@@ -114,13 +114,13 @@ Gerar o executavel versionado:
 Executar via CLI:
 
 ```powershell
-.\.venv\Scripts\python.exe -m src.main --project-dir ".\IED-DES" --process-all --collaborator "JEAN-CARLOS-MACHADO" --atu-path ".\IED-ATU" --his-path ".\IED-HIS"
+.\.venv\Scripts\python.exe -m src.main --project-dir ".\IED-DES" --process-all --collaborator "COLABORADOR-EXEMPLO" --atu-path ".\IED-ATU" --his-path ".\IED-HIS"
 ```
 
 Simular sem criar ZIP nem mover arquivos:
 
 ```powershell
-.\.venv\Scripts\python.exe -m src.main --project-dir ".\IED-DES" --project-type sel --process-all --dry-run --collaborator "JEAN-CARLOS-MACHADO" --atu-path ".\IED-ATU" --his-path ".\IED-HIS"
+.\.venv\Scripts\python.exe -m src.main --project-dir ".\IED-DES" --project-type sel --process-all --dry-run --collaborator "COLABORADOR-EXEMPLO" --atu-path ".\IED-ATU" --his-path ".\IED-HIS"
 ```
 
 ## Estados de Processamento

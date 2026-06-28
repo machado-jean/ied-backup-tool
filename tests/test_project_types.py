@@ -48,14 +48,14 @@ def test_backup_service_accepts_custom_project_type(tmp_path: Path) -> None:
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.TAF,
         project_type=FakeProjectType(),
     )
 
     assert [result.status for result in results] == ["stored"]
     assert [path.name for path in atu.glob("*.zip")] == [
-        "FAKE-V1_SEL-751_20260618-1030_JEAN-CARLOS-MACHADO_TAF.zip"
+        "FAKE-V1_SEL-751_20260618-1030_COLABORADOR-EXEMPLO_TAF.zip"
     ]
 
 
@@ -64,7 +64,7 @@ def test_backup_service_accepts_pcm600_project_type(tmp_path: Path) -> None:
     atu = tmp_path / "IED-ATU"
     his = tmp_path / "IED-HIS"
     project_dir.mkdir()
-    project_file = project_dir / "SE-ABB_20260619_1230.pcmp"
+    project_file = project_dir / "SE-DDD_20260619_1230.pcmp"
     with ZipFile(project_file, "w") as archive:
         archive.writestr(
             "ProjectDataServer%versions.ini",
@@ -77,12 +77,12 @@ def test_backup_service_accepts_pcm600_project_type(tmp_path: Path) -> None:
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="JEAN-CARLOS-MACHADO",
+        collaborator="COLABORADOR-EXEMPLO",
         stage=BackupStage.TAF,
         project_type=get_project_type("pcm600"),
     )
 
     assert [result.status for result in results] == ["stored"]
     assert [path.name for path in atu.glob("*.zip")] == [
-        "PCM600-V2.10_SE-ABB_20260619-1230_JEAN-CARLOS-MACHADO_TAF.zip"
+        "PCM600-V2.10_SE-DDD_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip"
     ]
