@@ -11,6 +11,7 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
+from src.core.hashing import calculate_sha256
 from src.core.naming import (
     BackupStage,
     build_backup_name,
@@ -863,6 +864,7 @@ def _build_backup_info_text(
             f"  Modified: {get_file_timestamp(path).strftime('%Y%m%d-%H%M')}",
         )
         lines.append(f"  Size: {path.stat().st_size} bytes")
+        lines.append(f"  SHA256: {calculate_sha256(path)}")
 
     return "\n".join(lines) + "\n"
 

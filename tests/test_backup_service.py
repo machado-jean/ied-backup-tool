@@ -57,6 +57,7 @@ def test_process_all_backups_versions_atu_and_his(tmp_path: Path) -> None:
         assert "Software: DIGSI5-V10.00" in backup_info
         assert "Project: SE-GVM" in backup_info
         assert "Size:" in backup_info
+        assert "SHA256:" in backup_info
 
 
 def test_process_all_backups_skips_older_files_when_atu_has_newest(tmp_path: Path) -> None:
@@ -369,6 +370,7 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
         assert "DIGSI 5 (.dz5): DIGSI5-V10.00 (SE-GVM_20260619_1230.dz5)" in backup_info
         assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34 (SE-GVM.rdb)" in backup_info
         assert "Size:" in backup_info
+        assert "SHA256:" in backup_info
         assert "SE-GVM_20260619_1200.dz5" not in backup_info
 
 

@@ -35,7 +35,7 @@ Status: implementado em `v1.5.0`.
 - [x] Nome adotado: `IEDS-BACKUP-INFO.txt`.
 - [x] Incluir versoes detectadas, arquivos incluidos, tamanho e data de
   modificacao.
-- [ ] Incluir SHA256 dos arquivos de origem.
+- [x] Incluir SHA256 dos arquivos de origem em `v1.5.2`.
 
 Conteudo minimo sugerido:
 
@@ -67,7 +67,8 @@ Detected versions:
 
 Objetivo: registrar a impressao digital dos arquivos incluidos no ZIP.
 
-Status: planejado para versao posterior a `v1.5.0`.
+Status: registro de SHA256 implementado em `v1.5.2`; uso do SHA256 para alerta
+de conflito fica planejado para versao posterior.
 
 Vantagens:
 
@@ -78,10 +79,10 @@ Vantagens:
 
 Escopo inicial recomendado:
 
-- Calcular SHA256 de cada arquivo de origem incluido no ZIP.
-- Registrar SHA256, tamanho e data de modificacao no arquivo interno de
+- [x] Calcular SHA256 de cada arquivo de origem incluido no ZIP.
+- [x] Registrar SHA256, tamanho e data de modificacao no arquivo interno de
   metadados.
-- Nao colocar SHA256 no nome do ZIP.
+- [x] Nao colocar SHA256 no nome do ZIP.
 
 Escopo posterior opcional:
 
