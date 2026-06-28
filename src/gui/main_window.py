@@ -74,7 +74,12 @@ def configure_language_button(button: QPushButton) -> None:
 class MainWindow(QMainWindow):
     """Main GUI controller for configuration, preview, execution, and logs."""
 
-    def __init__(self, *, project_dir: Path | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        project_dir: Path | None = None,
+        auto_startup_dialogs: bool = True,
+    ) -> None:
         super().__init__()
         self.project_dir = (project_dir or get_runtime_project_dir()).resolve()
         self.config_path = self.project_dir / "config.json"
@@ -90,8 +95,14 @@ class MainWindow(QMainWindow):
         self._resize_to_available_screen()
         self._build_ui()
         self._load_manual_software_version(self._manual_version_project_type())
-        QTimer.singleShot(0, self._run_startup_dialogs)
+        if auto_startup_dialogs:
+            self.schedule_startup_dialogs()
         self.refresh_preview()
+
+    def schedule_startup_dialogs(self) -> None:
+        """Open startup dialogs after the window has entered the event loop."""
+
+        QTimer.singleShot(0, self._run_startup_dialogs)
 
     def _resize_to_available_screen(self) -> None:
         """Start wider on normal desktops while respecting the minimum size."""
