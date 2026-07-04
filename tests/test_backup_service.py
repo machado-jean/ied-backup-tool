@@ -184,6 +184,93 @@ def test_process_all_backups_treats_same_identity_in_atu_as_current(
     assert not his.exists()
 
 
+def test_plan_all_backups_flags_same_identity_with_different_sha(
+    tmp_path: Path,
+) -> None:
+    project_dir = tmp_path / "BKPs"
+    atu = tmp_path / "IED-ATU"
+    his = tmp_path / "IED-HIS"
+    project_dir.mkdir()
+    timestamp = datetime(2026, 5, 25, 17, 19)
+    source = create_dz5_with_content(
+        project_dir / "SE-AAA_20260525_1719.dz5",
+        timestamp,
+        "original content",
+    )
+
+    process_all_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="COLABORADOR-EXEMPLO",
+        stage=BackupStage.DEV,
+    )
+    current_backup = next(atu.glob("*.zip"))
+    create_dz5_with_content(source, timestamp, "changed content")
+
+    plans = plan_all_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="OUTRO-COLABORADOR",
+        stage=BackupStage.TAF,
+    )
+    results = process_all_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="OUTRO-COLABORADOR",
+        stage=BackupStage.TAF,
+    )
+
+    assert [plan.status for plan in plans] == ["sha_conflict"]
+    assert plans[0].destination_path == current_backup
+    assert summarize_results(plans).sha_conflicts == 1
+    assert [result.status for result in results] == ["sha_conflict"]
+    assert [path.name for path in atu.glob("*.zip")] == [current_backup.name]
+    assert not list(his.glob("*.zip"))
+
+
+def test_plan_all_backups_flags_same_identity_history_with_different_sha(
+    tmp_path: Path,
+) -> None:
+    project_dir = tmp_path / "BKPs"
+    atu = tmp_path / "IED-ATU"
+    his = tmp_path / "IED-HIS"
+    project_dir.mkdir()
+    timestamp = datetime(2026, 5, 25, 17, 19)
+    source = create_dz5_with_content(
+        project_dir / "SE-AAA_20260525_1719.dz5",
+        timestamp,
+        "original content",
+    )
+
+    process_all_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="COLABORADOR-EXEMPLO",
+        stage=BackupStage.DEV,
+    )
+    current_backup = next(atu.glob("*.zip"))
+    his.mkdir(exist_ok=True)
+    history_backup = his / current_backup.name
+    current_backup.replace(history_backup)
+    create_dz5_with_content(source, timestamp, "changed content")
+
+    plans = plan_all_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="COLABORADOR-EXEMPLO",
+        stage=BackupStage.DEV,
+    )
+
+    assert [plan.status for plan in plans] == ["sha_conflict"]
+    assert plans[0].destination_path == history_backup
+    assert not list(atu.glob("*.zip"))
+
+
 def test_process_all_backups_allows_newer_backup_with_any_stage(tmp_path: Path) -> None:
     project_dir = tmp_path / "BKPs"
     atu = tmp_path / "IED-ATU"
@@ -406,6 +493,14 @@ def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
 def create_dz5(path: Path, mtime: datetime) -> Path:
     with ZipFile(path, "w") as archive:
         archive.writestr(f"{path.stem}.dp5v100", "DIGSI project")
+    timestamp = mtime.timestamp()
+    os.utime(path, (timestamp, timestamp))
+    return path
+
+
+def create_dz5_with_content(path: Path, mtime: datetime, content: str) -> Path:
+    with ZipFile(path, "w") as archive:
+        archive.writestr(f"{path.stem}.dp5v100", content)
     timestamp = mtime.timestamp()
     os.utime(path, (timestamp, timestamp))
     return path

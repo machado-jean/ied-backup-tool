@@ -247,6 +247,7 @@ def print_summary(summary: BackupSummary) -> None:
         f"substituidos={summary.replaced_current}, "
         f"historicos={summary.archived_history}, "
         f"correcoes_atu={summary.atu_duplicates}, "
+        f"conflitos_sha={summary.sha_conflicts}, "
         f"ignorados_antigos={summary.skipped_older}, "
         f"ja_atuais={summary.already_current}"
     )

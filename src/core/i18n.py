@@ -10,6 +10,7 @@ STATUS_TEXT = {
         "replaced_current": "Atualiza ATU",
         "archived_history": "Arquivar HIS",
         "atu_duplicate": "Corrigir ATU",
+        "sha_conflict": "Conflito SHA",
         "skipped_older": "Ignorado",
         "already_current": "Já atual",
     },
@@ -18,6 +19,7 @@ STATUS_TEXT = {
         "replaced_current": "Update ATU",
         "archived_history": "Archive HIS",
         "atu_duplicate": "Fix ATU",
+        "sha_conflict": "SHA conflict",
         "skipped_older": "Skipped",
         "already_current": "Already current",
     },
@@ -42,6 +44,7 @@ UI_TEXT = {
         "already_current": "Já atuais",
         "archive_count": "Históricos",
         "atu_corrections": "Correções ATU",
+        "sha_conflicts": "Conflitos SHA",
         "atu_folder": "Pasta ATU",
         "backup_failed": "Falha ao gerar backup",
         "backup_processed_title": "Backups processados",
@@ -63,6 +66,12 @@ UI_TEXT = {
         "fill_fields": "Preencha",
         "generate_backups": "Gerar backups",
         "ignored": "Ignorados",
+        "integrity_conflicts_found": (
+            "Foram encontrados backups com a mesma identidade técnica, mas SHA256 "
+            "diferente. A execução foi bloqueada para evitar sobrescrever ou arquivar "
+            "um backup potencialmente divergente.\n\n{details}"
+        ),
+        "integrity_conflicts_title": "Conflitos de integridade",
         "his_folder": "Pasta HIS",
         "language_tooltip": "Idioma",
         "mode": "Modo",
@@ -129,6 +138,7 @@ UI_TEXT = {
         "summary_archived_line": "Históricos arquivados: {count}",
         "summary_atu_line": "Correções em ATU: {count}",
         "summary_current_line": "Já estavam atuais: {count}",
+        "summary_sha_conflict_line": "Conflitos SHA: {count}",
         "summary_replaced_line": "ATU atualizado: {count}",
         "summary_skipped_line": "Ignorados por serem antigos: {count}",
         "summary_stored_line": "Novos backups criados: {count}",
@@ -146,6 +156,7 @@ UI_TEXT = {
         "already_current": "Already current",
         "archive_count": "History",
         "atu_corrections": "ATU fixes",
+        "sha_conflicts": "SHA conflicts",
         "atu_folder": "ATU folder",
         "backup_failed": "Backup failed",
         "backup_processed_title": "Backups processed",
@@ -167,6 +178,12 @@ UI_TEXT = {
         "fill_fields": "Fill in",
         "generate_backups": "Generate backups",
         "ignored": "Ignored",
+        "integrity_conflicts_found": (
+            "Backups with the same technical identity but different SHA256 values "
+            "were found. Execution was blocked to avoid overwriting or archiving a "
+            "potentially divergent backup.\n\n{details}"
+        ),
+        "integrity_conflicts_title": "Integrity conflicts",
         "his_folder": "HIS folder",
         "language_tooltip": "Language",
         "mode": "Mode",
@@ -233,6 +250,7 @@ UI_TEXT = {
         "summary_archived_line": "History archived: {count}",
         "summary_atu_line": "ATU fixes: {count}",
         "summary_current_line": "Already current: {count}",
+        "summary_sha_conflict_line": "SHA conflicts: {count}",
         "summary_replaced_line": "ATU updated: {count}",
         "summary_skipped_line": "Skipped because older: {count}",
         "summary_stored_line": "New backups created: {count}",

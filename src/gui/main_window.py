@@ -57,6 +57,7 @@ STATUS_COLORS = {
     "replaced_current": QColor("#1c5d99"),
     "archived_history": QColor("#7a4f00"),
     "atu_duplicate": QColor("#9a5b00"),
+    "sha_conflict": QColor("#b42318"),
     "skipped_older": QColor("#666666"),
     "already_current": QColor("#2f6f73"),
 }
@@ -184,6 +185,7 @@ class MainWindow(QMainWindow):
             ("replaced_current", "replaced_current"),
             ("archive_count", "archived_history"),
             ("atu_corrections", "atu_duplicates"),
+            ("sha_conflicts", "sha_conflicts"),
             ("ignored", "skipped_older"),
             ("already_current", "already_current"),
         ]
@@ -494,6 +496,19 @@ class MainWindow(QMainWindow):
             if not self.current_plans:
                 return
         summary = summarize_results([*self.current_plans, *self.atu_duplicate_plans])
+        if summary.sha_conflicts:
+            details = "\n".join(
+                f"- {self._source_files_text(plan.source_files or (plan.source_file,))} "
+                f"-> {plan.destination_path.name}"
+                for plan in self.current_plans
+                if plan.status == "sha_conflict"
+            )
+            QMessageBox.warning(
+                self,
+                ui_text("integrity_conflicts_title", self.language),
+                ui_text("integrity_conflicts_found", self.language).format(details=details),
+            )
+            return
         executable_count = summary.stored + summary.replaced_current + summary.archived_history
         if executable_count == 0 and summary.atu_duplicates == 0:
             QMessageBox.information(
@@ -886,6 +901,9 @@ class MainWindow(QMainWindow):
                     count=summary.archived_history
                 ),
                 ui_text("summary_atu_line", self.language).format(count=summary.atu_duplicates),
+                ui_text("summary_sha_conflict_line", self.language).format(
+                    count=summary.sha_conflicts
+                ),
                 ui_text("summary_skipped_line", self.language).format(
                     count=summary.skipped_older
                 ),
@@ -928,6 +946,7 @@ class MainWindow(QMainWindow):
         self.summary_labels["replaced_current"].setText(str(summary.replaced_current))
         self.summary_labels["archived_history"].setText(str(summary.archived_history))
         self.summary_labels["atu_duplicates"].setText(str(summary.atu_duplicates))
+        self.summary_labels["sha_conflicts"].setText(str(summary.sha_conflicts))
         self.summary_labels["skipped_older"].setText(str(summary.skipped_older))
         self.summary_labels["already_current"].setText(str(summary.already_current))
 

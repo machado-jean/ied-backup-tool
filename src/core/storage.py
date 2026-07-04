@@ -7,8 +7,10 @@ HIS stores older backups and prevents technical duplicates based on
 
 from __future__ import annotations
 
+import os
 import re
 import shutil
+import tempfile
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -76,7 +78,7 @@ def update_storage(*, new_backup: Path, atu_path: Path, his_path: Path) -> Path:
     if new_backup.resolve() != destination.resolve():
         if destination.exists():
             destination.unlink()
-        shutil.move(str(new_backup), destination)
+        _move_inheriting_destination_acl(new_backup, destination)
     return destination
 
 
@@ -143,7 +145,34 @@ def move_to_history(path: Path, his_path: Path) -> Path:
     if destination.exists():
         path.unlink()
         return destination
-    return Path(shutil.move(str(path), destination))
+    return _move_inheriting_destination_acl(path, destination)
+
+
+def _move_inheriting_destination_acl(source: Path, destination: Path) -> Path:
+    """Move a file by recreating it in the destination folder.
+
+    A direct same-volume move on Windows can preserve the source file ACL. Backups
+    staged in temporary folders should inherit the ACL from ATU/HIS instead.
+    """
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temp_handle = tempfile.NamedTemporaryFile(
+        delete=False,
+        dir=destination.parent,
+        prefix=f".{destination.name}.",
+        suffix=".tmp",
+    )
+    temp_path = Path(temp_handle.name)
+    try:
+        with temp_handle:
+            with source.open("rb") as input_file:
+                shutil.copyfileobj(input_file, temp_handle)
+        os.replace(temp_path, destination)
+        source.unlink()
+    except Exception:
+        temp_path.unlink(missing_ok=True)
+        raise
+    return destination
 
 
 def find_backup_by_identity(folder: Path, identity: str) -> Path | None:

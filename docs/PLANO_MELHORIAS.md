@@ -67,8 +67,8 @@ Detected versions:
 
 Objetivo: registrar a impressao digital dos arquivos incluidos no ZIP.
 
-Status: registro de SHA256 implementado em `v1.5.2`; uso do SHA256 para alerta
-de conflito fica planejado para versao posterior.
+Status: registro de SHA256 implementado em `v1.5.2`; alerta de conflito por
+SHA256 implementado em `v1.6.0`.
 
 Vantagens:
 
@@ -84,10 +84,14 @@ Escopo inicial recomendado:
   metadados.
 - [x] Nao colocar SHA256 no nome do ZIP.
 
+Escopo implementado em `v1.6.0`:
+
+- [x] Alertar quando existir mesma identidade tecnica com SHA256 diferente.
+- [x] Bloquear execucao enquanto houver conflito de integridade na previa.
+
 Escopo posterior opcional:
 
 - Gerar arquivo externo `.sha256` ao lado do ZIP final.
-- Alertar quando existir mesma identidade tecnica com SHA256 diferente.
 
 ## Prioridade Media
 

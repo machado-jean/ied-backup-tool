@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from src.core.hashing import calculate_sha256
+from src.core.integrity import has_sha256_conflict
 from src.core.naming import (
     BackupStage,
     build_backup_name,
@@ -34,6 +35,7 @@ STATUS_STORED = "stored"
 STATUS_REPLACED_CURRENT = "replaced_current"
 STATUS_ARCHIVED_HISTORY = "archived_history"
 STATUS_ATU_DUPLICATE = "atu_duplicate"
+STATUS_SHA_CONFLICT = "sha_conflict"
 STATUS_SKIPPED_OLDER = "skipped_older"
 STATUS_ALREADY_CURRENT = "already_current"
 StageValue = BackupStage | str
@@ -83,6 +85,7 @@ class BackupSummary:
     replaced_current: int
     archived_history: int
     atu_duplicates: int
+    sha_conflicts: int
     skipped_older: int
     already_current: int
 
@@ -99,6 +102,7 @@ def summarize_results(
         replaced_current=statuses.count(STATUS_REPLACED_CURRENT),
         archived_history=statuses.count(STATUS_ARCHIVED_HISTORY),
         atu_duplicates=statuses.count(STATUS_ATU_DUPLICATE),
+        sha_conflicts=statuses.count(STATUS_SHA_CONFLICT),
         skipped_older=statuses.count(STATUS_SKIPPED_OLDER),
         already_current=statuses.count(STATUS_ALREADY_CURRENT),
     )
@@ -163,7 +167,7 @@ def process_all_backups(
         software_version_override=software_version_override,
         virtual_current=virtual_current,
     ):
-        if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
+        if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT, STATUS_SHA_CONFLICT}:
             results.append(
                 BackupResult(
                     source_file=plan.source_file,
@@ -230,7 +234,7 @@ def process_backup_plans(
 
     results = []
     for plan in plans:
-        if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
+        if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT, STATUS_SHA_CONFLICT}:
             results.append(
                 BackupResult(
                     source_file=plan.source_file,
@@ -388,7 +392,7 @@ def plan_grouped_backups(
 def execute_backup_plan(*, plan: BackupPlan, atu_path: Path, his_path: Path) -> BackupResult:
     """Execute a previously computed plan without recalculating its metadata."""
 
-    if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT}:
+    if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT, STATUS_SHA_CONFLICT}:
         return BackupResult(
             source_file=plan.source_file,
             backup_name=plan.backup_name,
@@ -526,6 +530,7 @@ def filter_current_and_newer_plans(plans: list[BackupPlan]) -> list[BackupPlan]:
         if plan.status
         in {
             STATUS_ALREADY_CURRENT,
+            STATUS_SHA_CONFLICT,
             STATUS_STORED,
             STATUS_REPLACED_CURRENT,
         }
@@ -553,6 +558,15 @@ def process_backup_file(
         project_type=project_type,
         software_version_override=software_version_override,
     )
+
+    if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT, STATUS_SHA_CONFLICT}:
+        return BackupResult(
+            source_file=project_file,
+            backup_name=plan.backup_name,
+            final_path=plan.destination_path,
+            status=plan.status,
+            source_files=plan.source_files,
+        )
 
     with tempfile.TemporaryDirectory(prefix="ied-backup-") as staging:
         staged_zip = create_backup_zip(
@@ -646,7 +660,42 @@ def _plan_backup_name(
         detected_versions=detected_versions,
     )
 
+    history_identity_path = find_backup_by_identity(his_path, planned_info.identity)
+
+    if (
+        history_identity_path
+        and (current is None or current.identity != planned_info.identity)
+        and has_sha256_conflict(source_files, history_identity_path)
+    ):
+        return _build_plan(
+            source_file=source_file,
+            backup_name=backup_name,
+            destination_path=history_identity_path,
+            status=STATUS_SHA_CONFLICT,
+            software=software,
+            planned_info=planned_info,
+            project_type_key=project_type_key,
+            project_type_label=project_type_label,
+            current_backup=current.path if current else None,
+            source_files=source_files,
+            backup_info_text=backup_info_text,
+        )
+
     if current and current.timestamp > planned_info.timestamp:
+        if history_identity_path and has_sha256_conflict(source_files, history_identity_path):
+            return _build_plan(
+                source_file=source_file,
+                backup_name=backup_name,
+                destination_path=history_identity_path,
+                status=STATUS_SHA_CONFLICT,
+                software=software,
+                planned_info=planned_info,
+                project_type_key=project_type_key,
+                project_type_label=project_type_label,
+                current_backup=current.path,
+                source_files=source_files,
+                backup_info_text=backup_info_text,
+            )
         history_path = find_backup_by_identity(his_path, planned_info.identity)
         if history_path is None:
             # Older files missing from HIS are archived without touching ATU.
@@ -687,6 +736,20 @@ def _plan_backup_name(
         )
 
     if current and current.identity == planned_info.identity:
+        if has_sha256_conflict(source_files, current.path):
+            return _build_plan(
+                source_file=source_file,
+                backup_name=backup_name,
+                destination_path=current.path,
+                status=STATUS_SHA_CONFLICT,
+                software=software,
+                planned_info=planned_info,
+                project_type_key=project_type_key,
+                project_type_label=project_type_label,
+                current_backup=current.path,
+                source_files=source_files,
+                backup_info_text=backup_info_text,
+            )
         # Collaborator/stage differences do not create a new technical backup.
         return BackupPlan(
             source_file=source_file,
@@ -737,6 +800,42 @@ def _plan_backup_name(
         stage=planned_info.stage,
         project_type_key=project_type_key,
         project_type_label=project_type_label,
+        source_files=source_files,
+        backup_info_text=backup_info_text,
+    )
+
+
+def _build_plan(
+    *,
+    source_file: Path,
+    backup_name: str,
+    destination_path: Path,
+    status: str,
+    software: str,
+    planned_info: BackupFileInfo,
+    project_type_key: str,
+    project_type_label: str,
+    current_backup: Path | None = None,
+    history_path: Path | None = None,
+    source_files: tuple[Path, ...] = (),
+    backup_info_text: str | None = None,
+) -> BackupPlan:
+    """Create a plan from parsed filename metadata."""
+
+    return BackupPlan(
+        source_file=source_file,
+        backup_name=backup_name,
+        destination_path=destination_path,
+        status=status,
+        software=software,
+        project=planned_info.project,
+        timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+        collaborator=planned_info.collaborator,
+        stage=planned_info.stage,
+        project_type_key=project_type_key,
+        project_type_label=project_type_label,
+        current_backup=current_backup,
+        history_path=history_path,
         source_files=source_files,
         backup_info_text=backup_info_text,
     )

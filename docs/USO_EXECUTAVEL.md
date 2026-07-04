@@ -311,6 +311,9 @@ Status possiveis:
 - `Atualiza ATU`: move o backup atual para `HIS` e salva o novo em `ATU`.
 - `Arquivar HIS`: salva o arquivo antigo em `HIS`, sem alterar `ATU`.
 - `Corrigir ATU`: encontrou mais de um backup atual para o mesmo projeto.
+- `Conflito SHA`: existe backup com a mesma identidade tecnica, mas SHA256
+  diferente dos arquivos de origem. A execucao fica bloqueada ate o usuario
+  verificar o arquivo problemático.
 - `Ignorado`: o arquivo e antigo e ja existe no historico.
 - `Ja atual`: o arquivo ja corresponde ao backup atual em `ATU`.
 

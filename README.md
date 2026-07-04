@@ -33,6 +33,8 @@ arquivos finais.
   projeto.
 - Metadados `IEDS-BACKUP-INFO.txt` em todos os ZIPs, com versoes detectadas,
   arquivos incluidos, tamanho, data de modificacao e SHA256.
+- Alerta de integridade quando um backup existente tem a mesma identidade tecnica,
+  mas SHA256 diferente dos arquivos de origem.
 - Validacao das pastas `ATU` e `HIS`, com criacao assistida quando faltarem.
 - Atualizacao automatica de `ATU` e arquivamento do backup anterior em `HIS`.
 - Deteccao de duplicidades em `ATU`, com aviso do arquivo problematico.
@@ -175,8 +177,6 @@ Validar qualidade e testes:
 
 Itens desejados para evolucoes futuras:
 
-- Usar SHA256 para alertar quando houver mesma identidade tecnica com conteudo
-  diferente.
 - Adicionar novos tipos de IED conforme surgirem arquivos reais de teste.
 - Criar ferramenta de limpeza controlada para backups antigos.
 - Permitir politicas de limpeza por idade, por exemplo backups com mais de 30

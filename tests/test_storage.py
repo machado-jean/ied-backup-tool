@@ -33,6 +33,29 @@ def test_update_storage_moves_previous_atu_backup_to_his(tmp_path: Path) -> None
     assert (his / old.name).read_text(encoding="utf-8") == "old"
 
 
+def test_update_storage_recreates_files_in_destination_without_shutil_move(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+    staged = tmp_path / "staging"
+    staged.mkdir()
+    new = staged / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new.write_text("new", encoding="utf-8")
+
+    def fail_move(*args, **kwargs):
+        raise AssertionError("shutil.move must not be used for final backup placement")
+
+    monkeypatch.setattr("src.core.storage.shutil.move", fail_move)
+
+    final_path = update_storage(new_backup=new, atu_path=atu, his_path=his)
+
+    assert final_path == atu / new.name
+    assert final_path.read_text(encoding="utf-8") == "new"
+    assert not new.exists()
+
+
 def test_update_storage_keeps_different_project_in_atu(tmp_path: Path) -> None:
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
