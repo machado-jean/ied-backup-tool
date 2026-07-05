@@ -4,9 +4,10 @@ Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.10.0`
+Current application version: `1.10.1`
 
-The `v1.10.0` executable has been generated.
+The `v1.10.1` source changes are implemented, but the executable has not been
+generated yet.
 
 Latest generated executable:
 
@@ -26,6 +27,8 @@ releases/v1.10.0/IED Backup Manager v1.10.0.exe
 - `v1.9.0`: public/professional user documentation and in-app help access.
 - `v1.9.1`: in-app help points to the public GitHub `HELP.md`.
 - `v1.10.0`: automatic GitHub release check with clickable update notice.
+- `v1.10.1`: fixed distributed executable name for simpler updates and latest
+  download URLs.
 
 ## Current v1.6.0 Released Scope
 
@@ -114,9 +117,19 @@ pytest: 84 passed
   application startup or backup use.
 - Automatic download/replacement remains out of scope.
 
+## Current v1.10.1 Scope
+
+- Release script generates and copies `IED Backup Manager.exe` instead of a
+  versioned executable filename.
+- Version remains visible in the window title and splash screen through
+  `APP_VERSION`.
+- Release folders remain versioned as `releases/vX.Y.Z/`.
+- GitHub can expose a stable latest-download URL:
+  `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED%20Backup%20Manager.exe`.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.10.0`:
+Planned next improvement after `v1.10.1`:
 
 ```text
 public-repository sensitivity review and repository polish

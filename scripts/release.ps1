@@ -15,7 +15,7 @@ if ($VersionText -notmatch 'APP_VERSION\s*=\s*"([^"]+)"') {
 
 $Version = $Matches[1]
 $Tag = "v$Version"
-$ExeName = "IED Backup Manager $Tag"
+$ExeName = "IED Backup Manager"
 $ExePath = Join-Path $Root "dist\$ExeName.exe"
 $ReleaseDir = Join-Path $Root "releases\$Tag"
 $ReleaseExe = Join-Path $ReleaseDir "$ExeName.exe"
