@@ -135,3 +135,6 @@ Generate release executable:
 - GUI progress should show the current item as `file X/N`.
 - ZIP creation and final destination copies should report byte progress, not only
   completed-item counts.
+- GUI backup execution should run in a worker thread, not in the GUI thread.
+- Cancellation during ZIP staging should stop before publishing to `ATU`/`HIS`.
+- Cancellation should not interrupt a final destination copy midway.

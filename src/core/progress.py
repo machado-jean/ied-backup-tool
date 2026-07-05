@@ -7,6 +7,7 @@ from collections.abc import Callable
 from typing import BinaryIO
 
 ProgressCallback = Callable[[str, int, int], None]
+CancellationCallback = Callable[[], bool]
 
 CHUNK_SIZE = 1024 * 1024
 

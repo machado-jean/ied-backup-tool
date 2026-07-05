@@ -4,14 +4,14 @@ Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.7.0`
+Current application version: `1.8.0`
 
-The `v1.7.0` release combines all changes made after `v1.6.0`.
+The `v1.8.0` executable has been generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.7.0/IED Backup Manager v1.7.0.exe
+releases/v1.8.0/IED Backup Manager v1.8.0.exe
 ```
 
 ## Recently Completed
@@ -22,6 +22,7 @@ releases/v1.7.0/IED Backup Manager v1.7.0.exe
 - `v1.6.0`: advanced SHA256 integrity check.
 - `v1.7.0`: more transactional ATU/HIS movement and real per-file byte progress
   during ZIP creation and final copy.
+- `v1.8.0`: worker-thread execution and controlled cancellation.
 
 ## Current v1.6.0 Released Scope
 
@@ -40,7 +41,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 77 passed
+pytest: 79 passed
 ```
 
 ## Local-Safety Notes
@@ -67,16 +68,27 @@ pytest: 77 passed
 - Keeps duplicate correction progress tied to actual copy bytes when duplicate
   files are moved to `HIS`.
 
+## Current v1.8.0 Scope
+
+- Runs backup execution in a `QThread` worker instead of the GUI thread.
+- Updates the progress dialog through Qt signals.
+- Keeps the GUI event loop responsive while large files are being processed.
+- Allows cancellation before the next backup file starts.
+- If cancellation is requested while ZIP staging is running, the staged ZIP is
+  discarded and the backup is not published to `ATU`/`HIS`.
+- Does not interrupt a final destination copy midway, preserving transactional
+  storage behavior.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.7.0`:
+Planned next improvement after `v1.8.0`:
 
 ```text
-Worker-thread execution and controlled cancellation
+User-facing troubleshooting and known limitations documentation
 ```
 
 Likely scope:
 
-- execute backup processing in a worker thread;
-- keep the GUI responsive during large backups;
-- prepare controlled cancellation before starting the next file.
+- document large-file behavior and cancellation semantics;
+- document cloud-synced folder caveats;
+- document integrity conflict and recovery paths.

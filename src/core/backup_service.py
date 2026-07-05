@@ -18,7 +18,7 @@ from src.core.naming import (
     build_backup_name,
     get_file_timestamp,
 )
-from src.core.progress import ProgressCallback
+from src.core.progress import CancellationCallback, ProgressCallback
 from src.core.project_types.base import ProjectDetectionError, ProjectType
 from src.core.project_types.registry import DEFAULT_PROJECT_TYPE
 from src.core.storage import (
@@ -44,6 +44,10 @@ StageValue = BackupStage | str
 GROUPED_PROJECT_TYPE_KEY = "ied-package"
 GROUPED_PROJECT_TYPE_LABEL = "Pacote por SE"
 GROUPED_SOFTWARE_PREFIX = "IED-PACK"
+
+
+class BackupCanceledError(RuntimeError):
+    """Raised when execution is canceled before publishing a staged backup."""
 
 
 @dataclass(frozen=True)
@@ -397,6 +401,7 @@ def execute_backup_plan(
     atu_path: Path,
     his_path: Path,
     progress_callback: ProgressCallback | None = None,
+    cancellation_callback: CancellationCallback | None = None,
 ) -> BackupResult:
     """Execute a previously computed plan without recalculating its metadata."""
 
@@ -417,6 +422,7 @@ def execute_backup_plan(
             source_files=plan.source_files,
             backup_info_text=plan.backup_info_text,
             progress_callback=progress_callback,
+            cancellation_callback=cancellation_callback,
         )
         return BackupResult(
             source_file=plan.source_file,
@@ -434,6 +440,7 @@ def execute_backup_plan(
             backup_info_text=plan.backup_info_text,
             progress_callback=progress_callback,
         )
+        _raise_if_canceled(cancellation_callback)
         final_path = update_storage(
             new_backup=staged_zip,
             atu_path=atu_path,
@@ -563,6 +570,7 @@ def process_backup_file(
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     software_version_override: str | None = None,
     progress_callback: ProgressCallback | None = None,
+    cancellation_callback: CancellationCallback | None = None,
 ) -> BackupResult:
     """Create a staged zip and move it into ATU/HIS using the storage rules."""
 
@@ -593,6 +601,7 @@ def process_backup_file(
             backup_info_text=plan.backup_info_text,
             progress_callback=progress_callback,
         )
+        _raise_if_canceled(cancellation_callback)
         final_path = update_storage(
             new_backup=staged_zip,
             atu_path=atu_path,
@@ -869,6 +878,7 @@ def archive_history_backup(
     source_files: tuple[Path, ...] | None = None,
     backup_info_text: str | None = None,
     progress_callback: ProgressCallback | None = None,
+    cancellation_callback: CancellationCallback | None = None,
 ) -> Path:
     """Create a missing historical backup directly in HIS."""
 
@@ -903,6 +913,7 @@ def archive_history_backup(
             backup_info_text=backup_info_text,
             progress_callback=progress_callback,
         )
+        _raise_if_canceled(cancellation_callback)
         return place_staged_backup(
             staged_zip,
             destination,
@@ -922,6 +933,13 @@ def _unique_paths(paths) -> list[Path]:
         seen.add(key)
         unique.append(path)
     return unique
+
+
+def _raise_if_canceled(cancellation_callback: CancellationCallback | None) -> None:
+    """Stop after staging ZIP creation and before publishing to ATU/HIS."""
+
+    if cancellation_callback and cancellation_callback():
+        raise BackupCanceledError("Backup cancelado antes da copia final.")
 
 
 def _unique_text(values) -> list[str]:

@@ -119,15 +119,17 @@ Escopo posterior opcional:
 
 Objetivo: melhorar responsividade da GUI em backups grandes.
 
-Status: progresso real por arquivo implementado em `v1.7.0`.
+Status: implementado em `v1.8.0`.
 
 TODO:
 
 - [x] Mostrar progresso real por arquivo durante compactacao e copia para
   `ATU`/`HIS`.
-- Mover o processamento para `QThread` ou worker dedicado.
-- Atualizar progresso por sinal quando o worker dedicado for implementado.
-- Permitir cancelamento controlado antes de iniciar o proximo arquivo.
+- [x] Mover o processamento para `QThread` ou worker dedicado.
+- [x] Atualizar progresso por sinal.
+- [x] Permitir cancelamento controlado antes de iniciar o proximo arquivo.
+- [x] Se o cancelamento ocorrer durante a compactacao, descartar o ZIP em
+  staging e nao copiar para `ATU`/`HIS`.
 
 ### Documentacao para Usuario Final
 

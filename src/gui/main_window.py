@@ -6,7 +6,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from PySide6.QtCore import QSize, Qt, QTimer, QUrl
+from PySide6.QtCore import QSize, Qt, QThread, QTimer, QUrl
 from PySide6.QtGui import QColor, QDesktopServices, QIcon
 from PySide6.QtWidgets import (
     QApplication,
@@ -35,9 +35,7 @@ from src.core.backup_service import (
     AtuDuplicatePlan,
     BackupPlan,
     BackupResult,
-    execute_backup_plan,
     filter_current_and_newer_plans,
-    fix_atu_duplicate_backups,
     plan_all_backups,
     plan_atu_duplicate_fixes,
     plan_grouped_backups,
@@ -45,9 +43,9 @@ from src.core.backup_service import (
 )
 from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
 from src.core.naming import BackupStage, normalize_stage
-from src.core.progress import ProgressCallback
 from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
+from src.gui.backup_worker import BackupExecutionWorker, BackupProgressEvent
 from src.gui.resources import app_icon_path, language_flag_path
 from src.gui.settings_window import SettingsWindow
 from src.gui.storage_paths import confirm_storage_paths_ready
@@ -90,6 +88,10 @@ class MainWindow(QMainWindow):
         self.atu_duplicate_plans: list[AtuDuplicatePlan] = []
         self.language = self.config.language if self.config else DEFAULT_LANGUAGE
         self.pending_show_startup_instructions: bool | None = None
+        self.backup_thread: QThread | None = None
+        self.backup_worker: BackupExecutionWorker | None = None
+        self.progress_dialog: QProgressDialog | None = None
+        self.cancel_requested = False
 
         self.setWindowTitle(APP_DISPLAY_NAME)
         self.setWindowIcon(QIcon(str(app_icon_path())))
@@ -556,12 +558,135 @@ class MainWindow(QMainWindow):
         if answer != QMessageBox.StandardButton.Yes:
             return
 
-        try:
-            duplicate_results, results = self._run_backup_with_progress(fix_duplicates)
-        except Exception as exc:
-            QMessageBox.critical(self, ui_text("backup_failed", self.language), str(exc))
-            self.log_output.appendPlainText(f"{ui_text('error_prefix', self.language)}: {exc}")
+        self._start_backup_worker(fix_duplicates)
+
+    def _start_backup_worker(
+        self,
+        fix_duplicates: bool,
+    ) -> None:
+        """Start backup execution in a worker thread."""
+
+        if not self.config:
             return
+
+        plans = self.current_plans
+        self.cancel_requested = False
+        self.progress_dialog = QProgressDialog(
+            ui_text("progress_starting", self.language),
+            ui_text("cancel", self.language),
+            0,
+            1000,
+            self,
+        )
+        self.progress_dialog.setWindowTitle(ui_text("progress_title", self.language))
+        self.progress_dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.progress_dialog.setMinimumDuration(0)
+        self.progress_dialog.setAutoClose(False)
+        self.progress_dialog.setAutoReset(False)
+        self.progress_dialog.setValue(0)
+        self.progress_dialog.canceled.connect(self._request_backup_cancel)
+
+        self.generate_button.setEnabled(False)
+        self.backup_thread = QThread(self)
+        self.backup_worker = BackupExecutionWorker(
+            plans=plans,
+            atu_duplicate_plans=self.atu_duplicate_plans,
+            atu_path=self.config.atu_path,
+            his_path=self.config.his_path,
+            fix_duplicates=fix_duplicates,
+        )
+        self.backup_worker.moveToThread(self.backup_thread)
+        self.backup_thread.started.connect(self.backup_worker.run)
+        self.backup_worker.progress.connect(self._on_backup_progress)
+        self.backup_worker.finished.connect(self._on_backup_finished)
+        self.backup_worker.failed.connect(self._on_backup_failed)
+        self.backup_worker.finished.connect(self.backup_thread.quit)
+        self.backup_worker.failed.connect(self.backup_thread.quit)
+        self.backup_thread.finished.connect(self.backup_worker.deleteLater)
+        self.backup_thread.finished.connect(self._clear_backup_worker)
+        self.backup_thread.start()
+
+    def _request_backup_cancel(self) -> None:
+        """Ask the worker to stop before the next file starts."""
+
+        self.cancel_requested = True
+        if self.backup_worker:
+            self.backup_worker.request_cancel()
+        if self.progress_dialog:
+            self.progress_dialog.setCancelButton(None)
+            self.progress_dialog.setLabelText(ui_text("progress_cancel_requested", self.language))
+            self.progress_dialog.show()
+
+    def _on_backup_progress(self, event: BackupProgressEvent) -> None:
+        """Update the progress dialog from a worker progress event."""
+
+        if not self.progress_dialog:
+            return
+
+        percent = (
+            100
+            if event.total_bytes <= 0
+            else min(100, int(event.current_bytes * 100 / event.total_bytes))
+        )
+        self.progress_dialog.setValue(percent * 10)
+        if event.is_duplicate_fix:
+            text = ui_text("progress_fixing_atu_detail", self.language).format(
+                phase=ui_text(f"progress_phase_{event.phase}", self.language),
+                percent=percent,
+            )
+        else:
+            text = ui_text("progress_processing_file", self.language).format(
+                index=event.index,
+                total=event.total,
+                file=event.file_text,
+                phase=ui_text(f"progress_phase_{event.phase}", self.language),
+                percent=percent,
+            )
+        if self.cancel_requested:
+            text = f"{text}\n\n{ui_text('progress_cancel_pending', self.language)}"
+        self.progress_dialog.setLabelText(text)
+
+    def _on_backup_finished(
+        self,
+        duplicate_results: list[AtuDuplicatePlan],
+        results: list[BackupResult],
+        canceled: bool,
+    ) -> None:
+        """Handle successful or canceled worker completion."""
+
+        self._close_progress_dialog(ui_text("progress_finished", self.language))
+        self.generate_button.setEnabled(True)
+        self._write_execution_log(duplicate_results, results)
+        summary = summarize_results([*results, *duplicate_results])
+        if canceled:
+            title = ui_text("backup_canceled_title", self.language)
+            body = (
+                ui_text("backup_canceled_message", self.language).format(
+                    completed=len(results) + len(duplicate_results)
+                )
+                + "\n\n"
+                + self._summary_text(summary)
+            )
+        else:
+            title = ui_text("backup_processed_title", self.language)
+            body = self._summary_text(summary)
+        QMessageBox.information(self, title, body)
+        self.refresh_preview()
+
+    def _on_backup_failed(self, message: str) -> None:
+        """Handle worker failure."""
+
+        self._close_progress_dialog("")
+        self.generate_button.setEnabled(True)
+        QMessageBox.critical(self, ui_text("backup_failed", self.language), message)
+        self.log_output.appendPlainText(f"{ui_text('error_prefix', self.language)}: {message}")
+
+    def _write_execution_log(
+        self,
+        duplicate_results: list[AtuDuplicatePlan],
+        results: list[BackupResult],
+    ) -> None:
+        """Write the execution result log and summary."""
 
         self.log_output.clear()
         for result in duplicate_results:
@@ -582,136 +707,24 @@ class MainWindow(QMainWindow):
             f"{ui_text('completed_at', self.language)} {datetime.now().strftime('%d/%m/%Y %H:%M')}"
         )
         self.log_output.appendPlainText(self._summary_text(summary))
-        QMessageBox.information(
-            self,
-            ui_text("backup_processed_title", self.language),
-            self._summary_text(summary),
-        )
-        self.refresh_preview()
 
-    def _run_backup_with_progress(
-        self,
-        fix_duplicates: bool,
-    ) -> tuple[list[AtuDuplicatePlan], list[BackupResult]]:
-        """Execute plans while keeping the UI responsive with a progress dialog."""
+    def _close_progress_dialog(self, final_text: str) -> None:
+        """Close the progress dialog after worker completion."""
 
-        if not self.config:
-            return [], []
+        if not self.progress_dialog:
+            return
+        if final_text:
+            self.progress_dialog.setLabelText(final_text)
+            self.progress_dialog.setValue(1000)
+        self.progress_dialog.blockSignals(True)
+        self.progress_dialog.close()
+        self.progress_dialog = None
 
-        plans = self.current_plans
-        total_items = len(plans)
-        progress = QProgressDialog(
-            ui_text("progress_starting", self.language),
-            None,
-            0,
-            1000,
-            self,
-        )
-        progress.setWindowTitle(ui_text("progress_title", self.language))
-        progress.setWindowModality(Qt.WindowModality.ApplicationModal)
-        progress.setMinimumDuration(0)
-        progress.setAutoClose(False)
-        progress.setAutoReset(False)
-        progress.setValue(0)
+    def _clear_backup_worker(self) -> None:
+        """Release worker/thread references after the thread stops."""
 
-        self.generate_button.setEnabled(False)
-        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
-        QApplication.processEvents()
-        try:
-            duplicate_results: list[AtuDuplicatePlan] = []
-            if fix_duplicates:
-                progress.setLabelText(ui_text("progress_fixing_atu", self.language))
-                progress.setValue(0)
-                QApplication.processEvents()
-                duplicate_results = fix_atu_duplicate_backups(
-                    atu_path=self.config.atu_path,
-                    his_path=self.config.his_path,
-                    progress_callback=self._progress_callback(
-                        progress=progress,
-                        title=ui_text("progress_fixing_atu_detail", self.language),
-                    ),
-                )
-                progress.setValue(1000)
-                QApplication.processEvents()
-
-            results: list[BackupResult] = []
-            for index, plan in enumerate(plans, start=1):
-                file_text = self._source_files_text(plan.source_files or (plan.source_file,))
-                progress.setLabelText(
-                    ui_text("progress_processing_file", self.language).format(
-                        index=index,
-                        total=total_items,
-                        file=file_text,
-                        phase=ui_text("progress_phase_preparing", self.language),
-                        percent=0,
-                    )
-                )
-                progress.setValue(0)
-                QApplication.processEvents()
-                results.append(
-                    self._process_plan(
-                        plan,
-                        progress_callback=self._progress_callback(
-                            progress=progress,
-                            title=ui_text("progress_processing_file", self.language).format(
-                                index=index,
-                                total=total_items,
-                                file=file_text,
-                                phase="{phase}",
-                                percent="{percent}",
-                            ),
-                        ),
-                    )
-                )
-                progress.setValue(1000)
-                QApplication.processEvents()
-
-            progress.setLabelText(ui_text("progress_finished", self.language))
-            progress.setValue(1000)
-            QApplication.processEvents()
-            return duplicate_results, results
-        finally:
-            QApplication.restoreOverrideCursor()
-            self.generate_button.setEnabled(True)
-            progress.close()
-
-    def _progress_callback(
-        self,
-        *,
-        progress: QProgressDialog,
-        title: str,
-    ) -> ProgressCallback:
-        """Build a callback that updates the progress dialog for one operation."""
-
-        def callback(phase: str, current_bytes: int, total_bytes: int) -> None:
-            percent = 100 if total_bytes <= 0 else min(100, int(current_bytes * 100 / total_bytes))
-            progress.setValue(percent * 10)
-            progress.setLabelText(
-                title.format(
-                    phase=ui_text(f"progress_phase_{phase}", self.language),
-                    percent=percent,
-                )
-            )
-            QApplication.processEvents()
-
-        return callback
-
-    def _process_plan(
-        self,
-        plan: BackupPlan,
-        progress_callback: ProgressCallback | None = None,
-    ) -> BackupResult:
-        """Execute one plan using the project type captured during preview."""
-
-        if not self.config:
-            raise RuntimeError(ui_text("settings_required", self.language))
-
-        return execute_backup_plan(
-            plan=plan,
-            atu_path=self.config.atu_path,
-            his_path=self.config.his_path,
-            progress_callback=progress_callback,
-        )
+        self.backup_thread = None
+        self.backup_worker = None
 
     def _show_plans(
         self,
@@ -760,23 +773,25 @@ class MainWindow(QMainWindow):
                 project = plan.key
                 software = "-"
                 timestamp = "-"
+                file_text = plan.source_file.name
             else:
                 project = plan.project
                 software = plan.software
                 timestamp = plan.timestamp_text
+                file_text = self._source_files_text(plan.source_files or (plan.source_file,))
             values = [
-                self._source_files_text(plan.source_files or (plan.source_file,)),
+                status_label(plan.status, self.language),
+                file_text,
                 project,
                 software,
                 timestamp,
-                status_label(plan.status, self.language),
                 str(plan.destination_path),
             ]
             for column, value in enumerate(values):
                 item = QTableWidgetItem(value)
-                if column in {1, 2, 3, 4}:
+                if column in {0, 2, 3, 4}:
                     item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-                if column == 4 and plan.status in STATUS_COLORS:
+                if column == 0 and plan.status in STATUS_COLORS:
                     item.setForeground(STATUS_COLORS[plan.status])
                 self.preview_table.setItem(row, column, item)
         self.preview_table.resizeColumnsToContents()
@@ -1019,11 +1034,11 @@ class MainWindow(QMainWindow):
         self.log_output.setPlaceholderText(ui_text("preview", self.language))
         self.preview_table.setHorizontalHeaderLabels(
             [
+                ui_text("action", self.language),
                 ui_text("file", self.language),
                 ui_text("project", self.language),
                 ui_text("version", self.language),
                 ui_text("timestamp", self.language),
-                ui_text("action", self.language),
                 ui_text("destination", self.language),
             ]
         )

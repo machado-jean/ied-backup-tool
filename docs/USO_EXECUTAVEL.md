@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.5.2.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.8.0.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
 (`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`/`.apcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
 
@@ -13,7 +13,7 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.5.2.exe
+├─ IED Backup Manager v1.8.0.exe
 ├─ config.json
 ├─ SE-AAA_20260529_1624.dz5
 ├─ SE-AAA_20260529_1625.dz5
@@ -297,12 +297,12 @@ encontrados na pasta.
 
 Colunas principais:
 
+- `Acao`: o que o programa pretende fazer.
 - `Arquivo`: arquivo principal de origem (`.dz5`, `.rdb`, `.pcmp`, `.apcmp`, `.efsPro`,
   `.ITPro2`) ou primeiro arquivo do pacote agrupado.
 - `Projeto`: identificador do projeto.
 - `Versao`: versao encontrada no arquivo ou conjunto de versoes do pacote.
 - `Data/Hora`: data do arquivo usada no nome do backup.
-- `Acao`: o que o programa pretende fazer.
 - `Destino`: pasta ou arquivo de destino previsto.
 
 Status possiveis:
@@ -336,8 +336,16 @@ Nesse momento, o programa revalida `ATU` e `HIS`. Se alguma pasta tiver sido
 apagada, desconectada ou ficar indisponivel depois da configuracao, a execucao
 sera bloqueada ate o usuario corrigir ou recriar a pasta.
 
-Durante a execucao, uma barra de progresso mostra o arquivo atual. Aguarde a
-conclusao antes de fechar o programa.
+Durante a execucao, uma barra de progresso mostra o arquivo atual, a etapa da
+operacao e o progresso por bytes. A execucao roda em segundo plano para manter a
+interface responsiva.
+
+Se clicar em `Cancelar` durante a compactacao, o ZIP temporario sera descartado
+e nao sera copiado para `ATU`/`HIS`. Se a copia final para `ATU`/`HIS` ja tiver
+comecado, o programa finaliza essa copia antes de parar para preservar a
+consistencia do backup.
+
+Aguarde a conclusao ou o cancelamento controlado antes de fechar o programa.
 
 Ao final, sera exibido um resumo com:
 

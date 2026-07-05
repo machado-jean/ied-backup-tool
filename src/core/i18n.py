@@ -47,6 +47,11 @@ UI_TEXT = {
         "sha_conflicts": "Conflitos SHA",
         "atu_folder": "Pasta ATU",
         "backup_failed": "Falha ao gerar backup",
+        "backup_canceled_message": (
+            "A execução foi cancelada antes de iniciar o próximo arquivo. "
+            "Itens concluídos: {completed}."
+        ),
+        "backup_canceled_title": "Backup cancelado",
         "backup_processed_title": "Backups processados",
         "cancel": "Cancelar",
         "collaborator": "Colaborador",
@@ -85,6 +90,12 @@ UI_TEXT = {
         "preview": "Prévia do lote",
         "preview_note": "PRÉVIA: nenhum arquivo foi criado ou movido ainda.",
         "progress_finished": "Backups concluídos.",
+        "progress_cancel_pending": (
+            "Cancelamento solicitado. O arquivo atual será finalizado antes de parar."
+        ),
+        "progress_cancel_requested": (
+            "Cancelamento solicitado.\nFinalizando a operação atual antes de parar..."
+        ),
         "progress_fixing_atu": "Corrigindo duplicidades em ATU...",
         "progress_fixing_atu_detail": "Corrigindo duplicidades em ATU...\n{phase}: {percent}%",
         "progress_phase_archive_current": "Arquivando backup anterior",
@@ -166,6 +177,11 @@ UI_TEXT = {
         "sha_conflicts": "SHA conflicts",
         "atu_folder": "ATU folder",
         "backup_failed": "Backup failed",
+        "backup_canceled_message": (
+            "Execution was canceled before starting the next file. "
+            "Completed items: {completed}."
+        ),
+        "backup_canceled_title": "Backup canceled",
         "backup_processed_title": "Backups processed",
         "cancel": "Cancel",
         "collaborator": "Collaborator",
@@ -204,6 +220,12 @@ UI_TEXT = {
         "preview": "Batch preview",
         "preview_note": "PREVIEW: no file has been created or moved yet.",
         "progress_finished": "Backups completed.",
+        "progress_cancel_pending": (
+            "Cancellation requested. The current file will finish before stopping."
+        ),
+        "progress_cancel_requested": (
+            "Cancellation requested.\nFinishing the current operation before stopping..."
+        ),
         "progress_fixing_atu": "Fixing ATU duplicates...",
         "progress_fixing_atu_detail": "Fixing ATU duplicates...\n{phase}: {percent}%",
         "progress_phase_archive_current": "Archiving previous backup",
