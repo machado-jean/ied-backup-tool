@@ -6,13 +6,12 @@ Last updated: 2026-07-05
 
 Current application version: `1.10.1`
 
-The `v1.10.1` source changes are implemented, but the executable has not been
-generated yet.
+The `v1.10.1` executable has been generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.10.0/IED Backup Manager v1.10.0.exe
+releases/v1.10.1/IED Backup Manager.exe
 ```
 
 ## Recently Completed
