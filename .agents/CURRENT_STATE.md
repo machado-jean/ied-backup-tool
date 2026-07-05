@@ -4,14 +4,14 @@ Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.10.3`
+Current application version: `1.10.4`
 
-The `v1.10.3` executable has been generated.
+The `v1.10.4` executable has been generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.10.3/IED_Backup_Manager.exe
+releases/v1.10.4/IED_Backup_Manager.exe
 ```
 
 ## Recently Completed
@@ -32,6 +32,8 @@ releases/v1.10.3/IED_Backup_Manager.exe
   clickable copyright notice in the GUI.
 - `v1.10.3`: update notice opens direct latest executable download and the
   release asset uses underscore naming.
+- `v1.10.4`: update notice text clarifies that clicking downloads the new
+  version.
 
 ## Current v1.6.0 Released Scope
 
@@ -147,7 +149,7 @@ pytest: 86 passed
 
 ## Next Planned Work
 
-Planned next improvement after `v1.10.3`:
+Planned next improvement after `v1.10.4`:
 
 ```text
 public-repository sensitivity review and repository polish
