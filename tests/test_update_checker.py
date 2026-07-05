@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 from src.core.update_checker import (
+    LATEST_EXECUTABLE_DOWNLOAD_URL,
     LATEST_RELEASE_PAGE_URL,
     check_latest_release,
     is_version_newer,
@@ -30,14 +31,15 @@ def test_check_latest_release_uses_github_payload() -> None:
     assert result.current_version == "1.9.1"
     assert result.latest_version == "1.10.0"
     assert result.update_available is True
-    assert result.release_url == LATEST_RELEASE_PAGE_URL
+    assert result.release_url == LATEST_EXECUTABLE_DOWNLOAD_URL
 
 
-def test_check_latest_release_falls_back_to_latest_page_url() -> None:
+def test_check_latest_release_uses_latest_download_url_when_current() -> None:
     result = check_latest_release("1.10.0", opener=fake_opener({"tag_name": "v1.10.0"}))
 
     assert result.update_available is False
-    assert result.release_url == LATEST_RELEASE_PAGE_URL
+    assert result.release_url == LATEST_EXECUTABLE_DOWNLOAD_URL
+    assert LATEST_RELEASE_PAGE_URL.endswith("/releases/latest")
 
 
 class FakeResponse:

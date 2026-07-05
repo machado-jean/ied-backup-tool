@@ -12,6 +12,10 @@ LATEST_RELEASE_API_URL = (
 LATEST_RELEASE_PAGE_URL = (
     "https://github.com/machado-jean/ied-backup-tool/releases/latest"
 )
+LATEST_EXECUTABLE_DOWNLOAD_URL = (
+    "https://github.com/machado-jean/ied-backup-tool/releases/latest/download/"
+    "IED_Backup_Manager.exe"
+)
 
 
 @dataclass(frozen=True)
@@ -47,7 +51,7 @@ def check_latest_release(
     return UpdateCheckResult(
         current_version=current_version,
         latest_version=latest_version,
-        release_url=LATEST_RELEASE_PAGE_URL,
+        release_url=LATEST_EXECUTABLE_DOWNLOAD_URL,
         update_available=is_version_newer(latest_version, current_version),
     )
 

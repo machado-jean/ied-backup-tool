@@ -179,7 +179,7 @@ UI_TEXT = {
         "total": "Total",
         "type": "Tipos",
         "update_available": "Nova versão disponível",
-        "update_available_tooltip": "Clique para abrir a versão {version} no GitHub.",
+        "update_available_tooltip": "Clique para baixar a versão {version}.",
         "version": "Versão",
     },
     "en_US": {
@@ -322,7 +322,7 @@ UI_TEXT = {
         "total": "Total",
         "type": "Types",
         "update_available": "New version available",
-        "update_available_tooltip": "Click to open version {version} on GitHub.",
+        "update_available_tooltip": "Click to download version {version}.",
         "version": "Version",
     },
 }

@@ -62,7 +62,7 @@ folders, `config.json`, or `releases/vX.Y.Z/`.
 Confirm:
 
 ```text
-releases/vX.Y.Z/IED Backup Manager.exe exists
+releases/vX.Y.Z/IED_Backup_Manager.exe exists
 releases/vX.Y.Z/RELEASE_NOTES.md exists
 IED Backup Manager.spec does not exist
 build/ and dist/ do not exist

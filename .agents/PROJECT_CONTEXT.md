@@ -65,7 +65,7 @@ compatible and are not marked as conflicts.
 - Public latest-release page:
   `https://github.com/machado-jean/ied-backup-tool/releases/latest`
 - Public latest executable download:
-  `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED%20Backup%20Manager.exe`
+  `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe`
 - License file: `LICENSE`
 - Core planning/execution rules: `src/core/backup_service.py`
 - ATU/HIS storage rules: `src/core/storage.py`
@@ -126,7 +126,7 @@ Generate release executable:
 - Prefer small, versioned changes.
 - Before generating an executable, update `src/version.py`, `README.md`,
   `.agents/CURRENT_STATE.md`, and `releases/vX.Y.Z/RELEASE_NOTES.md`.
-- Distributed executable filename is fixed: `IED Backup Manager.exe`.
+- Distributed executable filename is fixed: `IED_Backup_Manager.exe`.
 - Keep versioning in the release folder, release notes, Git tag, window title,
   and splash screen, not in the executable filename.
 - When the user asks to generate the `.exe`, generate it directly using

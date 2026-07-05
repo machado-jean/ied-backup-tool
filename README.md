@@ -31,7 +31,7 @@ arquivos finais.
   no GitHub.
 - Verificacao automatica de novas versoes publicadas no GitHub, com aviso
   clicavel no rodape quando houver update.
-- Executavel distribuido com nome fixo `IED Backup Manager.exe`, mantendo a
+- Executavel distribuido com nome fixo `IED_Backup_Manager.exe`, mantendo a
   versao visivel dentro da interface.
 - Indicador `©` na interface com autoria, uso nao comercial e link do
   repositorio.
@@ -221,12 +221,12 @@ Itens desejados para evolucoes futuras:
 
 As versoes publicadas ficam em `releases/vX.Y.Z/`, sempre com:
 
-- executavel com nome fixo `IED Backup Manager.exe`;
+- executavel com nome fixo `IED_Backup_Manager.exe`;
 - `RELEASE_NOTES.md`;
 - tag Git correspondente quando a versao for consolidada.
 
 Link fixo para download do ultimo executavel publicado:
 
 ```text
-https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED%20Backup%20Manager.exe
+https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe
 ```

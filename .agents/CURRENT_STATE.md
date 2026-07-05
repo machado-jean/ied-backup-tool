@@ -4,14 +4,14 @@ Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.10.2`
+Current application version: `1.10.3`
 
-The `v1.10.2` executable has been generated.
+The `v1.10.3` executable has been generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.10.2/IED Backup Manager.exe
+releases/v1.10.3/IED_Backup_Manager.exe
 ```
 
 ## Recently Completed
@@ -30,6 +30,8 @@ releases/v1.10.2/IED Backup Manager.exe
   download URLs.
 - `v1.10.2`: non-commercial license file, public license documentation, and
   clickable copyright notice in the GUI.
+- `v1.10.3`: update notice opens direct latest executable download and the
+  release asset uses underscore naming.
 
 ## Current v1.6.0 Released Scope
 
@@ -120,13 +122,13 @@ pytest: 86 passed
 
 ## Current v1.10.1 Scope
 
-- Release script generates and copies `IED Backup Manager.exe` instead of a
+- Release script generates and copies `IED_Backup_Manager.exe` instead of a
   versioned executable filename.
 - Version remains visible in the window title and splash screen through
   `APP_VERSION`.
 - Release folders remain versioned as `releases/vX.Y.Z/`.
 - GitHub can expose a stable latest-download URL:
-  `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED%20Backup%20Manager.exe`.
+  `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe`.
 
 ## Current v1.10.2 Scope
 
@@ -135,9 +137,17 @@ pytest: 86 passed
 - Adds a clickable `©` indicator in the bottom-right corner of the GUI.
 - Clicking `©` shows a compact authorship/license note and repository link.
 
+## Current v1.10.3 Scope
+
+- The release script generates `IED_Backup_Manager.exe`.
+- The update notice opens the direct latest download URL:
+  `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe`.
+- The tooltip explains that clicking the update notice downloads the new
+  version.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.10.2`:
+Planned next improvement after `v1.10.3`:
 
 ```text
 public-repository sensitivity review and repository polish
