@@ -4,14 +4,14 @@ Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.9.0`
+Current application version: `1.9.1`
 
-The `v1.9.0` executable has been generated.
+The `v1.9.1` executable has been generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.9.0/IED Backup Manager v1.9.0.exe
+releases/v1.9.1/IED Backup Manager v1.9.1.exe
 ```
 
 ## Recently Completed
@@ -24,6 +24,7 @@ releases/v1.9.0/IED Backup Manager v1.9.0.exe
   during ZIP creation and final copy.
 - `v1.8.0`: worker-thread execution and controlled cancellation.
 - `v1.9.0`: public/professional user documentation and in-app help access.
+- `v1.9.1`: in-app help points to the public GitHub `HELP.md`.
 
 ## Current v1.6.0 Released Scope
 
@@ -42,7 +43,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 80 passed
+pytest: 81 passed
 ```
 
 ## Local-Safety Notes
@@ -90,17 +91,32 @@ pytest: 80 passed
 - Updates README, executable-use documentation, improvement roadmap, release
   notes, and agent context.
 
+## Current v1.9.1 Scope
+
+- Changes the main-window `Ajuda` / `Help` button to open the public GitHub
+  document:
+  `https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md`.
+- Removes `docs/HELP.md` from PyInstaller bundled data because the online
+  document is now the single help target.
+- Keeps the local `docs/HELP.md` in the repository as the public source
+  document.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.9.0`:
+Planned next improvement after `v1.9.1`:
 
 ```text
-v1.9.1 public-repository sensitivity review
+v1.9.2 GitHub update checker
 ```
 
 Likely scope:
 
-- scan public docs/code for real names, real substations, internal paths, and
-  sensitive samples;
-- confirm ignored local folders are not staged;
-- update release notes with the review result.
+- query GitHub Releases for the latest public version;
+- compare it with `APP_VERSION`;
+- show a non-blocking update notice with a browser link to the release;
+- handle offline/corporate-network failures gracefully;
+- keep auto-download/replacement out of scope.
+
+Postponed follow-up:
+
+- public-repository sensitivity review and repository polish.

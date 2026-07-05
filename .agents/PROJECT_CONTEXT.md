@@ -58,6 +58,8 @@ compatible and are not marked as conflicts.
 - GUI entrypoint: `src/gui/app.py`
 - Main GUI window: `src/gui/main_window.py`
 - User help document: `docs/HELP.md`
+- Public help URL:
+  `https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md`
 - Core planning/execution rules: `src/core/backup_service.py`
 - ATU/HIS storage rules: `src/core/storage.py`
 - ZIP creation: `src/core/zipper.py`

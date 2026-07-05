@@ -46,7 +46,7 @@ from src.core.naming import BackupStage, normalize_stage
 from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
 from src.gui.backup_worker import BackupExecutionWorker, BackupProgressEvent
-from src.gui.resources import app_icon_path, help_document_path, language_flag_path
+from src.gui.resources import app_icon_path, help_document_url, language_flag_path
 from src.gui.settings_window import SettingsWindow
 from src.gui.storage_paths import confirm_storage_paths_ready
 from src.version import APP_DISPLAY_NAME
@@ -368,14 +368,14 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def open_help_document(self) -> None:
-        """Open the bundled user help document with the system default app."""
+        """Open the public user help document with the system default browser."""
 
-        path = help_document_path()
-        if not path.exists() or not QDesktopServices.openUrl(QUrl.fromLocalFile(str(path))):
+        url = help_document_url()
+        if not QDesktopServices.openUrl(QUrl(url)):
             QMessageBox.warning(
                 self,
                 ui_text("help", self.language),
-                ui_text("help_open_failed", self.language).format(path=path),
+                ui_text("help_open_failed", self.language).format(url=url),
             )
 
     def on_settings_saved(self, config: AppConfig) -> None:

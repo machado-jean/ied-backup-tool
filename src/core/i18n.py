@@ -71,7 +71,7 @@ UI_TEXT = {
         "fill_fields": "Preencha",
         "generate_backups": "Gerar backups",
         "help": "Ajuda",
-        "help_open_failed": "Não foi possível abrir o documento de ajuda: {path}",
+        "help_open_failed": "Não foi possível abrir a ajuda online: {url}",
         "ignored": "Ignorados",
         "integrity_conflicts_found": (
             "Foram encontrados backups com a mesma identidade técnica, mas SHA256 "
@@ -203,7 +203,7 @@ UI_TEXT = {
         "fill_fields": "Fill in",
         "generate_backups": "Generate backups",
         "help": "Help",
-        "help_open_failed": "Could not open the help document: {path}",
+        "help_open_failed": "Could not open the online help: {url}",
         "ignored": "Ignored",
         "integrity_conflicts_found": (
             "Backups with the same technical identity but different SHA256 values "

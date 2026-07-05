@@ -150,13 +150,30 @@ Status: implementado em `v1.9.0`.
 Objetivo: reduzir risco de exposicao antes de abrir o GitHub para acesso
 publico.
 
-Status: planejado para `v1.9.1`.
+Status: planejado para depois de `v1.9.2`.
 
+- [x] Apontar o botao `Ajuda` / `Help` para o `HELP.md` publico no GitHub.
 - [ ] Fazer varredura final de nomes reais, caminhos internos e amostras
   sensiveis.
 - [ ] Confirmar que pastas locais com backups reais seguem ignoradas pelo Git.
 - [ ] Revisar documentos publicos usando somente exemplos genericos.
 - [ ] Registrar resultado da revisao em release note de patch.
+
+### Verificacao de Atualizacoes
+
+Objetivo: avisar o usuario quando existir uma versao nova publicada no GitHub,
+sem baixar ou substituir o executavel automaticamente.
+
+Status: planejado para `v1.9.2`.
+
+- [ ] Consultar a ultima versao publicada no GitHub Releases.
+- [ ] Comparar a versao publicada com `APP_VERSION`.
+- [ ] Mostrar aviso quando houver uma versao mais recente.
+- [ ] Oferecer botao para abrir o release no navegador.
+- [ ] Mostrar mensagem amigavel quando o usuario ja estiver na versao mais
+  recente.
+- [ ] Tratar falhas de internet ou bloqueio corporativo sem interromper o uso do
+  aplicativo.
 
 ## Prioridade Baixa
 

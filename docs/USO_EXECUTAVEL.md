@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.9.0.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.9.1.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
 (`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`/`.apcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
 
@@ -13,7 +13,7 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.9.0.exe
+├─ IED Backup Manager v1.9.1.exe
 ├─ config.json
 ├─ SE-AAA_20260529_1624.dz5
 ├─ SE-AAA_20260529_1625.dz5
@@ -84,8 +84,12 @@ A preferencia fica salva no `config.json`.
 
 ## 4. Abrir ajuda
 
-Use o botao `Ajuda` na tela principal para abrir o documento operacional
-incluido com a aplicacao.
+Use o botao `Ajuda` na tela principal para abrir o documento operacional no
+GitHub:
+
+```text
+https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md
+```
 
 Esse documento resume estrutura de pastas, regras de nomes, exemplos de saida,
 metadados internos dos ZIPs, limitacoes conhecidas, solucao de problemas e
