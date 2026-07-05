@@ -107,7 +107,7 @@ def test_process_all_backups_archives_missing_history_when_atu_has_newest(
     create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
     create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
     current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1809_COLABORADOR-EXEMPLO_DEV.zip"
-    current.write_text("current", encoding="utf-8")
+    create_plain_zip(current, "current")
 
     results = process_all_backups(
         project_dir=project_dir,
@@ -141,9 +141,9 @@ def test_process_all_backups_does_not_archive_when_same_identity_exists_in_his(
 
     create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
     current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_TAC.zip"
-    current.write_text("current", encoding="utf-8")
+    create_plain_zip(current, "current")
     existing_history = his / "DIGSI5-V10.00_SE-AAA_20260525-1218_OUTRO-COLABORADOR_DEV.zip"
-    existing_history.write_text("history", encoding="utf-8")
+    create_plain_zip(existing_history, "history")
 
     results = process_all_backups(
         project_dir=project_dir,
@@ -155,7 +155,7 @@ def test_process_all_backups_does_not_archive_when_same_identity_exists_in_his(
 
     assert [result.status for result in results] == ["skipped_older"]
     assert len(list(his.glob("*.zip"))) == 1
-    assert existing_history.read_text(encoding="utf-8") == "history"
+    assert read_plain_zip(existing_history) == "history"
 
 
 def test_process_all_backups_treats_same_identity_in_atu_as_current(
@@ -169,7 +169,7 @@ def test_process_all_backups_treats_same_identity_in_atu_as_current(
 
     create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
     current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip"
-    current.write_text("current", encoding="utf-8")
+    create_plain_zip(current, "current")
 
     results = process_all_backups(
         project_dir=project_dir,
@@ -280,7 +280,7 @@ def test_process_all_backups_allows_newer_backup_with_any_stage(tmp_path: Path) 
 
     create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
     current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_POS-TAC.zip"
-    current.write_text("current", encoding="utf-8")
+    create_plain_zip(current, "current")
 
     results = process_all_backups(
         project_dir=project_dir,
@@ -303,8 +303,8 @@ def test_plan_and_fix_atu_duplicate_backups(tmp_path: Path) -> None:
     atu.mkdir()
     older = atu / "DIGSI5-V10.00_SE-AAA_20260525-1218_COLABORADOR-EXEMPLO_DEV.zip"
     newer = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip"
-    older.write_text("older", encoding="utf-8")
-    newer.write_text("newer", encoding="utf-8")
+    create_plain_zip(older, "older")
+    create_plain_zip(newer, "newer")
 
     plans = plan_atu_duplicate_fixes(atu_path=atu, his_path=his)
 
@@ -319,7 +319,7 @@ def test_plan_and_fix_atu_duplicate_backups(tmp_path: Path) -> None:
     assert len(fixed) == 1
     assert not older.exists()
     assert newer.exists()
-    assert (his / older.name).read_text(encoding="utf-8") == "older"
+    assert read_plain_zip(his / older.name) == "older"
 
 
 def test_process_all_backups_keeps_one_current_per_project(tmp_path: Path) -> None:
@@ -363,7 +363,7 @@ def test_filter_current_and_newer_plans_omits_previous_history(tmp_path: Path) -
     create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
     create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
     current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip"
-    current.write_text("current", encoding="utf-8")
+    create_plain_zip(current, "current")
 
     plans = plan_all_backups(
         project_dir=project_dir,
@@ -504,5 +504,16 @@ def create_dz5_with_content(path: Path, mtime: datetime, content: str) -> Path:
     timestamp = mtime.timestamp()
     os.utime(path, (timestamp, timestamp))
     return path
+
+
+def create_plain_zip(path: Path, content: str) -> Path:
+    with ZipFile(path, "w") as archive:
+        archive.writestr("payload.txt", content)
+    return path
+
+
+def read_plain_zip(path: Path) -> str:
+    with ZipFile(path) as archive:
+        return archive.read("payload.txt").decode("utf-8")
 
 

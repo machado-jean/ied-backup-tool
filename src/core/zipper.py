@@ -6,6 +6,8 @@ import zipfile
 from collections.abc import Sequence
 from pathlib import Path
 
+from src.core.progress import ProgressCallback, copy_stream_with_progress
+
 
 class BackupZipError(RuntimeError):
     pass
@@ -19,6 +21,7 @@ def create_backup_zip(
     backup_name: str,
     output_dir: Path | None = None,
     backup_info_text: str | None = None,
+    progress_callback: ProgressCallback | None = None,
 ) -> Path:
     """Create a zip containing one or more source files under their original names."""
 
@@ -42,7 +45,14 @@ def create_backup_zip(
             archive.writestr(BACKUP_INFO_FILENAME, backup_info_text)
         for path in source_files:
             try:
-                archive.write(path, arcname=path.name)
+                with path.open("rb") as source, archive.open(path.name, "w") as target:
+                    copy_stream_with_progress(
+                        source,
+                        target,
+                        total_bytes=path.stat().st_size,
+                        phase="zip",
+                        progress_callback=progress_callback,
+                    )
             except OSError as exc:
                 raise BackupZipError(
                     f"Nao foi possivel compactar o arquivo. Verifique se ele esta aberto "

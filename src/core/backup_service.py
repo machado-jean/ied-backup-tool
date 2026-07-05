@@ -18,6 +18,7 @@ from src.core.naming import (
     build_backup_name,
     get_file_timestamp,
 )
+from src.core.progress import ProgressCallback
 from src.core.project_types.base import ProjectDetectionError, ProjectType
 from src.core.project_types.registry import DEFAULT_PROJECT_TYPE
 from src.core.storage import (
@@ -27,6 +28,7 @@ from src.core.storage import (
     find_current_backup,
     fix_atu_duplicates,
     parse_backup_filename,
+    place_staged_backup,
     update_storage,
 )
 from src.core.zipper import create_backup_zip
@@ -389,7 +391,13 @@ def plan_grouped_backups(
     return sorted(plans, key=lambda plan: (plan.project, plan.timestamp_text))
 
 
-def execute_backup_plan(*, plan: BackupPlan, atu_path: Path, his_path: Path) -> BackupResult:
+def execute_backup_plan(
+    *,
+    plan: BackupPlan,
+    atu_path: Path,
+    his_path: Path,
+    progress_callback: ProgressCallback | None = None,
+) -> BackupResult:
     """Execute a previously computed plan without recalculating its metadata."""
 
     if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT, STATUS_SHA_CONFLICT}:
@@ -408,6 +416,7 @@ def execute_backup_plan(*, plan: BackupPlan, atu_path: Path, his_path: Path) -> 
             his_path=his_path,
             source_files=plan.source_files,
             backup_info_text=plan.backup_info_text,
+            progress_callback=progress_callback,
         )
         return BackupResult(
             source_file=plan.source_file,
@@ -423,11 +432,13 @@ def execute_backup_plan(*, plan: BackupPlan, atu_path: Path, his_path: Path) -> 
             plan.backup_name,
             output_dir=Path(staging),
             backup_info_text=plan.backup_info_text,
+            progress_callback=progress_callback,
         )
         final_path = update_storage(
             new_backup=staged_zip,
             atu_path=atu_path,
             his_path=his_path,
+            progress_callback=progress_callback,
         )
 
     return BackupResult(
@@ -455,11 +466,16 @@ def plan_atu_duplicate_fixes(*, atu_path: Path, his_path: Path) -> list[AtuDupli
     ]
 
 
-def fix_atu_duplicate_backups(*, atu_path: Path, his_path: Path) -> list[AtuDuplicatePlan]:
+def fix_atu_duplicate_backups(
+    *,
+    atu_path: Path,
+    his_path: Path,
+    progress_callback: ProgressCallback | None = None,
+) -> list[AtuDuplicatePlan]:
     """Move older duplicate ATU files to HIS and return the planned actions."""
 
     plans = plan_atu_duplicate_fixes(atu_path=atu_path, his_path=his_path)
-    fix_atu_duplicates(atu_path, his_path)
+    fix_atu_duplicates(atu_path, his_path, progress_callback=progress_callback)
     return plans
 
 
@@ -546,6 +562,7 @@ def process_backup_file(
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     software_version_override: str | None = None,
+    progress_callback: ProgressCallback | None = None,
 ) -> BackupResult:
     """Create a staged zip and move it into ATU/HIS using the storage rules."""
 
@@ -574,11 +591,13 @@ def process_backup_file(
             plan.backup_name,
             output_dir=Path(staging),
             backup_info_text=plan.backup_info_text,
+            progress_callback=progress_callback,
         )
         final_path = update_storage(
             new_backup=staged_zip,
             atu_path=atu_path,
             his_path=his_path,
+            progress_callback=progress_callback,
         )
 
     return BackupResult(
@@ -849,6 +868,7 @@ def archive_history_backup(
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     source_files: tuple[Path, ...] | None = None,
     backup_info_text: str | None = None,
+    progress_callback: ProgressCallback | None = None,
 ) -> Path:
     """Create a missing historical backup directly in HIS."""
 
@@ -875,12 +895,19 @@ def archive_history_backup(
             source_files=list(files_to_zip),
             detected_versions=None,
         )
-    return create_backup_zip(
-        files_to_zip,
-        backup_name,
-        output_dir=his_path,
-        backup_info_text=backup_info_text,
-    )
+    with tempfile.TemporaryDirectory(prefix="ied-backup-history-") as staging:
+        staged_zip = create_backup_zip(
+            files_to_zip,
+            backup_name,
+            output_dir=Path(staging),
+            backup_info_text=backup_info_text,
+            progress_callback=progress_callback,
+        )
+        return place_staged_backup(
+            staged_zip,
+            destination,
+            progress_callback=progress_callback,
+        )
 
 
 def _unique_paths(paths) -> list[Path]:

@@ -86,7 +86,14 @@ UI_TEXT = {
         "preview_note": "PRÉVIA: nenhum arquivo foi criado ou movido ainda.",
         "progress_finished": "Backups concluídos.",
         "progress_fixing_atu": "Corrigindo duplicidades em ATU...",
-        "progress_processing_file": "Processando {file}...",
+        "progress_fixing_atu_detail": "Corrigindo duplicidades em ATU...\n{phase}: {percent}%",
+        "progress_phase_archive_current": "Arquivando backup anterior",
+        "progress_phase_copy_current": "Copiando backup final",
+        "progress_phase_preparing": "Preparando",
+        "progress_phase_zip": "Compactando arquivos",
+        "progress_processing_file": (
+            "Processando arquivo {index}/{total}\n{file}\n{phase}: {percent}%"
+        ),
         "progress_starting": "Preparando processamento...",
         "progress_title": "Gerando backups",
         "process_from_current": "Processar apenas a partir do backup atual",
@@ -198,7 +205,14 @@ UI_TEXT = {
         "preview_note": "PREVIEW: no file has been created or moved yet.",
         "progress_finished": "Backups completed.",
         "progress_fixing_atu": "Fixing ATU duplicates...",
-        "progress_processing_file": "Processing {file}...",
+        "progress_fixing_atu_detail": "Fixing ATU duplicates...\n{phase}: {percent}%",
+        "progress_phase_archive_current": "Archiving previous backup",
+        "progress_phase_copy_current": "Copying final backup",
+        "progress_phase_preparing": "Preparing",
+        "progress_phase_zip": "Compressing files",
+        "progress_processing_file": (
+            "Processing file {index}/{total}\n{file}\n{phase}: {percent}%"
+        ),
         "progress_starting": "Preparing processing...",
         "progress_title": "Generating backups",
         "process_from_current": "Process only from current backup",

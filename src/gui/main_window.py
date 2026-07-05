@@ -45,6 +45,7 @@ from src.core.backup_service import (
 )
 from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
 from src.core.naming import BackupStage, normalize_stage
+from src.core.progress import ProgressCallback
 from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
 from src.gui.resources import app_icon_path, language_flag_path
@@ -598,12 +599,12 @@ class MainWindow(QMainWindow):
             return [], []
 
         plans = self.current_plans
-        total_steps = len(plans) + (1 if fix_duplicates else 0)
+        total_items = len(plans)
         progress = QProgressDialog(
             ui_text("progress_starting", self.language),
             None,
             0,
-            max(total_steps, 1),
+            1000,
             self,
         )
         progress.setWindowTitle(ui_text("progress_title", self.language))
@@ -617,34 +618,56 @@ class MainWindow(QMainWindow):
         QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         QApplication.processEvents()
         try:
-            step = 0
             duplicate_results: list[AtuDuplicatePlan] = []
             if fix_duplicates:
                 progress.setLabelText(ui_text("progress_fixing_atu", self.language))
+                progress.setValue(0)
                 QApplication.processEvents()
                 duplicate_results = fix_atu_duplicate_backups(
                     atu_path=self.config.atu_path,
                     his_path=self.config.his_path,
+                    progress_callback=self._progress_callback(
+                        progress=progress,
+                        title=ui_text("progress_fixing_atu_detail", self.language),
+                    ),
                 )
-                step += 1
-                progress.setValue(step)
+                progress.setValue(1000)
                 QApplication.processEvents()
 
             results: list[BackupResult] = []
-            for plan in plans:
+            for index, plan in enumerate(plans, start=1):
+                file_text = self._source_files_text(plan.source_files or (plan.source_file,))
                 progress.setLabelText(
                     ui_text("progress_processing_file", self.language).format(
-                        file=self._source_files_text(plan.source_files or (plan.source_file,))
+                        index=index,
+                        total=total_items,
+                        file=file_text,
+                        phase=ui_text("progress_phase_preparing", self.language),
+                        percent=0,
                     )
                 )
+                progress.setValue(0)
                 QApplication.processEvents()
-                results.append(self._process_plan(plan))
-                step += 1
-                progress.setValue(step)
+                results.append(
+                    self._process_plan(
+                        plan,
+                        progress_callback=self._progress_callback(
+                            progress=progress,
+                            title=ui_text("progress_processing_file", self.language).format(
+                                index=index,
+                                total=total_items,
+                                file=file_text,
+                                phase="{phase}",
+                                percent="{percent}",
+                            ),
+                        ),
+                    )
+                )
+                progress.setValue(1000)
                 QApplication.processEvents()
 
             progress.setLabelText(ui_text("progress_finished", self.language))
-            progress.setValue(max(total_steps, 1))
+            progress.setValue(1000)
             QApplication.processEvents()
             return duplicate_results, results
         finally:
@@ -652,7 +675,32 @@ class MainWindow(QMainWindow):
             self.generate_button.setEnabled(True)
             progress.close()
 
-    def _process_plan(self, plan: BackupPlan) -> BackupResult:
+    def _progress_callback(
+        self,
+        *,
+        progress: QProgressDialog,
+        title: str,
+    ) -> ProgressCallback:
+        """Build a callback that updates the progress dialog for one operation."""
+
+        def callback(phase: str, current_bytes: int, total_bytes: int) -> None:
+            percent = 100 if total_bytes <= 0 else min(100, int(current_bytes * 100 / total_bytes))
+            progress.setValue(percent * 10)
+            progress.setLabelText(
+                title.format(
+                    phase=ui_text(f"progress_phase_{phase}", self.language),
+                    percent=percent,
+                )
+            )
+            QApplication.processEvents()
+
+        return callback
+
+    def _process_plan(
+        self,
+        plan: BackupPlan,
+        progress_callback: ProgressCallback | None = None,
+    ) -> BackupResult:
         """Execute one plan using the project type captured during preview."""
 
         if not self.config:
@@ -662,6 +710,7 @@ class MainWindow(QMainWindow):
             plan=plan,
             atu_path=self.config.atu_path,
             his_path=self.config.his_path,
+            progress_callback=progress_callback,
         )
 
     def _show_plans(

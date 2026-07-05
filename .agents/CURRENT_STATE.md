@@ -1,15 +1,17 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-07-04
+Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.6.0`
+Current application version: `1.7.0`
+
+The `v1.7.0` release combines all changes made after `v1.6.0`.
 
 Latest generated executable:
 
 ```text
-releases/v1.6.0/IED Backup Manager v1.6.0.exe
+releases/v1.7.0/IED Backup Manager v1.7.0.exe
 ```
 
 ## Recently Completed
@@ -18,8 +20,10 @@ releases/v1.6.0/IED Backup Manager v1.6.0.exe
 - `v1.5.4`: ABB PCM600 support expanded from `.pcmp` to `.pcmp` and `.apcmp`.
 - `v1.5.5`: splash screen and startup ordering fix.
 - `v1.6.0`: advanced SHA256 integrity check.
+- `v1.7.0`: more transactional ATU/HIS movement and real per-file byte progress
+  during ZIP creation and final copy.
 
-## Current v1.6.0 Scope
+## Current v1.6.0 Released Scope
 
 - Reads SHA256 values from `IEDS-BACKUP-INFO.txt` in existing ZIPs.
 - Detects same technical identity with different source-file SHA256 values.
@@ -36,7 +40,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 73 passed
+pytest: 77 passed
 ```
 
 ## Local-Safety Notes
@@ -47,17 +51,32 @@ pytest: 73 passed
 - Previously generated ZIPs created before the storage-permission fix may need
   manual deletion/recreation or ACL repair if Windows denies access to them.
 
+## Current v1.7.0 Scope
+
+- Validates staged ZIPs before touching `ATU`/`HIS`.
+- Copies new ZIPs into a temporary file inside the destination folder and
+  validates them before publishing the final name.
+- Publishes the new ATU backup before archiving the previous current backup, and
+  removes the new ATU backup if archiving the previous current backup fails.
+- Creates missing history backups in a temporary staging folder before placing
+  them in `HIS`.
+- Rejects silent overwrite when a destination ZIP already exists unexpectedly.
+- Shows `file X/N` while generating backups.
+- Updates the progress bar by bytes during ZIP creation.
+- Updates the progress bar by bytes while copying the final ZIP into `ATU`/`HIS`.
+- Keeps duplicate correction progress tied to actual copy bytes when duplicate
+  files are moved to `HIS`.
+
 ## Next Planned Work
 
-Planned next minor release:
+Planned next improvement after `v1.7.0`:
 
 ```text
-v1.7.0 - More transactional ATU/HIS movement
+Worker-thread execution and controlled cancellation
 ```
 
 Likely scope:
 
-- validate the newly created ZIP before touching `ATU`;
-- validate readable destination file after final placement;
-- handle blocked destination files more clearly;
-- consider rollback/quarantine when archiving current `ATU` to `HIS` fails.
+- execute backup processing in a worker thread;
+- keep the GUI responsive during large backups;
+- prepare controlled cancellation before starting the next file.

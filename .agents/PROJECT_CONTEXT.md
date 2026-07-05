@@ -120,3 +120,18 @@ Generate release executable:
   `scripts/release.ps1` unless there is a clear blocker.
 - After running tests or builds, remove generated caches/build folders when they
   are not needed: `.pytest_cache`, `.ruff_cache`, `__pycache__`, `build`, `dist`.
+
+## Storage Safety Rules
+
+- Stage ZIP creation outside the final `ATU`/`HIS` name.
+- Validate ZIP readability before publishing it to the final destination.
+- Do not silently overwrite an unexpected destination ZIP.
+- When replacing the current ATU backup, publish the validated new ZIP first and
+  remove it again if the previous current backup cannot be archived in `HIS`.
+
+## Progress Rules
+
+- Long file operations should accept optional progress callbacks.
+- GUI progress should show the current item as `file X/N`.
+- ZIP creation and final destination copies should report byte progress, not only
+  completed-item counts.

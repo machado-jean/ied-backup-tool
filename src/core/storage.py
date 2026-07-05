@@ -9,11 +9,13 @@ from __future__ import annotations
 
 import os
 import re
-import shutil
 import tempfile
+import zipfile
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+
+from src.core.progress import ProgressCallback, copy_stream_with_progress
 
 
 class StorageError(RuntimeError):
@@ -55,10 +57,17 @@ class AtuDuplicateInfo:
     history_path: Path
 
 
-def update_storage(*, new_backup: Path, atu_path: Path, his_path: Path) -> Path:
+def update_storage(
+    *,
+    new_backup: Path,
+    atu_path: Path,
+    his_path: Path,
+    progress_callback: ProgressCallback | None = None,
+) -> Path:
     """Move a staged backup into ATU while preserving the previous current file in HIS."""
 
     new_info = parse_backup_filename(new_backup)
+    validate_backup_zip(new_backup)
     atu_path.mkdir(parents=True, exist_ok=True)
     his_path.mkdir(parents=True, exist_ok=True)
 
@@ -72,13 +81,35 @@ def update_storage(*, new_backup: Path, atu_path: Path, his_path: Path) -> Path:
         if current.identity == new_info.identity:
             new_backup.unlink(missing_ok=True)
             return current.path
-        move_to_history(current.path, his_path)
+        destination = atu_path / new_backup.name
+        if destination.exists():
+            new_backup.unlink(missing_ok=True)
+            raise StorageError(f"Ja existe um backup no destino: {destination}")
+
+        prepared_backup = _copy_to_destination_temp(
+            new_backup,
+            destination,
+            phase="copy_current",
+            progress_callback=progress_callback,
+        )
+        try:
+            os.replace(prepared_backup, destination)
+            validate_backup_zip(destination)
+            try:
+                move_to_history(current.path, his_path, progress_callback=progress_callback)
+            except Exception:
+                destination.unlink(missing_ok=True)
+                raise
+            new_backup.unlink()
+            return destination
+        except Exception:
+            prepared_backup.unlink(missing_ok=True)
+            raise
 
     destination = atu_path / new_backup.name
     if new_backup.resolve() != destination.resolve():
-        if destination.exists():
-            destination.unlink()
-        _move_inheriting_destination_acl(new_backup, destination)
+        place_staged_backup(new_backup, destination, progress_callback=progress_callback)
+    validate_backup_zip(destination)
     return destination
 
 
@@ -125,30 +156,135 @@ def find_atu_duplicates(atu_path: Path, his_path: Path) -> list[AtuDuplicateInfo
     return duplicates
 
 
-def fix_atu_duplicates(atu_path: Path, his_path: Path) -> list[Path]:
+def fix_atu_duplicates(
+    atu_path: Path,
+    his_path: Path,
+    progress_callback: ProgressCallback | None = None,
+) -> list[Path]:
     """Move older duplicate ATU files into HIS."""
 
     his_path.mkdir(parents=True, exist_ok=True)
     moved = []
     for duplicate in find_atu_duplicates(atu_path, his_path):
-        moved.append(move_to_history(duplicate.duplicate.path, his_path))
+        moved.append(
+            move_to_history(
+                duplicate.duplicate.path,
+                his_path,
+                progress_callback=progress_callback,
+            )
+        )
     return moved
 
 
-def move_to_history(path: Path, his_path: Path) -> Path:
+def move_to_history(
+    path: Path,
+    his_path: Path,
+    progress_callback: ProgressCallback | None = None,
+) -> Path:
     """Move a backup to HIS, reusing an existing file with the same identity if present."""
 
     source_info = parse_backup_filename(path)
+    validate_backup_zip(path)
     destination = find_backup_by_identity(his_path, source_info.identity)
     if destination is None:
         destination = his_path / path.name
     if destination.exists():
+        validate_backup_zip(destination)
         path.unlink()
         return destination
-    return _move_inheriting_destination_acl(path, destination)
+    moved = _move_inheriting_destination_acl(
+        path,
+        destination,
+        phase="archive_current",
+        progress_callback=progress_callback,
+    )
+    validate_backup_zip(moved)
+    return moved
 
 
-def _move_inheriting_destination_acl(source: Path, destination: Path) -> Path:
+def validate_backup_zip(path: Path) -> None:
+    """Ensure a backup ZIP exists, is non-empty, and can be read by the zip module."""
+
+    try:
+        if not path.exists() or path.stat().st_size == 0:
+            raise StorageError(f"Backup compactado vazio ou inexistente: {path}")
+        with zipfile.ZipFile(path) as archive:
+            bad_member = archive.testzip()
+    except (OSError, zipfile.BadZipFile) as exc:
+        raise StorageError(f"Backup compactado invalido ou ilegivel: {path}") from exc
+
+    if bad_member is not None:
+        raise StorageError(f"Backup compactado invalido. Entrada corrompida: {bad_member}")
+
+
+def place_staged_backup(
+    source: Path,
+    destination: Path,
+    progress_callback: ProgressCallback | None = None,
+) -> Path:
+    """Place a new staged ZIP in its final folder only after destination validation."""
+
+    if destination.exists():
+        raise StorageError(f"Ja existe um backup no destino: {destination}")
+
+    temp_path = _copy_to_destination_temp(
+        source,
+        destination,
+        phase="copy_current",
+        progress_callback=progress_callback,
+    )
+    try:
+        os.replace(temp_path, destination)
+        validate_backup_zip(destination)
+        source.unlink()
+    except Exception:
+        temp_path.unlink(missing_ok=True)
+        destination.unlink(missing_ok=True)
+        raise
+    return destination
+
+
+def _copy_to_destination_temp(
+    source: Path,
+    destination: Path,
+    *,
+    phase: str,
+    progress_callback: ProgressCallback | None = None,
+) -> Path:
+    """Copy a staged ZIP to a temporary file inside the destination folder."""
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temp_handle = tempfile.NamedTemporaryFile(
+        delete=False,
+        dir=destination.parent,
+        prefix=f".{destination.name}.",
+        suffix=".tmp",
+    )
+    temp_path = Path(temp_handle.name)
+    try:
+        with temp_handle:
+            with source.open("rb") as input_file:
+                copy_stream_with_progress(
+                    input_file,
+                    temp_handle,
+                    total_bytes=source.stat().st_size,
+                    phase=phase,
+                    progress_callback=progress_callback,
+                )
+        validate_backup_zip(temp_path)
+    except Exception:
+        temp_path.unlink(missing_ok=True)
+        raise
+    return temp_path
+
+
+def _move_inheriting_destination_acl(
+    source: Path,
+    destination: Path,
+    *,
+    phase: str,
+    progress_callback: ProgressCallback | None = None,
+) -> Path:
     """Move a file by recreating it in the destination folder.
 
     A direct same-volume move on Windows can preserve the source file ACL. Backups
@@ -166,7 +302,13 @@ def _move_inheriting_destination_acl(source: Path, destination: Path) -> Path:
     try:
         with temp_handle:
             with source.open("rb") as input_file:
-                shutil.copyfileobj(input_file, temp_handle)
+                copy_stream_with_progress(
+                    input_file,
+                    temp_handle,
+                    total_bytes=source.stat().st_size,
+                    phase=phase,
+                    progress_callback=progress_callback,
+                )
         os.replace(temp_path, destination)
         source.unlink()
     except Exception:

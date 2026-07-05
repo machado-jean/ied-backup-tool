@@ -4,7 +4,7 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um
 backup atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.6.0`
+Versao atual: `1.7.0`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 
@@ -37,8 +37,11 @@ arquivos finais.
   mas SHA256 diferente dos arquivos de origem.
 - Validacao das pastas `ATU` e `HIS`, com criacao assistida quando faltarem.
 - Atualizacao automatica de `ATU` e arquivamento do backup anterior em `HIS`.
+- Gravacao mais transacional: o novo ZIP e validado antes de substituir o backup
+  atual, reduzindo risco de estado parcial em falhas de arquivo ou permissao.
 - Deteccao de duplicidades em `ATU`, com aviso do arquivo problematico.
 - Barra de progresso durante a geracao dos backups.
+- Progresso real por arquivo durante compactacao e copia para `ATU`/`HIS`.
 - Validacao amigavel para arquivos bloqueados, ausentes ou indisponiveis.
 
 ## Tipos Suportados

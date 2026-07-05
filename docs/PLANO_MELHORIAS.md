@@ -99,21 +99,34 @@ Escopo posterior opcional:
 
 Objetivo: reduzir estado parcial quando houver erro ao mover arquivos.
 
-TODO:
+Status: implementado em `v1.7.0`.
 
-- Criar ZIP em pasta temporaria.
-- Validar leitura/tamanho antes de mover.
-- Mover backup atual para `HIS` somente quando o novo ZIP estiver pronto.
-- Considerar mecanismo de rollback ou quarentena em falhas de movimento.
+- [x] Criar ZIP em pasta temporaria.
+- [x] Validar leitura/tamanho antes de mover.
+- [x] Preparar e validar o novo ZIP dentro da pasta de destino antes de arquivar
+  o backup atual.
+- [x] Remover o novo ZIP de `ATU` se a movimentacao do backup atual para `HIS`
+  falhar.
+- [x] Criar backups historicos faltantes em staging antes de publica-los em
+  `HIS`.
+
+Escopo posterior opcional:
+
+- Criar quarentena explicita para falhas raras em que um arquivo parcialmente
+  movido precise de analise manual.
 
 ### Execucao em Worker Thread
 
 Objetivo: melhorar responsividade da GUI em backups grandes.
 
+Status: progresso real por arquivo implementado em `v1.7.0`.
+
 TODO:
 
+- [x] Mostrar progresso real por arquivo durante compactacao e copia para
+  `ATU`/`HIS`.
 - Mover o processamento para `QThread` ou worker dedicado.
-- Atualizar progresso por sinal.
+- Atualizar progresso por sinal quando o worker dedicado for implementado.
 - Permitir cancelamento controlado antes de iniciar o proximo arquivo.
 
 ### Documentacao para Usuario Final
