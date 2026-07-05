@@ -46,7 +46,7 @@ from src.core.naming import BackupStage, normalize_stage
 from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
 from src.gui.backup_worker import BackupExecutionWorker, BackupProgressEvent
-from src.gui.resources import app_icon_path, language_flag_path
+from src.gui.resources import app_icon_path, help_document_path, language_flag_path
 from src.gui.settings_window import SettingsWindow
 from src.gui.storage_paths import confirm_storage_paths_ready
 from src.version import APP_DISPLAY_NAME
@@ -138,11 +138,14 @@ class MainWindow(QMainWindow):
         self.refresh_button.clicked.connect(self.refresh_preview)
         self.settings_button = QPushButton()
         self.settings_button.clicked.connect(self.open_settings)
+        self.help_button = QPushButton()
+        self.help_button.clicked.connect(self.open_help_document)
         self.current_folder_title = QLabel()
         top.addWidget(self.current_folder_title)
         top.addWidget(self.project_dir_label, 1)
         top.addWidget(self.refresh_button)
         top.addWidget(self.settings_button)
+        top.addWidget(self.help_button)
         top.addWidget(self.language_button)
         layout.addLayout(top)
 
@@ -363,6 +366,17 @@ class MainWindow(QMainWindow):
         )
         dialog.saved.connect(self.on_settings_saved)
         dialog.exec()
+
+    def open_help_document(self) -> None:
+        """Open the bundled user help document with the system default app."""
+
+        path = help_document_path()
+        if not path.exists() or not QDesktopServices.openUrl(QUrl.fromLocalFile(str(path))):
+            QMessageBox.warning(
+                self,
+                ui_text("help", self.language),
+                ui_text("help_open_failed", self.language).format(path=path),
+            )
 
     def on_settings_saved(self, config: AppConfig) -> None:
         """Update in-memory configuration after the settings dialog saves."""
@@ -1028,6 +1042,7 @@ class MainWindow(QMainWindow):
         self._set_language_button_icon(self.language_button)
         self.refresh_button.setText(ui_text("refresh", self.language))
         self.settings_button.setText(ui_text("settings", self.language))
+        self.help_button.setText(ui_text("help", self.language))
         self.summary_group.setTitle(ui_text("summary", self.language))
         self.preview_group.setTitle(ui_text("preview", self.language))
         self.action_group.setTitle(ui_text("execution", self.language))

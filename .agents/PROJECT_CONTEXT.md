@@ -57,6 +57,7 @@ compatible and are not marked as conflicts.
 
 - GUI entrypoint: `src/gui/app.py`
 - Main GUI window: `src/gui/main_window.py`
+- User help document: `docs/HELP.md`
 - Core planning/execution rules: `src/core/backup_service.py`
 - ATU/HIS storage rules: `src/core/storage.py`
 - ZIP creation: `src/core/zipper.py`
@@ -118,6 +119,10 @@ Generate release executable:
   `.agents/CURRENT_STATE.md`, and `releases/vX.Y.Z/RELEASE_NOTES.md`.
 - When the user asks to generate the `.exe`, generate it directly using
   `scripts/release.ps1` unless there is a clear blocker.
+- Every release should update `.agents/CURRENT_STATE.md`,
+  `.agents/PROJECT_CONTEXT.md`, and relevant docs/release notes.
+- Public-facing examples should use generic names such as `SE-AAA`, `ETD-BBB`,
+  `VAO-ZZZ`, and `COLABORADOR-EXEMPLO`.
 - After running tests or builds, remove generated caches/build folders when they
   are not needed: `.pytest_cache`, `.ruff_cache`, `__pycache__`, `build`, `dist`.
 

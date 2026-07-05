@@ -25,3 +25,9 @@ def language_flag_path(language: str) -> Path:
 
     filename = "flag_us.svg" if language == "pt_BR" else "flag_br.svg"
     return resource_path(f"assets/{filename}")
+
+
+def help_document_path() -> Path:
+    """Return the bundled user help document."""
+
+    return resource_path("docs/HELP.md")

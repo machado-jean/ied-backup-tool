@@ -133,13 +133,30 @@ TODO:
 
 ### Documentacao para Usuario Final
 
-TODO:
+Status: implementado em `v1.9.0`.
 
-- Adicionar secao de limitacoes conhecidas.
-- Adicionar solucao de problemas para OneDrive, arquivo bloqueado e projeto
+- [x] Adicionar documento operacional `docs/HELP.md`.
+- [x] Adicionar botao `Ajuda` / `Help` na tela principal.
+- [x] Empacotar o documento de ajuda dentro do `.exe`.
+- [x] Adicionar secao de limitacoes conhecidas.
+- [x] Adicionar solucao de problemas para OneDrive, arquivo bloqueado e projeto
   identificado incorretamente.
-- Adicionar exemplo do arquivo de metadados interno do ZIP.
-- Adicionar capturas da tela principal, configuracoes e previa.
+- [x] Adicionar exemplo do arquivo de metadados interno do ZIP.
+- [ ] Adicionar capturas reais da tela principal, configuracoes e previa quando
+  houver material publico revisado.
+
+### Preparacao Para Repositorio Publico
+
+Objetivo: reduzir risco de exposicao antes de abrir o GitHub para acesso
+publico.
+
+Status: planejado para `v1.9.1`.
+
+- [ ] Fazer varredura final de nomes reais, caminhos internos e amostras
+  sensiveis.
+- [ ] Confirmar que pastas locais com backups reais seguem ignoradas pelo Git.
+- [ ] Revisar documentos publicos usando somente exemplos genericos.
+- [ ] Registrar resultado da revisao em release note de patch.
 
 ## Prioridade Baixa
 

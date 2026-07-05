@@ -4,14 +4,14 @@ Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.8.0`
+Current application version: `1.9.0`
 
-The `v1.8.0` executable has been generated.
+The `v1.9.0` executable has been generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.8.0/IED Backup Manager v1.8.0.exe
+releases/v1.9.0/IED Backup Manager v1.9.0.exe
 ```
 
 ## Recently Completed
@@ -23,6 +23,7 @@ releases/v1.8.0/IED Backup Manager v1.8.0.exe
 - `v1.7.0`: more transactional ATU/HIS movement and real per-file byte progress
   during ZIP creation and final copy.
 - `v1.8.0`: worker-thread execution and controlled cancellation.
+- `v1.9.0`: public/professional user documentation and in-app help access.
 
 ## Current v1.6.0 Released Scope
 
@@ -41,7 +42,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 79 passed
+pytest: 80 passed
 ```
 
 ## Local-Safety Notes
@@ -79,16 +80,27 @@ pytest: 79 passed
 - Does not interrupt a final destination copy midway, preserving transactional
   storage behavior.
 
+## Current v1.9.0 Scope
+
+- Adds `docs/HELP.md` with operational usage, folder structure, naming policy,
+  supported IED types, output examples, ZIP metadata example, known limitations,
+  troubleshooting, and privacy guidance.
+- Adds an `Ajuda` / `Help` button to the main window.
+- Bundles `docs/HELP.md` into the PyInstaller executable.
+- Updates README, executable-use documentation, improvement roadmap, release
+  notes, and agent context.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.8.0`:
+Planned next improvement after `v1.9.0`:
 
 ```text
-User-facing troubleshooting and known limitations documentation
+v1.9.1 public-repository sensitivity review
 ```
 
 Likely scope:
 
-- document large-file behavior and cancellation semantics;
-- document cloud-synced folder caveats;
-- document integrity conflict and recovery paths.
+- scan public docs/code for real names, real substations, internal paths, and
+  sensitive samples;
+- confirm ignored local folders are not staged;
+- update release notes with the review result.

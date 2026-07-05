@@ -1,6 +1,6 @@
 # IED Backup Manager - Uso do Executavel
 
-Este guia explica como usar o `IED Backup Manager v1.8.0.exe` para gerar backups
+Este guia explica como usar o `IED Backup Manager v1.9.0.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
 (`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`/`.apcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
 
@@ -13,7 +13,7 @@ Exemplo:
 
 ```text
 Pasta do projeto/
-├─ IED Backup Manager v1.8.0.exe
+├─ IED Backup Manager v1.9.0.exe
 ├─ config.json
 ├─ SE-AAA_20260529_1624.dz5
 ├─ SE-AAA_20260529_1625.dz5
@@ -82,7 +82,16 @@ tela de instrucoes e tambem na tela principal, ao lado de `Configuracoes`.
 
 A preferencia fica salva no `config.json`.
 
-## 4. Selecionar tipos de IED
+## 4. Abrir ajuda
+
+Use o botao `Ajuda` na tela principal para abrir o documento operacional
+incluido com a aplicacao.
+
+Esse documento resume estrutura de pastas, regras de nomes, exemplos de saida,
+metadados internos dos ZIPs, limitacoes conhecidas, solucao de problemas e
+cuidados de privacidade.
+
+## 5. Selecionar tipos de IED
 
 Marque os tipos de IED que deseja processar.
 
@@ -92,7 +101,7 @@ a selecao anterior sera restaurada.
 Se nenhuma preferencia estiver salva, o programa inicia sem tipo selecionado.
 Selecione ao menos um tipo para liberar a previa do lote.
 
-## 5. Selecionar etapa
+## 6. Selecionar etapa
 
 Antes de gerar backups, selecione a etapa da entrega.
 
@@ -116,7 +125,7 @@ pode ser preenchido manualmente, por exemplo para indicar um backup antes de uma
 grande alteracao, ou pode ficar vazio quando o caso nao se enquadrar nas etapas
 anteriores.
 
-## 6. Tipos de arquivo suportados
+## 7. Tipos de arquivo suportados
 
 ### DIGSI 5
 
@@ -244,7 +253,7 @@ lista:
 - data de modificacao dos arquivos incluidos;
 - SHA256 dos arquivos incluidos.
 
-## 7. Padrao de nome dos arquivos de origem
+## 8. Padrao de nome dos arquivos de origem
 
 Para os tipos suportados, o programa identifica o projeto/subestacao pelo nome
 do arquivo. Pela politica atual, o projeto e sempre o primeiro bloco antes do
@@ -290,7 +299,7 @@ Cuidados:
   `DEV_SE-BBB_20260619_0013.dz5` sera identificado como projeto `DEV`.
 - Confira sempre a coluna `Projeto` na previa antes de gerar backups.
 
-## 8. Conferir a previa do lote
+## 9. Conferir a previa do lote
 
 Depois de selecionar a etapa, a tela mostra uma previa dos arquivos suportados
 encontrados na pasta.
@@ -317,7 +326,7 @@ Status possiveis:
 - `Ignorado`: o arquivo e antigo e ja existe no historico.
 - `Ja atual`: o arquivo ja corresponde ao backup atual em `ATU`.
 
-## 9. Modo de processamento
+## 10. Modo de processamento
 
 A opcao `Processar apenas a partir do backup atual` evita reprocessar arquivos
 antigos que vieram antes do backup atual ja existente em `ATU`.
@@ -325,7 +334,7 @@ antigos que vieram antes do backup atual ja existente em `ATU`.
 Use essa opcao quando a pasta tiver muitos arquivos antigos e voce quiser
 processar somente o backup atual e os arquivos mais novos.
 
-## 10. Gerar backups
+## 11. Gerar backups
 
 Clique em `Gerar backups`.
 
@@ -357,7 +366,7 @@ Ao final, sera exibido um resumo com:
 - Arquivos ignorados por serem antigos.
 - Arquivos que ja estavam atuais.
 
-## 11. Resultado dos arquivos
+## 12. Resultado dos arquivos
 
 O nome final do backup segue o padrao:
 
@@ -382,7 +391,7 @@ Regras principais:
 - A comparacao tecnica considera `SOFTWARE_PROJETO_DATAHORA`.
 - Mudancas apenas de colaborador ou etapa nao criam duplicidade tecnica.
 
-## 12. Abrir pastas ATU e HIS
+## 13. Abrir pastas ATU e HIS
 
 Use os botoes:
 
@@ -395,7 +404,7 @@ Se a pasta tiver sido apagada depois da configuracao, o programa perguntara se
 voce deseja recria-la antes de abrir. A pasta nao e recriada automaticamente
 sem confirmacao.
 
-## 13. Cuidados recomendados
+## 14. Cuidados recomendados
 
 - Feche o DIGSI antes de gerar backups, para evitar arquivo bloqueado.
 - Feche QuickSet/Architect antes de gerar backups SEL, para evitar arquivo
@@ -406,7 +415,7 @@ sem confirmacao.
   confirmar a correcao.
 - Mantenha o `config.json` junto do executavel.
 
-## 14. Atualizacao de versao
+## 15. Atualizacao de versao
 
 Quando receber uma nova versao do executavel:
 

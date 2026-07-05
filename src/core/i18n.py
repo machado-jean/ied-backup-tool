@@ -70,6 +70,8 @@ UI_TEXT = {
         "file": "Arquivo",
         "fill_fields": "Preencha",
         "generate_backups": "Gerar backups",
+        "help": "Ajuda",
+        "help_open_failed": "Não foi possível abrir o documento de ajuda: {path}",
         "ignored": "Ignorados",
         "integrity_conflicts_found": (
             "Foram encontrados backups com a mesma identidade técnica, mas SHA256 "
@@ -200,6 +202,8 @@ UI_TEXT = {
         "file": "File",
         "fill_fields": "Fill in",
         "generate_backups": "Generate backups",
+        "help": "Help",
+        "help_open_failed": "Could not open the help document: {path}",
         "ignored": "Ignored",
         "integrity_conflicts_found": (
             "Backups with the same technical identity but different SHA256 values "

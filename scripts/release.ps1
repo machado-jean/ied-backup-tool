@@ -33,6 +33,7 @@ if (-not $SkipTests) {
     --windowed `
     --icon "assets\app_icon.ico" `
     --add-data "assets;assets" `
+    --add-data "docs\HELP.md;docs" `
     --name $ExeName `
     --paths . `
     src\gui\app.py

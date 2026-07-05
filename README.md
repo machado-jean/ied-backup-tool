@@ -4,9 +4,11 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um
 backup atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.8.0`
+Versao atual: `1.9.0`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
+
+Ajuda operacional: [docs/HELP.md](docs/HELP.md)
 
 Backlog tecnico: [docs/PLANO_MELHORIAS.md](docs/PLANO_MELHORIAS.md)
 
@@ -25,6 +27,7 @@ arquivos finais.
 
 - Interface grafica para Windows com pre-visualizacao do lote antes da execucao.
 - Tela inicial de instrucoes com opcao `Nao exibir novamente`.
+- Botao `Ajuda` / `Help` na tela principal, abrindo a documentacao operacional.
 - Interface em portugues e ingles, com preferencia salva em `config.json`.
 - Selecao obrigatoria de etapa: `DEV`, `PRE-TAF`, `TAF`, `POS-TAF`,
   `PRE-TAC`, `TAC`, `POS-TAC` ou descricao livre.
@@ -185,6 +188,8 @@ Validar qualidade e testes:
 
 Itens desejados para evolucoes futuras:
 
+- Confirmar ausencia de dados sensiveis antes de eventual abertura publica do
+  repositorio.
 - Adicionar novos tipos de IED conforme surgirem arquivos reais de teste.
 - Criar ferramenta de limpeza controlada para backups antigos.
 - Permitir politicas de limpeza por idade, por exemplo backups com mais de 30
