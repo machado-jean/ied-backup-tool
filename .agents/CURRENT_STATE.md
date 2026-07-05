@@ -4,14 +4,14 @@ Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.9.1`
+Current application version: `1.10.0`
 
-The `v1.9.1` executable has been generated.
+The `v1.10.0` executable has been generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.9.1/IED Backup Manager v1.9.1.exe
+releases/v1.10.0/IED Backup Manager v1.10.0.exe
 ```
 
 ## Recently Completed
@@ -25,6 +25,7 @@ releases/v1.9.1/IED Backup Manager v1.9.1.exe
 - `v1.8.0`: worker-thread execution and controlled cancellation.
 - `v1.9.0`: public/professional user documentation and in-app help access.
 - `v1.9.1`: in-app help points to the public GitHub `HELP.md`.
+- `v1.10.0`: automatic GitHub release check with clickable update notice.
 
 ## Current v1.6.0 Released Scope
 
@@ -43,7 +44,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 81 passed
+pytest: 84 passed
 ```
 
 ## Local-Safety Notes
@@ -101,22 +102,29 @@ pytest: 81 passed
 - Keeps the local `docs/HELP.md` in the repository as the public source
   document.
 
+## Current v1.10.0 Scope
+
+- On startup, a background Qt worker checks the latest public GitHub release.
+- If a newer version exists, the main window shows a red clickable notice in
+  the bottom-left corner.
+- Clicking the notice opens the GitHub `/releases/latest` URL in the default
+  browser.
+- No message is shown when the installed version is current.
+- Internet, proxy, corporate block, or GitHub errors are silent and do not block
+  application startup or backup use.
+- Automatic download/replacement remains out of scope.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.9.1`:
+Planned next improvement after `v1.10.0`:
 
 ```text
-v1.9.2 GitHub update checker
+public-repository sensitivity review and repository polish
 ```
 
 Likely scope:
 
-- query GitHub Releases for the latest public version;
-- compare it with `APP_VERSION`;
-- show a non-blocking update notice with a browser link to the release;
-- handle offline/corporate-network failures gracefully;
-- keep auto-download/replacement out of scope.
-
-Postponed follow-up:
-
-- public-repository sensitivity review and repository polish.
+- scan public docs/code for real names, real substations, internal paths, and
+  sensitive samples;
+- confirm ignored local folders are not staged;
+- update release notes with the review result.

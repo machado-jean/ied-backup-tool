@@ -60,6 +60,10 @@ compatible and are not marked as conflicts.
 - User help document: `docs/HELP.md`
 - Public help URL:
   `https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md`
+- Public latest-release API:
+  `https://api.github.com/repos/machado-jean/ied-backup-tool/releases/latest`
+- Public latest-release page:
+  `https://github.com/machado-jean/ied-backup-tool/releases/latest`
 - Core planning/execution rules: `src/core/backup_service.py`
 - ATU/HIS storage rules: `src/core/storage.py`
 - ZIP creation: `src/core/zipper.py`
@@ -145,3 +149,11 @@ Generate release executable:
 - GUI backup execution should run in a worker thread, not in the GUI thread.
 - Cancellation during ZIP staging should stop before publishing to `ATU`/`HIS`.
 - Cancellation should not interrupt a final destination copy midway.
+
+## Update Check Rules
+
+- Check GitHub Releases in a worker thread after startup.
+- Show update status only when a newer version exists.
+- Use a red clickable notice in the bottom-left corner of the main window.
+- Keep network errors silent; update checks must never block backup workflows.
+- Do not auto-download or replace the executable.

@@ -49,6 +49,7 @@ from src.gui.backup_worker import BackupExecutionWorker, BackupProgressEvent
 from src.gui.resources import app_icon_path, help_document_url, language_flag_path
 from src.gui.settings_window import SettingsWindow
 from src.gui.storage_paths import confirm_storage_paths_ready
+from src.gui.update_worker import UpdateCheckWorker
 from src.version import APP_DISPLAY_NAME
 
 STATUS_COLORS = {
@@ -90,6 +91,9 @@ class MainWindow(QMainWindow):
         self.pending_show_startup_instructions: bool | None = None
         self.backup_thread: QThread | None = None
         self.backup_worker: BackupExecutionWorker | None = None
+        self.update_thread: QThread | None = None
+        self.update_worker: UpdateCheckWorker | None = None
+        self.latest_release_url: str | None = None
         self.progress_dialog: QProgressDialog | None = None
         self.cancel_requested = False
 
@@ -102,11 +106,17 @@ class MainWindow(QMainWindow):
         if auto_startup_dialogs:
             self.schedule_startup_dialogs()
         self.refresh_preview()
+        self.schedule_update_check()
 
     def schedule_startup_dialogs(self) -> None:
         """Open startup dialogs after the window has entered the event loop."""
 
         QTimer.singleShot(0, self._run_startup_dialogs)
+
+    def schedule_update_check(self) -> None:
+        """Check for new public releases shortly after startup."""
+
+        QTimer.singleShot(750, self._start_update_check)
 
     def _resize_to_available_screen(self) -> None:
         """Start wider on normal desktops while respecting the minimum size."""
@@ -160,6 +170,18 @@ class MainWindow(QMainWindow):
         self.log_output.setReadOnly(True)
         self.log_output.setMaximumBlockCount(300)
         layout.addWidget(self.log_output, 1)
+
+        footer = QHBoxLayout()
+        self.update_available_label = QLabel()
+        self.update_available_label.setTextFormat(Qt.TextFormat.RichText)
+        self.update_available_label.setTextInteractionFlags(
+            Qt.TextInteractionFlag.LinksAccessibleByMouse
+        )
+        self.update_available_label.linkActivated.connect(self.open_latest_release)
+        self.update_available_label.setVisible(False)
+        footer.addWidget(self.update_available_label)
+        footer.addStretch()
+        layout.addLayout(footer)
 
         self.setCentralWidget(root)
         self.retranslate_ui()
@@ -377,6 +399,64 @@ class MainWindow(QMainWindow):
                 ui_text("help", self.language),
                 ui_text("help_open_failed", self.language).format(url=url),
             )
+
+    def _start_update_check(self) -> None:
+        """Start the background update checker if one is not already running."""
+
+        if self.update_thread is not None:
+            return
+
+        self.update_thread = QThread(self)
+        self.update_worker = UpdateCheckWorker()
+        self.update_worker.moveToThread(self.update_thread)
+        self.update_thread.started.connect(self.update_worker.run)
+        self.update_worker.finished.connect(self._on_update_check_finished)
+        self.update_worker.failed.connect(self._on_update_check_failed)
+        self.update_worker.finished.connect(self.update_thread.quit)
+        self.update_worker.failed.connect(self.update_thread.quit)
+        self.update_thread.finished.connect(self.update_worker.deleteLater)
+        self.update_thread.finished.connect(self._clear_update_worker)
+        self.update_thread.start()
+
+    def _on_update_check_finished(self, result) -> None:
+        """Show the update notice only when a newer release exists."""
+
+        if not result.update_available:
+            self.latest_release_url = None
+            self.update_available_label.setVisible(False)
+            return
+
+        self.latest_release_url = result.release_url
+        self.update_available_label.setText(
+            f'<a href="{result.release_url}" style="color:#d92d20; '
+            f'text-decoration:none; font-weight:600;">'
+            f'{ui_text("update_available", self.language)}</a>'
+        )
+        self.update_available_label.setToolTip(
+            ui_text("update_available_tooltip", self.language).format(
+                version=result.latest_version
+            )
+        )
+        self.update_available_label.setVisible(True)
+
+    def _on_update_check_failed(self, _message: str) -> None:
+        """Keep startup quiet when update checks fail."""
+
+        self.latest_release_url = None
+        self.update_available_label.setVisible(False)
+
+    def _clear_update_worker(self) -> None:
+        """Release update worker/thread references after completion."""
+
+        self.update_thread = None
+        self.update_worker = None
+
+    def open_latest_release(self, url: str | None = None) -> None:
+        """Open the latest release URL in the default browser."""
+
+        target = url or self.latest_release_url
+        if target:
+            QDesktopServices.openUrl(QUrl(target))
 
     def on_settings_saved(self, config: AppConfig) -> None:
         """Update in-memory configuration after the settings dialog saves."""
@@ -1043,6 +1123,12 @@ class MainWindow(QMainWindow):
         self.refresh_button.setText(ui_text("refresh", self.language))
         self.settings_button.setText(ui_text("settings", self.language))
         self.help_button.setText(ui_text("help", self.language))
+        if self.update_available_label.isVisible() and self.latest_release_url:
+            self.update_available_label.setText(
+                f'<a href="{self.latest_release_url}" style="color:#d92d20; '
+                f'text-decoration:none; font-weight:600;">'
+                f'{ui_text("update_available", self.language)}</a>'
+            )
         self.summary_group.setTitle(ui_text("summary", self.language))
         self.preview_group.setTitle(ui_text("preview", self.language))
         self.action_group.setTitle(ui_text("execution", self.language))

@@ -4,7 +4,7 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um
 backup atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.9.1`
+Versao atual: `1.10.0`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 
@@ -29,6 +29,8 @@ arquivos finais.
 - Tela inicial de instrucoes com opcao `Nao exibir novamente`.
 - Botao `Ajuda` / `Help` na tela principal, abrindo a documentacao operacional
   no GitHub.
+- Verificacao automatica de novas versoes publicadas no GitHub, com aviso
+  clicavel no rodape quando houver update.
 - Interface em portugues e ingles, com preferencia salva em `config.json`.
 - Selecao obrigatoria de etapa: `DEV`, `PRE-TAF`, `TAF`, `POS-TAF`,
   `PRE-TAC`, `TAC`, `POS-TAC` ou descricao livre.

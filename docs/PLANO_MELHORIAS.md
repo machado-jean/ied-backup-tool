@@ -164,15 +164,14 @@ Status: planejado para depois de `v1.9.2`.
 Objetivo: avisar o usuario quando existir uma versao nova publicada no GitHub,
 sem baixar ou substituir o executavel automaticamente.
 
-Status: planejado para `v1.9.2`.
+Status: implementado em `v1.10.0`.
 
-- [ ] Consultar a ultima versao publicada no GitHub Releases.
-- [ ] Comparar a versao publicada com `APP_VERSION`.
-- [ ] Mostrar aviso quando houver uma versao mais recente.
-- [ ] Oferecer botao para abrir o release no navegador.
-- [ ] Mostrar mensagem amigavel quando o usuario ja estiver na versao mais
-  recente.
-- [ ] Tratar falhas de internet ou bloqueio corporativo sem interromper o uso do
+- [x] Consultar a ultima versao publicada no GitHub Releases.
+- [x] Comparar a versao publicada com `APP_VERSION`.
+- [x] Mostrar aviso quando houver uma versao mais recente.
+- [x] Permitir abrir o release no navegador ao clicar no aviso.
+- [x] Nao exibir aviso quando o usuario ja estiver na versao mais recente.
+- [x] Tratar falhas de internet ou bloqueio corporativo sem interromper o uso do
   aplicativo.
 
 ## Prioridade Baixa

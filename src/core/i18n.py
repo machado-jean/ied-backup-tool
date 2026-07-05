@@ -169,6 +169,8 @@ UI_TEXT = {
         "timestamp": "Data/Hora",
         "total": "Total",
         "type": "Tipos",
+        "update_available": "Nova versão disponível",
+        "update_available_tooltip": "Clique para abrir a versão {version} no GitHub.",
         "version": "Versão",
     },
     "en_US": {
@@ -301,6 +303,8 @@ UI_TEXT = {
         "timestamp": "Date/Time",
         "total": "Total",
         "type": "Types",
+        "update_available": "New version available",
+        "update_available_tooltip": "Click to open version {version} on GitHub.",
         "version": "Version",
     },
 }
