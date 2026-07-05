@@ -81,6 +81,15 @@ UI_TEXT = {
         "integrity_conflicts_title": "Conflitos de integridade",
         "his_folder": "Pasta HIS",
         "language_tooltip": "Idioma",
+        "license": "Licença",
+        "license_message": (
+            "IED Backup Manager<br>"
+            "Copyright © 2026 Jean Carlos Machado.<br><br>"
+            "Disponibilizado para uso gratuito e não comercial, conforme a licença "
+            "do projeto.<br><br>"
+            'Repositório: <a href="{url}">{url}</a>'
+        ),
+        "license_tooltip": "Licença e autoria",
         "mode": "Modo",
         "new": "Novos",
         "no_digsi_found": "Nenhum arquivo DIGSI 5 encontrado nesta pasta.",
@@ -215,6 +224,15 @@ UI_TEXT = {
         "integrity_conflicts_title": "Integrity conflicts",
         "his_folder": "HIS folder",
         "language_tooltip": "Language",
+        "license": "License",
+        "license_message": (
+            "IED Backup Manager<br>"
+            "Copyright © 2026 Jean Carlos Machado.<br><br>"
+            "Available for free non-commercial use under the project license."
+            "<br><br>"
+            'Repository: <a href="{url}">{url}</a>'
+        ),
+        "license_tooltip": "License and authorship",
         "mode": "Mode",
         "new": "New",
         "no_digsi_found": "No DIGSI 5 file found in this folder.",

@@ -200,3 +200,14 @@ Nao publique arquivos reais de backup, `config.json` local, caminhos internos de
 empresa ou nomes reais de colaboradores em repositorios publicos. Para exemplos,
 use nomes genericos como `SE-AAA`, `ETD-BBB`, `VAO-ZZZ` e
 `COLABORADOR-EXEMPLO`.
+
+## Licenca
+
+Copyright (c) 2026 Jean Carlos Machado.
+
+O IED Backup Manager e disponibilizado para uso gratuito e nao comercial,
+conforme a licenca do projeto:
+
+```text
+https://github.com/machado-jean/ied-backup-tool
+```

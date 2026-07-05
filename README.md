@@ -4,7 +4,7 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um
 backup atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.10.1`
+Versao atual: `1.10.2`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 
@@ -33,6 +33,8 @@ arquivos finais.
   clicavel no rodape quando houver update.
 - Executavel distribuido com nome fixo `IED Backup Manager.exe`, mantendo a
   versao visivel dentro da interface.
+- Indicador `©` na interface com autoria, uso nao comercial e link do
+  repositorio.
 - Interface em portugues e ingles, com preferencia salva em `config.json`.
 - Selecao obrigatoria de etapa: `DEV`, `PRE-TAF`, `TAF`, `POS-TAF`,
   `PRE-TAC`, `TAC`, `POS-TAC` ou descricao livre.
@@ -121,7 +123,7 @@ Executar a GUI usando uma pasta de amostras:
 .\.venv\Scripts\python.exe -m src.gui.app --project-dir ".\IED-DES"
 ```
 
-Gerar o executavel versionado:
+Gerar o executavel:
 
 ```powershell
 .\scripts\release.ps1
@@ -189,12 +191,25 @@ Validar qualidade e testes:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
+## Licenca
+
+Este projeto e disponibilizado sob a **IED Backup Manager Non-Commercial
+License**.
+
+Uso gratuito, estudo, auditoria, modificacao e uso interno nao comercial sao
+permitidos. Uso comercial, revenda, sublicenciamento, oferta como servico pago
+ou incorporacao em produto/servico comercial nao sao permitidos sem autorizacao
+previa por escrito do autor.
+
+A atribuicao ao autor original, Jean Carlos Machado, deve ser preservada.
+
+Leia o arquivo [LICENSE](LICENSE) para os termos completos.
+
 ## Roadmap
 
 Itens desejados para evolucoes futuras:
 
-- Confirmar ausencia de dados sensiveis antes de eventual abertura publica do
-  repositorio.
+- Manter revisao periodica de dados sensiveis no repositorio publico.
 - Adicionar novos tipos de IED conforme surgirem arquivos reais de teste.
 - Criar ferramenta de limpeza controlada para backups antigos.
 - Permitir politicas de limpeza por idade, por exemplo backups com mais de 30

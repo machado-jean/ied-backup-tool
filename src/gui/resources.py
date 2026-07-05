@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 HELP_DOCUMENT_URL = "https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md"
+REPOSITORY_URL = "https://github.com/machado-jean/ied-backup-tool"
 
 
 def resource_path(relative_path: str) -> Path:
@@ -39,3 +40,9 @@ def help_document_url() -> str:
     """Return the public user help document URL."""
 
     return HELP_DOCUMENT_URL
+
+
+def repository_url() -> str:
+    """Return the public project repository URL."""
+
+    return REPOSITORY_URL

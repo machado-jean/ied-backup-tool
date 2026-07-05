@@ -449,3 +449,11 @@ O download direto da versao mais recente pode usar sempre o mesmo link:
 https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED%20Backup%20Manager.exe
 ```
 
+## 17. Licenca e autoria
+
+Na tela principal, clique no simbolo `©` no canto inferior direito para ver a
+nota curta de autoria e licenca.
+
+O projeto e disponibilizado para uso gratuito e nao comercial. A atribuicao ao
+autor original, Jean Carlos Machado, deve ser preservada.
+

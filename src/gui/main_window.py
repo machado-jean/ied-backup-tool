@@ -46,7 +46,7 @@ from src.core.naming import BackupStage, normalize_stage
 from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
 from src.gui.backup_worker import BackupExecutionWorker, BackupProgressEvent
-from src.gui.resources import app_icon_path, help_document_url, language_flag_path
+from src.gui.resources import app_icon_path, help_document_url, language_flag_path, repository_url
 from src.gui.settings_window import SettingsWindow
 from src.gui.storage_paths import confirm_storage_paths_ready
 from src.gui.update_worker import UpdateCheckWorker
@@ -181,6 +181,11 @@ class MainWindow(QMainWindow):
         self.update_available_label.setVisible(False)
         footer.addWidget(self.update_available_label)
         footer.addStretch()
+        self.license_label = QLabel()
+        self.license_label.setTextFormat(Qt.TextFormat.RichText)
+        self.license_label.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
+        self.license_label.linkActivated.connect(self.show_license_notice)
+        footer.addWidget(self.license_label)
         layout.addLayout(footer)
 
         self.setCentralWidget(root)
@@ -457,6 +462,28 @@ class MainWindow(QMainWindow):
         target = url or self.latest_release_url
         if target:
             QDesktopServices.openUrl(QUrl(target))
+
+    def show_license_notice(self) -> None:
+        """Show a compact copyright and license notice."""
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle(ui_text("license", self.language))
+        layout = QVBoxLayout(dialog)
+        label = QLabel(
+            ui_text("license_message", self.language).format(url=repository_url())
+        )
+        label.setTextFormat(Qt.TextFormat.RichText)
+        label.setWordWrap(True)
+        label.setOpenExternalLinks(True)
+        label.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse
+            | Qt.TextInteractionFlag.LinksAccessibleByMouse
+        )
+        layout.addWidget(label)
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        buttons.accepted.connect(dialog.accept)
+        layout.addWidget(buttons)
+        dialog.exec()
 
     def on_settings_saved(self, config: AppConfig) -> None:
         """Update in-memory configuration after the settings dialog saves."""
@@ -1123,6 +1150,10 @@ class MainWindow(QMainWindow):
         self.refresh_button.setText(ui_text("refresh", self.language))
         self.settings_button.setText(ui_text("settings", self.language))
         self.help_button.setText(ui_text("help", self.language))
+        self.license_label.setText(
+            '<a href="license" style="text-decoration:none; color:inherit;">©</a>'
+        )
+        self.license_label.setToolTip(ui_text("license_tooltip", self.language))
         if self.update_available_label.isVisible() and self.latest_release_url:
             self.update_available_label.setText(
                 f'<a href="{self.latest_release_url}" style="color:#d92d20; '

@@ -4,14 +4,14 @@ Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.10.1`
+Current application version: `1.10.2`
 
-The `v1.10.1` executable has been generated.
+The `v1.10.2` executable has been generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.10.1/IED Backup Manager.exe
+releases/v1.10.2/IED Backup Manager.exe
 ```
 
 ## Recently Completed
@@ -28,6 +28,8 @@ releases/v1.10.1/IED Backup Manager.exe
 - `v1.10.0`: automatic GitHub release check with clickable update notice.
 - `v1.10.1`: fixed distributed executable name for simpler updates and latest
   download URLs.
+- `v1.10.2`: non-commercial license file, public license documentation, and
+  clickable copyright notice in the GUI.
 
 ## Current v1.6.0 Released Scope
 
@@ -46,7 +48,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 84 passed
+pytest: 86 passed
 ```
 
 ## Local-Safety Notes
@@ -126,9 +128,16 @@ pytest: 84 passed
 - GitHub can expose a stable latest-download URL:
   `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED%20Backup%20Manager.exe`.
 
+## Current v1.10.2 Scope
+
+- Adds `LICENSE` with the `IED Backup Manager Non-Commercial License`.
+- Adds license notes to README, executable-use documentation, and public help.
+- Adds a clickable `©` indicator in the bottom-right corner of the GUI.
+- Clicking `©` shows a compact authorship/license note and repository link.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.10.1`:
+Planned next improvement after `v1.10.2`:
 
 ```text
 public-repository sensitivity review and repository polish

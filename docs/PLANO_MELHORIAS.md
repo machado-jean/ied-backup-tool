@@ -174,6 +174,22 @@ Status: implementado em `v1.10.0`.
 - [x] Tratar falhas de internet ou bloqueio corporativo sem interromper o uso do
   aplicativo.
 
+### Licenca e Autoria
+
+Objetivo: deixar claro que o projeto e publico/source-available para uso
+gratuito e nao comercial, preservando autoria e restringindo uso comercial sem
+autorizacao previa.
+
+Status: implementado em `v1.10.2`.
+
+- [x] Criar arquivo `LICENSE` com a `IED Backup Manager Non-Commercial License`.
+- [x] Adicionar secao de licenca no README.
+- [x] Adicionar nota curta de licenca no `docs/HELP.md`.
+- [x] Adicionar instrucao de licenca/autoria em `docs/USO_EXECUTAVEL.md`.
+- [x] Adicionar indicador `©` no canto inferior direito da GUI.
+- [x] Ao clicar em `©`, mostrar autoria, uso nao comercial e link do
+  repositorio.
+
 ## Prioridade Baixa
 
 ### Refatoracao Estrutural
