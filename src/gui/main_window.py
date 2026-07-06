@@ -181,11 +181,12 @@ class MainWindow(QMainWindow):
         self.update_available_label.setVisible(False)
         footer.addWidget(self.update_available_label)
         footer.addStretch()
-        self.license_label = QLabel()
-        self.license_label.setTextFormat(Qt.TextFormat.RichText)
-        self.license_label.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
-        self.license_label.linkActivated.connect(self.show_license_notice)
-        footer.addWidget(self.license_label)
+        self.license_button = QPushButton("©")
+        self.license_button.setFlat(True)
+        self.license_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.license_button.setFixedSize(28, 24)
+        self.license_button.clicked.connect(self.show_license_notice)
+        footer.addWidget(self.license_button)
         layout.addLayout(footer)
 
         self.setCentralWidget(root)
@@ -1150,10 +1151,11 @@ class MainWindow(QMainWindow):
         self.refresh_button.setText(ui_text("refresh", self.language))
         self.settings_button.setText(ui_text("settings", self.language))
         self.help_button.setText(ui_text("help", self.language))
-        self.license_label.setText(
-            '<a href="license" style="text-decoration:none; color:inherit;">©</a>'
+        self.license_button.setToolTip(ui_text("license_tooltip", self.language))
+        self.license_button.setStyleSheet(
+            "QPushButton { border: none; padding: 0; font-weight: 600; }"
+            "QPushButton:hover { text-decoration: underline; }"
         )
-        self.license_label.setToolTip(ui_text("license_tooltip", self.language))
         if self.update_available_label.isVisible() and self.latest_release_url:
             self.update_available_label.setText(
                 f'<a href="{self.latest_release_url}" style="color:#d92d20; '

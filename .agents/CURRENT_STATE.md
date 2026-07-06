@@ -4,14 +4,15 @@ Last updated: 2026-07-05
 
 ## Current Version
 
-Current application version: `1.10.4`
+Current application version: `1.10.5`
 
-The `v1.10.4` executable has been generated.
+The `v1.10.5` source changes are implemented and the executable has been
+generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.10.4/IED_Backup_Manager.exe
+releases/v1.10.5/IED_Backup_Manager.exe
 ```
 
 ## Recently Completed
@@ -34,6 +35,8 @@ releases/v1.10.4/IED_Backup_Manager.exe
   release asset uses underscore naming.
 - `v1.10.4`: update notice text clarifies that clicking downloads the new
   version.
+- `v1.10.5`: public repository sensitivity review and copyright indicator
+  contrast fix.
 
 ## Current v1.6.0 Released Scope
 
@@ -147,17 +150,32 @@ pytest: 86 passed
 - The tooltip explains that clicking the update notice downloads the new
   version.
 
+## Current v1.10.5 Scope
+
+- Public repository scan reviewed versionable files outside ignored local
+  backup folders, `.venv`, `.git`, and generated binary assets.
+- Test fixtures were sanitized to use `COLABORADOR-EXEMPLO` instead of a real
+  first name.
+- `.gitignore` still protects `IED-DES/`, `IED-ATU/`, `IED-HIS/`, `.venv/`,
+  `.vscode/`, `config.json`, build outputs, and `.spec` files.
+- The bottom-right copyright indicator now uses a flat `QPushButton` with the
+  active theme text color instead of rich-text link coloring.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.10.4`:
+Planned next improvement after `v1.10.5`:
 
 ```text
-public-repository sensitivity review and repository polish
+public documentation screenshots and repository polish
 ```
 
 Likely scope:
 
-- scan public docs/code for real names, real substations, internal paths, and
-  sensitive samples;
-- confirm ignored local folders are not staged;
-- update release notes with the review result.
+- add sanitized screenshots to README and `docs/HELP.md`;
+- keep periodic public-repository sensitivity review;
+- consider repository presentation polish after screenshots.
+
+Roadmap reference:
+
+- `docs/PLANO_MELHORIAS.md` now includes estimated milestones from `v1.10.5`
+  through `v1.18.0`.

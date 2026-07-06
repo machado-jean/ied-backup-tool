@@ -4,6 +4,24 @@ Este documento registra melhorias aprovadas ou candidatas para implementacao
 futura. Ele serve como referencia pesquisavel para retomar decisoes tecnicas
 sem depender apenas do historico de conversa.
 
+## Roadmap por Marcos
+
+Este roadmap parte da versao atual `v1.10.5`. As versoes sao estimativas
+pragmaticas e podem mudar se surgir uma correcao urgente ou um novo tipo de IED
+prioritario.
+
+| Versao estimada | Marco | Entregas principais |
+| --- | --- | --- |
+| `v1.10.5` | Revisao publica do repositorio | Implementado: varredura final de dados sensiveis, caminhos internos, nomes reais e arquivos locais; confirmacao de `.gitignore`; ajuste de contraste do indicador `©`; release note registrando a revisao. |
+| `v1.11.0` | Documentacao visual publica | Capturas reais e sanitizadas da tela principal, configuracoes e previa; atualizacao do README e `docs/HELP.md` com imagens limpas. |
+| `v1.12.0` | Integridade externa opcional | Geracao opcional de arquivo `.sha256` ao lado do ZIP final para verificacao independente. |
+| `v1.13.0` | Recuperacao operacional | Quarentena explicita para falhas raras de movimentacao/copia, com orientacao ao usuario para analise manual. |
+| `v1.14.0` | Limpeza controlada de historico | Ferramenta para localizar backups antigos por idade, quantidade ou tamanho, inicialmente em modo previa/confirmacao. |
+| `v1.15.0` | Novos tipos de IED | Inclusao de novos fabricantes/formatos conforme surgirem arquivos reais de teste e regras de versao confiaveis. |
+| `v1.16.0` | Relatorios operacionais | Relatorio simples de execucao/resultado quando a base de uso real justificar. |
+| `v1.17.0` | Refatoracao estrutural | Separar `main_window.py` e `backup_service.py` em componentes menores; ampliar testes de GUI em modo offscreen. |
+| `v1.18.0` | Assinatura de codigo | Avaliar certificado de code signing/Trusted Signing para reduzir alerta de fornecedor desconhecido no Windows. |
+
 ## Prioridade Alta
 
 ### Validacao de ATU e HIS
@@ -150,14 +168,14 @@ Status: implementado em `v1.9.0`.
 Objetivo: reduzir risco de exposicao antes de abrir o GitHub para acesso
 publico.
 
-Status: planejado para depois de `v1.9.2`.
+Status: implementado em `v1.10.5`.
 
 - [x] Apontar o botao `Ajuda` / `Help` para o `HELP.md` publico no GitHub.
-- [ ] Fazer varredura final de nomes reais, caminhos internos e amostras
+- [x] Fazer varredura final de nomes reais, caminhos internos e amostras
   sensiveis.
-- [ ] Confirmar que pastas locais com backups reais seguem ignoradas pelo Git.
-- [ ] Revisar documentos publicos usando somente exemplos genericos.
-- [ ] Registrar resultado da revisao em release note de patch.
+- [x] Confirmar que pastas locais com backups reais seguem ignoradas pelo Git.
+- [x] Revisar documentos publicos usando somente exemplos genericos.
+- [x] Registrar resultado da revisao em release note de patch.
 
 ### Verificacao de Atualizacoes
 
