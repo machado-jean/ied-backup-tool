@@ -1,18 +1,18 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-07-05
+Last updated: 2026-07-06
 
 ## Current Version
 
-Current application version: `1.10.5`
+Current application version: `1.11.0`
 
-The `v1.10.5` source changes are implemented and the executable has been
+The `v1.11.0` source changes are implemented and the executable has been
 generated.
 
 Latest generated executable:
 
 ```text
-releases/v1.10.5/IED_Backup_Manager.exe
+releases/v1.11.0/IED_Backup_Manager.exe
 ```
 
 ## Recently Completed
@@ -37,6 +37,8 @@ releases/v1.10.5/IED_Backup_Manager.exe
   version.
 - `v1.10.5`: public repository sensitivity review and copyright indicator
   contrast fix.
+- `v1.11.0`: structural refactor of GUI and core modules without intended
+  behavior changes.
 
 ## Current v1.6.0 Released Scope
 
@@ -55,7 +57,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 86 passed
+pytest: 94 passed
 ```
 
 ## Local-Safety Notes
@@ -161,22 +163,47 @@ pytest: 86 passed
 - The bottom-right copyright indicator now uses a flat `QPushButton` with the
   active theme text color instead of rich-text link coloring.
 
+## Current v1.11.0 Scope
+
+- Extracted startup instructions into `src/gui/startup_instructions.py`.
+- Extracted GUI language/runtime helpers into `src/gui/language_button.py` and
+  `src/gui/runtime.py`.
+- Extracted preview-table rendering and source-file display formatting into
+  `src/gui/preview_table.py`.
+- Extracted execution-summary text formatting into `src/gui/summary_text.py`.
+- Extracted confirmation/conflict message builders into
+  `src/gui/backup_confirmation.py`.
+- Added `src/gui/backup_application_service.py` as a Qt-independent layer
+  between `MainWindow` and core planning.
+- Extracted backup status constants and data models into
+  `src/core/backup_models.py`.
+- Added `BackupStatus` as a string enum while preserving legacy status constants.
+- Extracted backup planning into `src/core/backup_planner.py`.
+- Extracted backup plan execution and history archiving into
+  `src/core/backup_executor.py`.
+- Extracted ATU duplicate planning/execution into
+  `src/core/backup_duplicates.py`.
+- Extracted backup metadata text generation into `src/core/backup_metadata.py`.
+- Added focused tests for backup metadata, application service, and GUI
+  presentation helpers.
+- Progress dialog hides the progress bar's built-in percentage text and keeps
+  only the explicit progress text above the bar.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.10.5`:
+Planned next improvement after `v1.11.0`:
 
 ```text
-structural refactor before adding new workflow features
+operational recovery and quarantine for rare copy/move failures
 ```
 
 Likely scope:
 
-- split large GUI/service modules into smaller components;
-- keep behavior stable and covered by current tests;
-- postpone public visual documentation until the workflow and structure are
-  more stable.
+- define where suspicious/partially handled files should be placed;
+- add clear user-facing messages for quarantine cases;
+- keep existing transactional ATU/HIS behavior intact.
 
 Roadmap reference:
 
-- `docs/PLANO_MELHORIAS.md` now includes estimated milestones from `v1.10.5`
+- `docs/PLANO_MELHORIAS.md` now includes estimated milestones from `v1.11.0`
   through `v1.17.0`; code signing was removed from the active roadmap.

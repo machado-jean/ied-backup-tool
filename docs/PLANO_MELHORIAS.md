@@ -6,14 +6,14 @@ sem depender apenas do historico de conversa.
 
 ## Roadmap por Marcos
 
-Este roadmap parte da versao atual `v1.10.5`. As versoes sao estimativas
+Este roadmap parte da versao atual `v1.11.0`. As versoes sao estimativas
 pragmaticas e podem mudar se surgir uma correcao urgente ou um novo tipo de IED
 prioritario.
 
 | Versao estimada | Marco | Entregas principais |
 | --- | --- | --- |
 | `v1.10.5` | Revisao publica do repositorio | Implementado: varredura final de dados sensiveis, caminhos internos, nomes reais e arquivos locais; confirmacao de `.gitignore`; ajuste de contraste do indicador `©`; release note registrando a revisao. |
-| `v1.11.0` | Refatoracao estrutural | Separar `main_window.py` e `backup_service.py` em componentes menores; ampliar testes de GUI em modo offscreen; reduzir risco antes de novas telas. |
+| `v1.11.0` | Refatoracao estrutural | Implementado: extracao de dialogo inicial, helpers de runtime/idioma, application service, renderizacao da previa, resumo/confirmacao textual, `BackupStatus`, planner, modelos, executor, metadados e tratamento de duplicados em modulos menores; testes adicionais de application service, apresentacao e metadados. |
 | `v1.12.0` | Recuperacao operacional | Quarentena explicita para falhas raras de movimentacao/copia, com orientacao ao usuario para analise manual. |
 | `v1.13.0` | Limpeza controlada de historico | Ferramenta para localizar backups antigos por idade, quantidade ou tamanho, inicialmente em modo previa/confirmacao. |
 | `v1.14.0` | Relatorios operacionais | Relatorio simples de execucao em `.txt` ou `.csv`, com resumo do lote, arquivos criados, ignorados, conflitos, hashes e mensagens relevantes. |

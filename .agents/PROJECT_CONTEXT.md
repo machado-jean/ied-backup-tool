@@ -57,6 +57,11 @@ compatible and are not marked as conflicts.
 
 - GUI entrypoint: `src/gui/app.py`
 - Main GUI window: `src/gui/main_window.py`
+- Startup instructions dialog: `src/gui/startup_instructions.py`
+- GUI application service: `src/gui/backup_application_service.py`
+- GUI confirmation text builders: `src/gui/backup_confirmation.py`
+- GUI preview-table rendering: `src/gui/preview_table.py`
+- GUI summary text formatting: `src/gui/summary_text.py`
 - User help document: `docs/HELP.md`
 - Public help URL:
   `https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md`
@@ -68,6 +73,11 @@ compatible and are not marked as conflicts.
   `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe`
 - License file: `LICENSE`
 - Core planning/execution rules: `src/core/backup_service.py`
+- Backup data models/status constants: `src/core/backup_models.py`
+- Backup planning helpers: `src/core/backup_planner.py`
+- Backup execution helpers: `src/core/backup_executor.py`
+- Backup metadata builder: `src/core/backup_metadata.py`
+- ATU duplicate handling: `src/core/backup_duplicates.py`
 - ATU/HIS storage rules: `src/core/storage.py`
 - ZIP creation: `src/core/zipper.py`
 - Integrity helpers: `src/core/integrity.py`
