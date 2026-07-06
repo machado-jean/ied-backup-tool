@@ -139,6 +139,8 @@ Generate release executable:
 - Distributed executable filename is fixed: `IED_Backup_Manager.exe`.
 - Keep versioning in the release folder, release notes, Git tag, window title,
   and splash screen, not in the executable filename.
+- `releases/` is a local ignored artifact folder and must not be committed.
+  Publish executables and release notes through GitHub Releases instead.
 - When the user asks to generate the `.exe`, generate it directly using
   `scripts/release.ps1` unless there is a clear blocker.
 - Every release should update `.agents/CURRENT_STATE.md`,

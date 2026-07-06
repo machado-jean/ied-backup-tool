@@ -16,7 +16,7 @@ Update:
 - `src/version.py`
 - `README.md` current version line
 - `.agents/CURRENT_STATE.md`
-- `releases/vX.Y.Z/RELEASE_NOTES.md`
+- release notes for the GitHub Release
 
 For user-visible behavior, also update when relevant:
 
@@ -44,6 +44,9 @@ Run:
 The script should run lint/tests, build with PyInstaller, copy the executable to
 `releases/vX.Y.Z/`, and remove the generated `.spec`.
 
+`releases/` is a local ignored artifact folder. Do not force-add it to Git; use
+GitHub Releases for downloadable executables and release notes.
+
 ## 5. Clean Temporary Files
 
 After build, remove temporary artifacts if they exist:
@@ -69,7 +72,7 @@ build/ and dist/ do not exist
 ```
 
 Then report executable path, release notes path, validation result, final
-executable size, and any local ignored files worth attention.
+executable size, and confirm `releases/` remains ignored by Git.
 
 ## 7. Git Closeout
 
