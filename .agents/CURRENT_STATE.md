@@ -166,16 +166,17 @@ pytest: 86 passed
 Planned next improvement after `v1.10.5`:
 
 ```text
-public documentation screenshots and repository polish
+structural refactor before adding new workflow features
 ```
 
 Likely scope:
 
-- add sanitized screenshots to README and `docs/HELP.md`;
-- keep periodic public-repository sensitivity review;
-- consider repository presentation polish after screenshots.
+- split large GUI/service modules into smaller components;
+- keep behavior stable and covered by current tests;
+- postpone public visual documentation until the workflow and structure are
+  more stable.
 
 Roadmap reference:
 
 - `docs/PLANO_MELHORIAS.md` now includes estimated milestones from `v1.10.5`
-  through `v1.18.0`.
+  through `v1.17.0`; code signing was removed from the active roadmap.

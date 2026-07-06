@@ -13,14 +13,19 @@ prioritario.
 | Versao estimada | Marco | Entregas principais |
 | --- | --- | --- |
 | `v1.10.5` | Revisao publica do repositorio | Implementado: varredura final de dados sensiveis, caminhos internos, nomes reais e arquivos locais; confirmacao de `.gitignore`; ajuste de contraste do indicador `©`; release note registrando a revisao. |
-| `v1.11.0` | Documentacao visual publica | Capturas reais e sanitizadas da tela principal, configuracoes e previa; atualizacao do README e `docs/HELP.md` com imagens limpas. |
-| `v1.12.0` | Integridade externa opcional | Geracao opcional de arquivo `.sha256` ao lado do ZIP final para verificacao independente. |
-| `v1.13.0` | Recuperacao operacional | Quarentena explicita para falhas raras de movimentacao/copia, com orientacao ao usuario para analise manual. |
-| `v1.14.0` | Limpeza controlada de historico | Ferramenta para localizar backups antigos por idade, quantidade ou tamanho, inicialmente em modo previa/confirmacao. |
-| `v1.15.0` | Novos tipos de IED | Inclusao de novos fabricantes/formatos conforme surgirem arquivos reais de teste e regras de versao confiaveis. |
-| `v1.16.0` | Relatorios operacionais | Relatorio simples de execucao/resultado quando a base de uso real justificar. |
-| `v1.17.0` | Refatoracao estrutural | Separar `main_window.py` e `backup_service.py` em componentes menores; ampliar testes de GUI em modo offscreen. |
-| `v1.18.0` | Assinatura de codigo | Avaliar certificado de code signing/Trusted Signing para reduzir alerta de fornecedor desconhecido no Windows. |
+| `v1.11.0` | Refatoracao estrutural | Separar `main_window.py` e `backup_service.py` em componentes menores; ampliar testes de GUI em modo offscreen; reduzir risco antes de novas telas. |
+| `v1.12.0` | Recuperacao operacional | Quarentena explicita para falhas raras de movimentacao/copia, com orientacao ao usuario para analise manual. |
+| `v1.13.0` | Limpeza controlada de historico | Ferramenta para localizar backups antigos por idade, quantidade ou tamanho, inicialmente em modo previa/confirmacao. |
+| `v1.14.0` | Relatorios operacionais | Relatorio simples de execucao em `.txt` ou `.csv`, com resumo do lote, arquivos criados, ignorados, conflitos, hashes e mensagens relevantes. |
+| `v1.15.0` | Documentacao visual publica | Capturas reais e sanitizadas da tela principal, configuracoes, previa e fluxo de execucao; atualizacao do README e `docs/HELP.md` com imagens limpas. |
+| `v1.16.0` | Novos tipos de IED | Inclusao de novos fabricantes/formatos conforme surgirem arquivos reais de teste e regras de versao confiaveis, depois da documentacao base estar estavel. |
+| `v1.17.0` | Integridade externa opcional | Avaliar se vale gerar arquivo `.sha256` ao lado do ZIP final para verificacao independente; manter fora do fluxo principal se nao houver uso real. |
+
+Marcos removidos do roadmap ativo:
+
+- Assinatura de codigo: abortada por enquanto. O alerta do SmartScreen pode ser
+  documentado como limitacao conhecida enquanto nao houver decisao de custo e
+  distribuicao com certificado.
 
 ## Prioridade Alta
 
