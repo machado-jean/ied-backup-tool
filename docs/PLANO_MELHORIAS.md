@@ -12,7 +12,6 @@ operacional claramente necessaria.
 
 | Versao estimada | Marco | Entregas previstas |
 | --- | --- | --- |
-| `v1.14.0` | Documentacao visual publica | Concluir imagens publicas e sanitizadas da tela principal, configuracoes, instrucoes, limpeza HIS e interface em ingles; atualizar `README.md`, `docs/HELP.md` e exemplos publicos. |
 | `v1.15.0` | Novos tipos de IED | Adicionar novos fabricantes, softwares ou extensoes conforme surgirem arquivos reais, limpos ou sanitizados, e regras confiaveis de identificacao de versao. |
 | `v1.16.0` | Melhorias guiadas por uso real | Pequenos ajustes de experiencia, robustez, mensagens, validacoes ou suporte, priorizados a partir de testes reais e feedback dos usuarios. |
 
@@ -45,7 +44,7 @@ notes detalhadas, mas ajuda a entender a evolucao tecnica do projeto.
 | `v1.11.0` | Refatoracao estrutural | Extracao de componentes GUI, application service, renderizacao da previa, resumo/confirmacao textual, `BackupStatus`, planner, executor, duplicados e metadados em modulos menores. |
 | `v1.12.0` | Quarentena operacional | Pasta `IED-QUARENTENA` para arquivos parciais ou suspeitos em falhas raras, nota `.txt` com origem/motivo/erro e limpeza automatica quando um backup valido cobre o caso. |
 | `v1.13.0` | Limpeza controlada de HIS | Janela `Limpeza HIS`, retencao configuravel, preservacao do backup mais recente por `SOFTWARE + PROJETO + ETAPA`, previa com tamanho e exclusao apenas por selecao/confirmacao manual. |
-| `v1.14.0` | Documentacao visual e contribuicao publica | Em andamento: screenshots publicos, exemplos artificiais em `docs/examples`, README profissional, `CONTRIBUTING.md` e templates de issue/pull request. |
+| `v1.14.0` | Documentacao visual e contribuicao publica | Screenshots publicos, exemplos artificiais em `docs/examples`, README profissional, `CONTRIBUTING.md`, templates de issue/pull request e roadmap reorganizado para novos IEDs. |
 
 ## Itens Pausados ou Descartados
 

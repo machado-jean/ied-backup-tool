@@ -4,15 +4,15 @@ Last updated: 2026-07-12
 
 ## Current Version
 
-Current application version: `1.13.0`
+Current application version: `1.14.0`
 
 Latest generated executable:
 
 ```text
-releases/v1.13.0/IED_Backup_Manager.exe
+releases/v1.14.0/IED_Backup_Manager.exe
 ```
 
-The `v1.13.0` executable has been generated locally.
+The `v1.14.0` executable has been generated locally.
 
 ## Recently Completed
 
@@ -42,6 +42,9 @@ The `v1.13.0` executable has been generated locally.
   copy, publication, or archive failures.
 - `v1.13.0`: controlled HIS cleanup with configurable retention days and
   protected latest backup per technical key and stage.
+- `v1.14.0`: public visual documentation, sanitized example files,
+  contribution guidance, issue/PR templates, and roadmap cleanup with new IED
+  types as the next milestone.
 
 ## Current v1.6.0 Released Scope
 
@@ -237,25 +240,41 @@ pytest: 110 passed
   still uses only the newest file per type when multiple real types exist.
 - Tests now include config parsing and core cleanup rules.
 
+## Current v1.14.0 Scope
+
+- Updates the public README with current screenshots, download guidance,
+  supported IED types, examples, development commands, architecture notes,
+  privacy guidance, contribution links, roadmap, and license summary.
+- Adds visual documentation to `docs/HELP.md`.
+- Adds public sanitized images under `docs/images/`.
+- Adds artificial public examples under `docs/examples/`.
+- Adds `CONTRIBUTING.md` with install, reproduction, pull request, and safe
+  sample-file contribution guidance.
+- Adds GitHub issue and pull request templates for bugs, feature requests, new
+  IED types, and pull requests.
+- Reorganizes `docs/PLANO_MELHORIAS.md` with implemented history since
+  `v1.0.0` and active roadmap focused on new IED types.
+- Keeps release artifacts local under ignored `releases/`.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.13.0`:
+Planned next improvement after `v1.14.0`:
 
 ```text
-public visual documentation
+new IED types
 ```
 
 Likely scope:
 
-- review GUI screens for public presentation quality;
-- create sanitized screenshots of the main window, settings, preview, HIS
-  cleanup, and execution-related dialogs;
-- update README and public help with clean visual examples.
-- maintain public contribution guidance, including issue/PR templates and safe
-  rules for sharing new IED sample files.
+- evaluate clean, artificial, or sanitized files shared for new manufacturers,
+  softwares, or extensions;
+- define version-extraction rules before implementing each new adapter;
+- add focused tests for each new adapter and grouped-backup behavior;
+- update README, HELP, executable-use docs, and examples when new IED types are
+  added.
 
 Roadmap reference:
 
-- `docs/PLANO_MELHORIAS.md` now includes estimated milestones from `v1.12.0`
-  through `v1.16.0`; code signing, operational reports, and external `.sha256`
-  files are outside the active roadmap.
+- `docs/PLANO_MELHORIAS.md` now lists `v1.15.0` as the next estimated milestone
+  for new IED types; code signing, operational reports, and external `.sha256`
+  files remain outside the active roadmap.

@@ -4,7 +4,7 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um backup
 atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.13.0`
+Versao atual: `1.14.0`
 
 - Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
@@ -293,10 +293,10 @@ As pastas locais `IED-DES/`, `IED-ATU/`, `IED-HIS/`, `config.json`, `.venv/`,
 
 ## Roadmap
 
-Prioridades atuais:
+Proximos marcos:
 
-- Concluir a documentacao visual publica.
-- Adicionar novos tipos de IED conforme surgirem arquivos reais de teste.
+- Adicionar novos tipos de IED conforme surgirem arquivos reais de teste,
+  limpos ou sanitizados.
 - Melhorar experiencia operacional conforme surgirem testes reais e feedback de
   usuarios.
 

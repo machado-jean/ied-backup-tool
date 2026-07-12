@@ -4,6 +4,10 @@ Este guia explica como usar o `IED_Backup_Manager.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
 (`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`/`.apcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
 
+Para uma visao visual do fluxo, consulte tambem o `README.md` e
+`docs/HELP.md`, que contem capturas publicas da tela principal, configuracoes,
+instrucoes de uso e limpeza `HIS`.
+
 ## 1. Estrutura esperada
 
 O executavel deve ficar na pasta do projeto que sera processada. Essa mesma

@@ -9,6 +9,29 @@ O IED Backup Manager padroniza backups de projetos de IED. Ele identifica os
 arquivos de trabalho na pasta local, gera ZIPs com nomes consistentes, mantem o
 backup atual em `ATU` e arquiva backups anteriores em `HIS`.
 
+## Interface
+
+Tela principal com previa do lote, resumo, selecao de tipos de IED, etapa e
+destino compacto:
+
+![Tela principal com previa](images/pt-main-window-preview.png)
+
+Configuracao do colaborador e das pastas de armazenamento:
+
+![Tela de configuracoes](images/pt-settings-window.png)
+
+Limpeza controlada da pasta `HIS`, sempre com previa e confirmacao manual:
+
+![Limpeza HIS](images/pt-history-cleanup.png)
+
+Tela de instrucoes exibida na primeira abertura:
+
+![Instrucoes de uso](images/pt-startup-instructions.png)
+
+Exemplo da interface em ingles:
+
+![Main window preview](images/en-main-window-preview.png)
+
 ## Estrutura Recomendada
 
 O executavel deve ficar dentro da pasta que contem os arquivos de trabalho da
