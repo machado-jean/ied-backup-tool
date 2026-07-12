@@ -29,6 +29,13 @@ class ProjectType(Protocol):
     def get_related_files(self, project_file: Path) -> list[Path]:
         """Return every source file that must be included in the backup zip."""
 
+    def get_backup_info_sections(
+        self,
+        project_file: Path,
+        source_files: list[Path],
+    ) -> list[str]:
+        """Return optional project-specific metadata sections."""
+
 
 class ProjectDetectionError(RuntimeError):
     pass
@@ -82,3 +89,12 @@ class BaseProjectType:
         """Return only the primary file for single-file project types."""
 
         return [project_file]
+
+    def get_backup_info_sections(
+        self,
+        project_file: Path,
+        source_files: list[Path],
+    ) -> list[str]:
+        """Return no extra metadata by default."""
+
+        return []

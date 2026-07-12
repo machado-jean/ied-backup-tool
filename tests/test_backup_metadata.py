@@ -33,3 +33,31 @@ def test_build_backup_info_text_includes_source_hash_and_detected_versions(
     assert "Stage: DEV" in text
     assert f"SHA256: {calculate_sha256(source)}" in text
     assert "- DIGSI 5 (.dz5): DIGSI5-V10.00" in text
+
+
+def test_build_backup_info_text_uses_relative_paths_for_nested_sources(
+    tmp_path: Path,
+) -> None:
+    root_file = tmp_path / "SE-AAA.ENV"
+    nested = tmp_path / "IED-A" / "IED-A.urs"
+    nested.parent.mkdir()
+    root_file.write_text("env", encoding="utf-8")
+    nested.write_text("urs", encoding="utf-8")
+
+    text = build_backup_info_text(
+        backup_name="GE-MULTILIN-V8.40_SE-AAA_20260622-1350_COLABORADOR_DEV.zip",
+        project="SE-AAA",
+        software="GE-MULTILIN-V8.40",
+        timestamp=datetime(2026, 6, 22, 13, 50),
+        collaborator="COLABORADOR",
+        stage=BackupStage.DEV,
+        project_type_label="GE Multilin UR (.urs, .urk)",
+        source_file=nested,
+        source_files=[root_file, nested],
+        detected_versions=None,
+        extra_sections=["GE Multilin IED Summary:\n- IED-A"],
+    )
+
+    assert "GE Multilin IED Summary:" in text
+    assert "- SE-AAA.ENV" in text
+    assert "- IED-A/IED-A.urs" in text

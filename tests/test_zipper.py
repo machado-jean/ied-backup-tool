@@ -1,4 +1,5 @@
 from pathlib import Path
+from zipfile import ZipFile
 
 import pytest
 
@@ -27,3 +28,22 @@ def test_create_backup_zip_reports_byte_progress(tmp_path: Path) -> None:
     assert events
     assert events[0] == ("zip", 0, 2048)
     assert events[-1] == ("zip", 2048, 2048)
+
+
+def test_create_backup_zip_preserves_relative_folders_for_nested_sources(
+    tmp_path: Path,
+) -> None:
+    root_file = tmp_path / "SE-AAA.ENV"
+    nested = tmp_path / "IED-A" / "IED-A.urs"
+    nested.parent.mkdir()
+    root_file.write_text("env", encoding="utf-8")
+    nested.write_text("urs", encoding="utf-8")
+
+    zip_path = create_backup_zip(
+        [root_file, nested],
+        "backup.zip",
+        output_dir=tmp_path / "out",
+    )
+
+    with ZipFile(zip_path) as archive:
+        assert archive.namelist() == ["SE-AAA.ENV", "IED-A/IED-A.urs"]

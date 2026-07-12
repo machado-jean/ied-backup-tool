@@ -3,6 +3,10 @@
 Este documento resume o uso operacional do IED Backup Manager. Ele usa apenas
 exemplos genericos para que possa ser publicado junto do projeto.
 
+Para entender como cada tipo de IED e identificado, quais arquivos entram no
+ZIP e como a versao e definida, consulte
+[LOGICA_IDENTIFICACAO_IEDS.md](LOGICA_IDENTIFICACAO_IEDS.md).
+
 ## Objetivo
 
 O IED Backup Manager padroniza backups de projetos de IED. Ele identifica os
@@ -46,6 +50,9 @@ Pasta local/
     +-- ETD-BBB_OUTRO-COMENTARIO.rdb
     +-- ETD-BBB_OUTRO-COMENTARIO.scd
     +-- VAO-ZZZ_COMENTARIO-GENERICO_20260619_1230.pcmp
+    +-- GE-IED-A/
+    |   +-- GE-IED-A.urs
+    |   +-- GE-IED-A.cid
     +-- outros arquivos de trabalho
 ```
 
@@ -88,6 +95,7 @@ Nesses casos, o projeto pode ser identificado incorretamente.
 | SEL QuickSet / Architect | `.rdb`, com `.scd` ou `.selaprj` opcional | QuickSet e Architect quando encontrados. |
 | ABB PCM600 | `.pcmp`, `.apcmp` | Detectada no arquivo interno `ProjectDataServer%versions.ini`. |
 | INGETEAM INGESYS | `.efsPro`, `.ITPro2` | Informada manualmente pelo usuario e salva em `config.json`. |
+| GE Multilin / EnerVista UR | subpastas com `.urs` ou `.urk`; `.ENV` opcional | Maior versao `GE UR Setup` encontrada em `.cid/.icd`; se nao houver SCL, maior versao `GEMULTILIN` em `.urs/.urk`. |
 
 ## Fluxo Basico
 
@@ -157,6 +165,26 @@ Se varios tipos estiverem marcados, mas apenas um tipo real existir para a SE,
 ETD, vao ou equipamento, o programa nao cria `IED-PACK`. Nesse caso, ele
 processa o tipo encontrado normalmente e respeita a opcao `Processar apenas a
 partir do backup atual`.
+
+Backup GE Multilin:
+
+```text
+Entrada:
+SE-AAA - Enervista UR Environment.ENV
+GE-IED-A/
+  GE-IED-A.urs
+  GE-IED-A.cid
+GE-IED-B/
+  GE-IED-B.urs
+
+Saida:
+GE-URSETUP-V8.61_SE-AAA_20260712-1100_COLABORADOR-EXEMPLO_TAF.zip
+```
+
+Para GE Multilin, o programa inclui o `.ENV` do topo quando existir e somente
+as subpastas que contenham `.urs` ou `.urk`. Dentro dessas subpastas, entram
+apenas `.urs`, `.urk`, `.cid` e `.icd`. Arquivos de RDP, switches, GPS e outros
+equipamentos nao sao incluidos automaticamente.
 
 ## Metadados no ZIP
 

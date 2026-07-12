@@ -12,8 +12,7 @@ operacional claramente necessaria.
 
 | Versao estimada | Marco | Entregas previstas |
 | --- | --- | --- |
-| `v1.15.0` | Novos tipos de IED | Adicionar novos fabricantes, softwares ou extensoes conforme surgirem arquivos reais, limpos ou sanitizados, e regras confiaveis de identificacao de versao. |
-| `v1.16.0` | Melhorias guiadas por uso real | Pequenos ajustes de experiencia, robustez, mensagens, validacoes ou suporte, priorizados a partir de testes reais e feedback dos usuarios. |
+| `v1.17.0` | Melhorias guiadas por uso real | Pequenos ajustes de experiencia, robustez, mensagens, validacoes ou suporte, priorizados a partir de testes reais e feedback dos usuarios. |
 
 ## Historico Implementado
 
@@ -45,6 +44,8 @@ notes detalhadas, mas ajuda a entender a evolucao tecnica do projeto.
 | `v1.12.0` | Quarentena operacional | Pasta `IED-QUARENTENA` para arquivos parciais ou suspeitos em falhas raras, nota `.txt` com origem/motivo/erro e limpeza automatica quando um backup valido cobre o caso. |
 | `v1.13.0` | Limpeza controlada de HIS | Janela `Limpeza HIS`, retencao configuravel, preservacao do backup mais recente por `SOFTWARE + PROJETO + ETAPA`, previa com tamanho e exclusao apenas por selecao/confirmacao manual. |
 | `v1.14.0` | Documentacao visual e contribuicao publica | Screenshots publicos, exemplos artificiais em `docs/examples`, README profissional, `CONTRIBUTING.md`, templates de issue/pull request e roadmap reorganizado para novos IEDs. |
+| `v1.15.0` | GE Multilin / EnerVista UR | Novo adaptador para ambientes GE por pasta de SE, incluindo `.ENV` opcional e subpastas de IED com `.urs`/`.urk`; ZIP preserva subpastas e metadados registram resumo dos IEDs e versoes GE. |
+| `v1.16.0` | Documentacao da logica de identificacao | Novo documento `docs/LOGICA_IDENTIFICACAO_IEDS.md` explicando regras de identificacao, arquivos incluidos, versao automatica/manual, casos especiais de INGETEAM e GE Multilin, e comportamento do `IED-PACK`. |
 
 ## Itens Pausados ou Descartados
 

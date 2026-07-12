@@ -32,6 +32,7 @@ def test_default_project_type_is_digsi() -> None:
     assert DEFAULT_PROJECT_TYPE.extensions == (".dz5",)
     assert get_project_type("digsi5") is DEFAULT_PROJECT_TYPE
     assert get_project_type("pcm600").extensions == (".pcmp", ".apcmp")
+    assert get_project_type("ge_multilin").extensions == (".urs", ".urk")
 
 
 def test_backup_service_accepts_custom_project_type(tmp_path: Path) -> None:

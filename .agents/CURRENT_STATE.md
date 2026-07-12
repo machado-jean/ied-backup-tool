@@ -4,15 +4,15 @@ Last updated: 2026-07-12
 
 ## Current Version
 
-Current application version: `1.14.0`
+Current application version: `1.16.0`
 
 Latest generated executable:
 
 ```text
-releases/v1.14.0/IED_Backup_Manager.exe
+releases/v1.16.0/IED_Backup_Manager.exe
 ```
 
-The `v1.14.0` executable has been generated locally.
+The `v1.16.0` executable has been generated locally.
 
 ## Recently Completed
 
@@ -45,6 +45,10 @@ The `v1.14.0` executable has been generated locally.
 - `v1.14.0`: public visual documentation, sanitized example files,
   contribution guidance, issue/PR templates, and roadmap cleanup with new IED
   types as the next milestone.
+- `v1.15.0`: GE Multilin / EnerVista UR support for SE-level environments,
+  preserving GE IED subfolders and adding GE-specific metadata.
+- `v1.16.0`: public documentation of IED identification/version rules,
+  including special cases for INGETEAM and GE Multilin.
 
 ## Current v1.6.0 Released Scope
 
@@ -63,7 +67,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 110 passed
+pytest: 116 passed
 ```
 
 ## Local-Safety Notes
@@ -256,25 +260,62 @@ pytest: 110 passed
   `v1.0.0` and active roadmap focused on new IED types.
 - Keeps release artifacts local under ignored `releases/`.
 
+## Current v1.15.0 Scope
+
+- Adds `src/core/project_types/ge_multilin.py`.
+- Registers `ge_multilin` in the project type registry, CLI, and GUI checkbox
+  list.
+- Detects GE backups from direct child folders containing `.urs` or `.urk`.
+- Includes the top-level `.ENV` file when present, but does not require it.
+- Includes only `.urs`, `.urk`, `.cid`, and `.icd` inside selected GE IED
+  folders.
+- Excludes non-IED folders/files such as RDP, switches, GPS, `.cfg`, `.xml`,
+  `.msf`, and extensionless switch configs unless future rules explicitly add
+  them.
+- Uses the highest `GE Digital Energy UR Setup` version found in `.cid/.icd`
+  for the backup name, e.g. `GE-URSETUP-V8.61`.
+- Falls back to the highest `GEMULTILIN` header version from `.urs/.urk` when
+  no SCL setup version exists, e.g. `GE-MULTILIN-V8.40`.
+- Preserves nested folder paths inside ZIPs when source files span subfolders.
+- Adds a GE-specific section to `IEDS-BACKUP-INFO.txt` with environment,
+  optional `.ENV` versions, included IED folders, development version, and
+  IED/application version.
+- Adds artificial GE examples under `docs/examples/ge-workspace/SE-AAA`.
+- Adds `docs/LOGICA_IDENTIFICACAO_IEDS.md` explaining detection/version rules
+  for DIGSI, SEL, PCM600, INGETEAM, GE Multilin, and `IED-PACK`.
+- Updates README, HELP, executable-use docs, roadmap, and tests.
+
+## Current v1.16.0 Scope
+
+- Promotes `docs/LOGICA_IDENTIFICACAO_IEDS.md` as the public reference for IED
+  identification logic.
+- Documents which project types use automatic version detection and which can
+  require manual input.
+- Explains why INGETEAM uses a manually informed version due to ambiguous
+  internal markers across imported/newer components.
+- Explains the GE Multilin special case: SE/application folder as the project,
+  `.ENV` optional, IED folders detected by `.urs`/`.urk`, allowed extensions,
+  excluded non-IED equipment files, and version selection order.
+- Links the logic document from README, HELP, executable-use docs, and agent
+  context.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.14.0`:
+Planned next improvement after `v1.16.0`:
 
 ```text
-new IED types
+real-usage improvements
 ```
 
 Likely scope:
 
-- evaluate clean, artificial, or sanitized files shared for new manufacturers,
-  softwares, or extensions;
-- define version-extraction rules before implementing each new adapter;
-- add focused tests for each new adapter and grouped-backup behavior;
-- update README, HELP, executable-use docs, and examples when new IED types are
-  added.
+- validate GE behavior with more real environments;
+- refine user-facing labels, warnings, and documentation based on actual tests;
+- add new IED types only when clean/sanitized samples and reliable version rules
+  are available.
 
 Roadmap reference:
 
-- `docs/PLANO_MELHORIAS.md` now lists `v1.15.0` as the next estimated milestone
-  for new IED types; code signing, operational reports, and external `.sha256`
-  files remain outside the active roadmap.
+- `docs/PLANO_MELHORIAS.md` now lists `v1.17.0` as the next estimated milestone
+  for improvements guided by real use; code signing, operational reports, and
+  external `.sha256` files remain outside the active roadmap.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import zipfile
 from collections.abc import Sequence
 from pathlib import Path
@@ -33,7 +34,8 @@ def create_backup_zip(
     destination_dir.mkdir(parents=True, exist_ok=True)
     destination = destination_dir / backup_name
 
-    arc_names = [path.name for path in source_files]
+    archive_root = _archive_root_for(source_files)
+    arc_names = [_archive_name(path, archive_root) for path in source_files]
     if len(arc_names) != len(set(arc_names)):
         raise BackupZipError("Arquivos com nomes duplicados nao podem ser compactados juntos.")
 
@@ -43,9 +45,9 @@ def create_backup_zip(
     with zipfile.ZipFile(destination, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
         if backup_info_text is not None:
             archive.writestr(BACKUP_INFO_FILENAME, backup_info_text)
-        for path in source_files:
+        for path, arc_name in zip(source_files, arc_names, strict=True):
             try:
-                with path.open("rb") as source, archive.open(path.name, "w") as target:
+                with path.open("rb") as source, archive.open(arc_name, "w") as target:
                     copy_stream_with_progress(
                         source,
                         target,
@@ -60,6 +62,29 @@ def create_backup_zip(
                 ) from exc
 
     return destination
+
+
+def _archive_root_for(source_files: list[Path]) -> Path | None:
+    """Return the common folder used to preserve subfolders in multi-file ZIPs."""
+
+    parent_paths = {path.parent.resolve() for path in source_files}
+    if len(parent_paths) <= 1:
+        return None
+
+    common = Path(os.path.commonpath([str(path.resolve()) for path in source_files]))
+    if common.is_file():
+        return common.parent
+    if common in [path.resolve() for path in source_files]:
+        return common.parent
+    return common
+
+
+def _archive_name(path: Path, archive_root: Path | None) -> str:
+    """Return a portable ZIP path, preserving relative folders when needed."""
+
+    if archive_root is None:
+        return path.name
+    return path.resolve().relative_to(archive_root).as_posix()
 
 
 def ensure_source_is_readable(source_file: Path) -> None:

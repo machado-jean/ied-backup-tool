@@ -90,6 +90,7 @@ def plan_grouped_backups(
             continue
 
         entries: list[tuple[ProjectType, Path, tuple[Path, ...], str]] = []
+        extra_metadata_sections: list[str] = []
         for project_type, project_files in entries_by_type.values():
             project_file = max(project_files, key=get_file_timestamp)
             version = project_type.get_software_version(
@@ -102,6 +103,9 @@ def plan_grouped_backups(
             )
             source_files = tuple(project_type.get_related_files(project_file))
             entries.append((project_type, project_file, source_files, version))
+            extra_metadata_sections.extend(
+                project_type.get_backup_info_sections(project_file, list(source_files))
+            )
 
         source_files = _unique_paths(path for _, _, files, _ in entries for path in files)
         primary_files = [project_file for _, project_file, _, _ in entries]
@@ -128,6 +132,7 @@ def plan_grouped_backups(
                 (project_type.label, version, project_file)
                 for project_type, project_file, _, version in entries
             ],
+            extra_metadata_sections=extra_metadata_sections,
         )
         plans.append(plan)
 
@@ -233,6 +238,10 @@ def plan_backup_file(
         software_version_override=software_version_override,
     )
     source_files = tuple(project_type.get_related_files(project_file))
+    extra_metadata_sections = project_type.get_backup_info_sections(
+        project_file,
+        list(source_files),
+    )
     return _plan_backup_name(
         source_file=project_file,
         source_files=source_files,
@@ -243,6 +252,7 @@ def plan_backup_file(
         software_display=None,
         project_type_key=project_type.key,
         project_type_label=project_type.label,
+        extra_metadata_sections=extra_metadata_sections,
     )
 
 
@@ -280,6 +290,7 @@ def _plan_backup_name(
     project_type_key: str,
     project_type_label: str,
     detected_versions: list[tuple[str, str, Path]] | None = None,
+    extra_metadata_sections: list[str] | None = None,
 ) -> BackupPlan:
     """Plan storage behavior for an already built backup filename."""
 
@@ -302,6 +313,7 @@ def _plan_backup_name(
         source_file=source_file,
         source_files=list(source_files),
         detected_versions=detected_versions,
+        extra_sections=extra_metadata_sections,
     )
 
     history_identity_path = find_backup_by_identity(his_path, planned_info.identity)

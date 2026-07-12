@@ -4,10 +4,11 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um backup
 atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.14.0`
+Versao atual: `1.16.0`
 
 - Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
+- Logica de identificacao dos IEDs: [docs/LOGICA_IDENTIFICACAO_IEDS.md](docs/LOGICA_IDENTIFICACAO_IEDS.md)
 - Plano de melhorias: [docs/PLANO_MELHORIAS.md](docs/PLANO_MELHORIAS.md)
 - Arquivos publicos de exemplo: [docs/examples](docs/examples)
 - Como contribuir: [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -54,6 +55,8 @@ Exemplo da interface em ingles:
 - Processamento individual ou agrupado por subestacao/projeto.
 - Pacote `IED-PACK` quando mais de um tipo de IED selecionado pertence ao mesmo
   projeto.
+- Suporte a GE Multilin / EnerVista UR por pasta de SE, incluindo somente
+  subpastas de IED com `.urs` ou `.urk`.
 - Metadados `IEDS-BACKUP-INFO.txt` em todos os ZIPs.
 - Registro de versoes detectadas, arquivos incluidos, tamanho, data de
   modificacao e SHA256 dos arquivos de origem.
@@ -81,6 +84,7 @@ Exemplo da interface em ingles:
 | SEL QuickSet / Architect | `.rdb`, com `.scd` ou `.selaprj` opcional | QuickSet e Architect, quando encontrados, gerando prefixos como `QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34`. |
 | ABB PCM600 | `.pcmp`, `.apcmp` | Detectada em `ProjectDataServer%versions.ini`, gerando prefixos como `PCM600-V2.10`. |
 | INGETEAM INGESYS | `.efsPro`, `.ITPro2` | Informada manualmente pelo usuario e salva em `config.json`, gerando prefixos como `INGESYS-V5.5.4`. |
+| GE Multilin / EnerVista UR | pastas com `.urs` ou `.urk`; `.ENV` opcional | Usa a maior versao `GE UR Setup` encontrada em `.cid/.icd`, gerando prefixos como `GE-URSETUP-V8.61`; se nao houver SCL, usa a maior versao `GEMULTILIN` dos headers `.urs/.urk`. |
 
 ## Regra de Nome dos Arquivos
 
@@ -123,6 +127,7 @@ DIGSI5-V10.00_SE-AAA_20260712-1030_COLABORADOR-EXEMPLO_TAF.zip
 QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-BBB_20260712-1035_COLABORADOR-EXEMPLO_TAF.zip
 PCM600-V2.10_SE-DDD_20260712-1040_COLABORADOR-EXEMPLO_TAF.zip
 INGESYS-V5.5.4_VAO-ZZZ_20260712-1050_COLABORADOR-EXEMPLO_TAF.zip
+GE-URSETUP-V8.61_SE-AAA_20260712-1100_COLABORADOR-EXEMPLO_TAF.zip
 IED-PACK_SE-AAA_20260712-1035_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
@@ -139,7 +144,7 @@ Exemplo:
   "atu_path": "C:/Backups/Exemplo/ATU",
   "his_path": "C:/Backups/Exemplo/HIS",
   "language": "pt_BR",
-  "project_types": ["digsi5", "sel", "pcm600", "ingeteam"],
+  "project_types": ["digsi5", "sel", "pcm600", "ingeteam", "ge_multilin"],
   "software_versions": {
     "ingeteam": "5.5.4"
   },
@@ -183,7 +188,8 @@ celula.
 
 A pasta [docs/examples](docs/examples) contem arquivos artificiais para testes,
 prints e demonstracoes publicas. Eles cobrem DIGSI, SEL, PCM600, INGETEAM e
-uma estrutura `ATU`/`HIS` para demonstrar a tela `Limpeza HIS`.
+GE Multilin, alem de uma estrutura `ATU`/`HIS` para demonstrar a tela
+`Limpeza HIS`.
 
 Executar a GUI com os exemplos:
 
@@ -295,10 +301,10 @@ As pastas locais `IED-DES/`, `IED-ATU/`, `IED-HIS/`, `config.json`, `.venv/`,
 
 Proximos marcos:
 
-- Adicionar novos tipos de IED conforme surgirem arquivos reais de teste,
-  limpos ou sanitizados.
 - Melhorar experiencia operacional conforme surgirem testes reais e feedback de
   usuarios.
+- Adicionar novos tipos de IED apenas quando surgirem arquivos reais de teste,
+  limpos ou sanitizados, com regras confiaveis de identificacao de versao.
 
 Consulte [docs/PLANO_MELHORIAS.md](docs/PLANO_MELHORIAS.md) para detalhes.
 

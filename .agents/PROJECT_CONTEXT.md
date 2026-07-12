@@ -34,6 +34,8 @@ generates consistent ZIP names for technical traceability.
 - SEL QuickSet / Architect: `.rdb`, with optional `.scd` or `.selaprj`
 - ABB PCM600: `.pcmp`, `.apcmp`
 - INGETEAM INGESYS: `.efsPro`, `.ITPro2`
+- GE Multilin / EnerVista UR: direct child folders containing `.urs` or `.urk`;
+  optional top-level `.ENV`
 
 ## Backup Metadata
 
@@ -44,6 +46,11 @@ stage, detected versions, included files, source file modification time, source
 file size, and source file SHA256.
 
 The source-file SHA256 must not be added to the ZIP filename.
+
+For GE Multilin backups, `IEDS-BACKUP-INFO.txt` also includes a GE IED summary
+with the environment folder, optional `.ENV` versions, included IED folders,
+the GE UR Setup version used to develop each IED when available, and the
+IED/application version from `.urs`/`.urk` headers.
 
 ## Integrity Rules
 
@@ -68,6 +75,7 @@ compatible and are not marked as conflicts.
 - GUI preview-table rendering: `src/gui/preview_table.py`
 - GUI summary text formatting: `src/gui/summary_text.py`
 - User help document: `docs/HELP.md`
+- IED identification logic document: `docs/LOGICA_IDENTIFICACAO_IEDS.md`
 - Public help URL:
   `https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md`
 - Public latest-release API:
@@ -89,6 +97,7 @@ compatible and are not marked as conflicts.
 - Integrity helpers: `src/core/integrity.py`
 - Project type registry: `src/core/project_types/registry.py`
 - Project-specific adapters: `src/core/project_types/`
+- GE Multilin adapter: `src/core/project_types/ge_multilin.py`
 - CLI entrypoint: `src/main.py`
 
 ## Local Workspace Folders
@@ -156,10 +165,9 @@ Generate release executable:
 - The project is public/source-available under the `IED Backup Manager
   Non-Commercial License`, not OSI open source. Commercial use requires prior
   written permission from Jean Carlos Machado.
-- The active next roadmap milestone after `v1.14.0` is support for new IED
-  types, driven by clean, artificial, or sanitized sample files and reliable
-  version-extraction rules. Operational reports and external `.sha256` files
-  are intentionally outside the active roadmap for now.
+- The active next roadmap milestone after `v1.16.0` is improvement guided by
+  real usage feedback. Operational reports and external `.sha256` files are
+  intentionally outside the active roadmap for now.
 - After running tests or builds, remove generated caches/build folders when they
   are not needed: `.pytest_cache`, `.ruff_cache`, `__pycache__`, `build`, `dist`.
 

@@ -2,11 +2,15 @@
 
 Este guia explica como usar o `IED_Backup_Manager.exe` para gerar backups
 padronizados de projetos de IED. Nesta versao, os tipos disponiveis sao DIGSI 5
-(`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`/`.apcmp`) e INGETEAM (`.efsPro`/`.ITPro2`).
+(`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`/`.apcmp`), INGETEAM
+(`.efsPro`/`.ITPro2`) e GE Multilin / EnerVista UR (`.urs`/`.urk` em subpastas).
 
 Para uma visao visual do fluxo, consulte tambem o `README.md` e
 `docs/HELP.md`, que contem capturas publicas da tela principal, configuracoes,
 instrucoes de uso e limpeza `HIS`.
+
+Para entender a regra tecnica de cada tipo de IED, incluindo os casos especiais
+de INGETEAM e GE Multilin, consulte `docs/LOGICA_IDENTIFICACAO_IEDS.md`.
 
 ## 1. Estrutura esperada
 
@@ -25,6 +29,9 @@ Pasta do projeto/
 ├─ ESD-AAA.scd
 ├─ SE-DDD_20260619_1230.pcmp
 ├─ SE-EEE_20260619_1230.apcmp
+├─ GE-IED-A/
+│  ├─ GE-IED-A.urs
+│  ├─ GE-IED-A.cid
 ```
 
 O programa nao precisa que a pasta `BKPs` exista quando estiver em uso real.
