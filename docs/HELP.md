@@ -76,6 +76,8 @@ Nesses casos, o projeto pode ser identificado incorretamente.
 6. Clique em `Gerar backups`.
 7. Aguarde a conclusao ou use `Cancelar` se precisar interromper antes do
    proximo arquivo.
+8. Quando necessario, use `Limpeza HIS` para revisar backups antigos antes de
+   remover qualquer arquivo.
 
 ## Previa do Lote
 
@@ -126,6 +128,11 @@ Saida:
 IED-PACK_ETD-BBB_20260612-0350_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
+Se varios tipos estiverem marcados, mas apenas um tipo real existir para a SE,
+ETD, vao ou equipamento, o programa nao cria `IED-PACK`. Nesse caso, ele
+processa o tipo encontrado normalmente e respeita a opcao `Processar apenas a
+partir do backup atual`.
+
 ## Metadados no ZIP
 
 Todos os ZIPs gerados incluem `IEDS-BACKUP-INFO.txt`.
@@ -152,6 +159,26 @@ Included files:
 O SHA256 ajuda a identificar quando dois arquivos possuem a mesma identidade
 tecnica, mas conteudo diferente.
 
+## Limpeza HIS
+
+Use o botao `Limpeza HIS` para localizar backups antigos no historico.
+
+A regra padrao e:
+
+- retencao de `30` dias, configuravel pelo usuario;
+- retencao `0` desabilita a verificacao de candidatos apos backup;
+- backups com menos que o periodo configurado sao mantidos;
+- o backup mais recente de cada `SOFTWARE + PROJETO + ETAPA` e sempre mantido,
+  mesmo se for mais antigo que o periodo configurado;
+- tamanho total de `HIS` e tamanho candidato a limpeza sao mostrados apenas como
+  informacao de apoio.
+
+A limpeza exige marcar os arquivos pelo checkbox e confirmar na janela
+`Limpeza HIS`.
+Depois de um backup concluido, se existirem candidatos em `HIS`, o resumo final
+informa a quantidade e oferece acesso a `Limpeza HIS` para revisao manual.
+Com retencao `0`, essa verificacao apos backup fica desabilitada.
+
 ## Limitacoes Conhecidas
 
 - Arquivos muito grandes podem demorar para compactar e copiar.
@@ -165,6 +192,8 @@ tecnica, mas conteudo diferente.
   possuem dados de SHA256 para comparacao.
 - Em falhas raras de copia/publicacao, arquivos parciais ou suspeitos podem ser
   movidos para `IED-QUARENTENA` para analise manual.
+- A limpeza `HIS` usa o nome padronizado do ZIP para identificar projeto, etapa
+  e data. Arquivos fora do padrao sao ignorados pela limpeza automatizada.
 
 ## Solucao de Problemas
 

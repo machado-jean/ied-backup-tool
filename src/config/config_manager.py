@@ -15,6 +15,13 @@ class ConfigError(RuntimeError):
 
 
 @dataclass(frozen=True)
+class HistoryCleanupConfig:
+    """User preferences for controlled HIS cleanup."""
+
+    retention_days: int = 30
+
+
+@dataclass(frozen=True)
 class AppConfig:
     """Runtime settings required to generate backups."""
 
@@ -25,6 +32,7 @@ class AppConfig:
     project_types: tuple[str, ...] = ()
     software_versions: dict[str, str] | None = None
     show_startup_instructions: bool = True
+    history_cleanup: HistoryCleanupConfig = HistoryCleanupConfig()
 
 
 def load_config(path: Path) -> AppConfig:
@@ -56,6 +64,9 @@ def save_config(path: Path, config: AppConfig) -> None:
         "project_types": list(config.project_types),
         "software_versions": config.software_versions or {},
         "show_startup_instructions": config.show_startup_instructions,
+        "history_cleanup": {
+            "retention_days": config.history_cleanup.retention_days,
+        },
     }
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -78,6 +89,7 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
     show_startup_instructions = raw.get("show_startup_instructions", True)
     if not isinstance(show_startup_instructions, bool):
         show_startup_instructions = True
+    history_cleanup = _parse_history_cleanup(raw.get("history_cleanup", {}))
 
     return AppConfig(
         collaborator=collaborator.strip().upper().replace(" ", "-"),
@@ -91,6 +103,7 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
             if isinstance(key, str) and isinstance(value, str) and value.strip()
         },
         show_startup_instructions=show_startup_instructions,
+        history_cleanup=history_cleanup,
     )
 
 
@@ -101,3 +114,17 @@ def _required_str(raw: dict[str, Any], key: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ConfigError(f"Campo obrigatorio ausente ou invalido: {key}")
     return value
+
+
+def _parse_history_cleanup(raw: Any) -> HistoryCleanupConfig:
+    """Normalize optional HIS cleanup preferences from config.json."""
+
+    if not isinstance(raw, dict):
+        return HistoryCleanupConfig()
+
+    retention_days = raw.get("retention_days", 30)
+    if not isinstance(retention_days, int) or isinstance(retention_days, bool):
+        retention_days = 30
+    retention_days = max(0, min(retention_days, 3650))
+
+    return HistoryCleanupConfig(retention_days=retention_days)

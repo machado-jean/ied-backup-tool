@@ -4,13 +4,15 @@ Last updated: 2026-07-11
 
 ## Current Version
 
-Current application version: `1.12.0`
+Current application version: `1.13.0`
 
 Latest generated executable:
 
 ```text
-releases/v1.12.0/IED_Backup_Manager.exe
+releases/v1.13.0/IED_Backup_Manager.exe
 ```
+
+The `v1.13.0` executable has been generated locally.
 
 ## Recently Completed
 
@@ -38,6 +40,8 @@ releases/v1.12.0/IED_Backup_Manager.exe
   behavior changes.
 - `v1.12.0`: operational quarantine for suspicious/partial files after rare
   copy, publication, or archive failures.
+- `v1.13.0`: controlled HIS cleanup with configurable retention days and
+  protected latest backup per technical key and stage.
 
 ## Current v1.6.0 Released Scope
 
@@ -56,7 +60,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 97 passed
+pytest: 109 passed
 ```
 
 ## Local-Safety Notes
@@ -202,19 +206,50 @@ pytest: 97 passed
 - Keeps normal ATU/HIS transactional behavior unchanged.
 - Updates README, executable usage docs, public help, and roadmap.
 
+## Current v1.13.0 Scope
+
+- Adds `src/core/history_cleanup.py` with a testable HIS cleanup policy.
+- Adds `Limpeza HIS` / `HIS cleanup` dialog in the main GUI.
+- Saves cleanup preferences in `config.json` under `history_cleanup`.
+- Default retention is `30` days.
+- Retention `0` disables post-backup cleanup checks and suppresses cleanup
+  notices in the final summary.
+- Cleanup candidates are ZIPs in `HIS` older than the retention period.
+- The newest backup for each `SOFTWARE + PROJETO + ETAPA` is always preserved,
+  even when it is older than the retention period.
+- The cleanup preview shows candidate count, total HIS size, candidate size,
+  age, stage, project, timestamp, and reason.
+- Manual cleanup requires row selection and explicit confirmation.
+- The `Limpeza HIS` table uses a checkbox in the first column; deletion uses
+  checked rows, not visual table selection.
+- The app reports cleanup candidates in the final backup summary after a
+  successful backup; it does not show a permanent main-window notice.
+- No post-backup path deletes HIS automatically. Deletion is restricted to the
+  `Limpeza HIS` dialog with explicit row selection and confirmation.
+- `history_cleanup` now stores only `retention_days`; the removed automatic
+  cleanup flag is no longer parsed or written.
+- The final backup summary uses a custom compact dialog that hides zero-value
+  counters and shows cleanup guidance as a separate highlighted note.
+- Files outside the standard ZIP naming pattern are ignored by cleanup.
+- Fixed grouped preview behavior: when multiple IED types are selected but only
+  one real type exists for a project, the app now processes all files of that
+  type unless `Processar apenas a partir do backup atual` is checked. `IED-PACK`
+  still uses only the newest file per type when multiple real types exist.
+- Tests now include config parsing and core cleanup rules.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.12.0`:
+Planned next improvement after `v1.13.0`:
 
 ```text
-controlled history cleanup by age, count, or size
+operational execution reports
 ```
 
 Likely scope:
 
-- preview old backups before deleting anything;
-- allow cleanup criteria such as age, max count per key, or total folder size;
-- require explicit confirmation before deletion.
+- simple `.txt` or `.csv` report per execution;
+- include created, ignored, conflicted, cleaned, hashes, and relevant messages;
+- keep report generation optional if it adds noise for normal users.
 
 Roadmap reference:
 

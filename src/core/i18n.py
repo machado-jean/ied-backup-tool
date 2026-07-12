@@ -58,6 +58,7 @@ UI_TEXT = {
         "completed_at": "Concluído em",
         "confirm_execution": "Confirmar execução",
         "continue_question": "Continuar?",
+        "close": "Fechar",
         "current_folder": "Pasta atual",
         "destination": "Destino",
         "duplicate_files_found": "Foram encontrados arquivos antigos duplicados em ATU:",
@@ -72,6 +73,35 @@ UI_TEXT = {
         "generate_backups": "Gerar backups",
         "help": "Ajuda",
         "help_open_failed": "Não foi possível abrir a ajuda online: {url}",
+        "history_cleanup": "Limpeza HIS",
+        "history_cleanup_age": "Idade",
+        "history_cleanup_confirm_message": (
+            "Serão removidos {count} arquivo(s) de HIS, liberando aproximadamente {size}.\n\n"
+            "Esta ação não pode ser desfeita. Continuar?"
+        ),
+        "history_cleanup_confirm_title": "Confirmar limpeza HIS",
+        "history_cleanup_delete_action": "Remover",
+        "history_cleanup_delete_selected": "Limpar selecionados",
+        "history_cleanup_done_message": "{count} arquivo(s) removido(s) de HIS.",
+        "history_cleanup_done_title": "Limpeza concluída",
+        "history_cleanup_failed_title": "Falha na limpeza HIS",
+        "history_cleanup_notice": (
+            "HIS tem {count} arquivo(s) candidato(s) à limpeza ({size})."
+        ),
+        "history_cleanup_manual_after_backup": (
+            "Limpeza HIS: existem {count} arquivo(s) candidato(s) à limpeza "
+            "({size}). Revise os itens antes de remover."
+        ),
+        "history_cleanup_reason": "Motivo",
+        "history_cleanup_refresh": "Atualizar prévia",
+        "history_cleanup_retention_days": "Retenção em dias (0 desabilita)",
+        "history_cleanup_select_all": "Selecionar todos",
+        "history_cleanup_select_required": "Selecione ao menos um arquivo para limpar.",
+        "history_cleanup_size": "Tamanho",
+        "history_cleanup_summary": (
+            "HIS: {total} arquivo(s), {total_size}. "
+            "Candidatos: {candidates} arquivo(s), {candidate_size}."
+        ),
         "ignored": "Ignorados",
         "integrity_conflicts_found": (
             "Foram encontrados backups com a mesma identidade técnica, mas SHA256 "
@@ -165,13 +195,21 @@ UI_TEXT = {
         "stage_description_placeholder": "Opcional; deixe vazio quando não se enquadrar",
         "summary": "Resumo",
         "summary_archived_line": "Históricos arquivados: {count}",
+        "summary_archived_title": "Históricos arquivados",
         "summary_atu_line": "Correções em ATU: {count}",
+        "summary_atu_title": "Correções em ATU",
         "summary_current_line": "Já estavam atuais: {count}",
+        "summary_current_title": "Já estavam atuais",
         "summary_sha_conflict_line": "Conflitos SHA: {count}",
+        "summary_sha_conflict_title": "Conflitos SHA",
         "summary_replaced_line": "ATU atualizado: {count}",
+        "summary_replaced_title": "ATU atualizado",
         "summary_skipped_line": "Ignorados por serem antigos: {count}",
+        "summary_skipped_title": "Ignorados por serem antigos",
         "summary_stored_line": "Novos backups criados: {count}",
+        "summary_stored_title": "Novos backups criados",
         "summary_total_line": "Total analisado: {total}",
+        "summary_total_title": "Total analisado",
         "software_version": "Versão do software",
         "ingeteam_software_version": "v",
         "software_version_placeholder": "Ex.: 5.5.4",
@@ -201,6 +239,7 @@ UI_TEXT = {
         "completed_at": "Completed at",
         "confirm_execution": "Confirm execution",
         "continue_question": "Continue?",
+        "close": "Close",
         "current_folder": "Current folder",
         "destination": "Destination",
         "duplicate_files_found": "Older duplicate files were found in ATU:",
@@ -215,6 +254,35 @@ UI_TEXT = {
         "generate_backups": "Generate backups",
         "help": "Help",
         "help_open_failed": "Could not open the online help: {url}",
+        "history_cleanup": "HIS cleanup",
+        "history_cleanup_age": "Age",
+        "history_cleanup_confirm_message": (
+            "{count} HIS file(s) will be removed, freeing approximately {size}.\n\n"
+            "This action cannot be undone. Continue?"
+        ),
+        "history_cleanup_confirm_title": "Confirm HIS cleanup",
+        "history_cleanup_delete_action": "Delete",
+        "history_cleanup_delete_selected": "Clean selected",
+        "history_cleanup_done_message": "{count} HIS file(s) removed.",
+        "history_cleanup_done_title": "Cleanup completed",
+        "history_cleanup_failed_title": "HIS cleanup failed",
+        "history_cleanup_notice": (
+            "HIS has {count} file(s) candidate for cleanup ({size})."
+        ),
+        "history_cleanup_manual_after_backup": (
+            "HIS cleanup: {count} file(s) are candidate for cleanup "
+            "({size}). Review the items before removing them."
+        ),
+        "history_cleanup_reason": "Reason",
+        "history_cleanup_refresh": "Refresh preview",
+        "history_cleanup_retention_days": "Retention in days (0 disables)",
+        "history_cleanup_select_all": "Select all",
+        "history_cleanup_select_required": "Select at least one file to clean.",
+        "history_cleanup_size": "Size",
+        "history_cleanup_summary": (
+            "HIS: {total} file(s), {total_size}. "
+            "Candidates: {candidates} file(s), {candidate_size}."
+        ),
         "ignored": "Ignored",
         "integrity_conflicts_found": (
             "Backups with the same technical identity but different SHA256 values "
@@ -308,13 +376,21 @@ UI_TEXT = {
         "stage_description_placeholder": "Optional; leave empty when it does not apply",
         "summary": "Summary",
         "summary_archived_line": "History archived: {count}",
+        "summary_archived_title": "History archived",
         "summary_atu_line": "ATU fixes: {count}",
+        "summary_atu_title": "ATU fixes",
         "summary_current_line": "Already current: {count}",
+        "summary_current_title": "Already current",
         "summary_sha_conflict_line": "SHA conflicts: {count}",
+        "summary_sha_conflict_title": "SHA conflicts",
         "summary_replaced_line": "ATU updated: {count}",
+        "summary_replaced_title": "ATU updated",
         "summary_skipped_line": "Skipped because older: {count}",
+        "summary_skipped_title": "Skipped because older",
         "summary_stored_line": "New backups created: {count}",
+        "summary_stored_title": "New backups created",
         "summary_total_line": "Total analyzed: {total}",
+        "summary_total_title": "Total analyzed",
         "software_version": "Software version",
         "ingeteam_software_version": "v",
         "software_version_placeholder": "Example: 5.5.4",

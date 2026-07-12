@@ -67,7 +67,10 @@ Exemplo de `config.json`:
   "software_versions": {
     "ingeteam": "5.5.4"
   },
-  "show_startup_instructions": true
+  "show_startup_instructions": true,
+  "history_cleanup": {
+    "retention_days": 30
+  }
 }
 ```
 
@@ -236,6 +239,11 @@ Se apenas um tipo for encontrado para uma subestacao, mesmo com varios tipos
 marcados, o nome do backup continua sendo o nome individual daquele tipo. Nesse
 caso, ele nao usa `IED-PACK`.
 
+Quando apenas um tipo real for encontrado para a subestacao, o processamento
+segue o modo normal desse tipo: com `Processar apenas a partir do backup atual`
+desmarcado, todos os backups encontrados podem ser avaliados para `ATU`/`HIS`.
+Com a opcao marcada, somente o atual e os mais recentes entram na previa.
+
 Exemplo:
 
 ```text
@@ -376,12 +384,8 @@ Aguarde a conclusao ou o cancelamento controlado antes de fechar o programa.
 Ao final, sera exibido um resumo com:
 
 - Total analisado.
-- Novos backups criados.
-- Atualizacoes em `ATU`.
-- Historicos arquivados.
-- Correcoes em `ATU`.
-- Arquivos ignorados por serem antigos.
-- Arquivos que ja estavam atuais.
+- Apenas os contadores com valor, como novos backups, atualizacoes em `ATU`,
+  historicos arquivados, correcoes, ignorados ou arquivos ja atuais.
 
 Se ocorrer uma falha rara de copia, publicacao ou arquivamento, o programa pode
 mover arquivos parciais ou suspeitos para `IED-QUARENTENA`, criada ao lado de
@@ -393,7 +397,32 @@ Quando a falha for resolvida e um backup da mesma chave tecnica for concluido
 com timestamp igual ou mais recente, os itens correspondentes da quarentena sao
 removidos automaticamente. Se a pasta ficar vazia, ela tambem e apagada.
 
-## 13. Resultado dos arquivos
+## 13. Limpeza HIS
+
+Use o botao `Limpeza HIS` para revisar backups antigos da pasta `HIS`.
+
+A regra padrao e:
+
+- `Retenção em dias`: `30`;
+- use `0` para desabilitar verificacoes de limpeza apos backup;
+- arquivos mais novos que o periodo configurado sao mantidos;
+- o backup mais recente de cada `SOFTWARE + PROJETO + ETAPA` e sempre mantido;
+- tamanho total e tamanho candidato a limpeza sao exibidos apenas para apoio;
+- a limpeza manual exige marcar os arquivos pelo checkbox e confirmar a
+  exclusao.
+
+Depois de um backup concluido, caso existam candidatos a limpeza, o resumo final
+informa a quantidade de arquivos e o tamanho estimado. A remocao so acontece ao
+abrir `Limpeza HIS`, selecionar os arquivos e confirmar manualmente.
+
+Se `Retenção em dias` estiver como `0`, o programa nao verifica candidatos apos
+o backup e nao mostra aviso no resumo final. A janela continua disponivel pelo
+botao `Limpeza HIS`.
+
+Arquivos ZIP fora do padrao de nome do IED Backup Manager sao ignorados pela
+limpeza.
+
+## 14. Resultado dos arquivos
 
 O nome final do backup segue o padrao:
 
@@ -418,7 +447,7 @@ Regras principais:
 - A comparacao tecnica considera `SOFTWARE_PROJETO_DATAHORA`.
 - Mudancas apenas de colaborador ou etapa nao criam duplicidade tecnica.
 
-## 14. Abrir pastas ATU e HIS
+## 15. Abrir pastas ATU e HIS
 
 Use os botoes:
 
@@ -431,7 +460,7 @@ Se a pasta tiver sido apagada depois da configuracao, o programa perguntara se
 voce deseja recria-la antes de abrir. A pasta nao e recriada automaticamente
 sem confirmacao.
 
-## 15. Cuidados recomendados
+## 16. Cuidados recomendados
 
 - Feche o DIGSI antes de gerar backups, para evitar arquivo bloqueado.
 - Feche QuickSet/Architect antes de gerar backups SEL, para evitar arquivo
@@ -442,9 +471,11 @@ sem confirmacao.
   confirmar a correcao.
 - Se existir `IED-QUARENTENA`, leia o `.txt` correspondente antes de apagar ou
   restaurar qualquer arquivo que nao tenha sido limpo automaticamente.
+- Antes de usar `Limpeza HIS`, confira a previa. A remocao exige selecao e
+  confirmacao manual.
 - Mantenha o `config.json` junto do executavel.
 
-## 16. Atualizacao de versao
+## 17. Atualizacao de versao
 
 Quando receber uma nova versao do executavel:
 
@@ -461,7 +492,7 @@ O download direto da versao mais recente pode usar sempre o mesmo link:
 https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe
 ```
 
-## 17. Licenca e autoria
+## 18. Licenca e autoria
 
 Na tela principal, clique no simbolo `©` no canto inferior direito para ver a
 nota curta de autoria e licenca.

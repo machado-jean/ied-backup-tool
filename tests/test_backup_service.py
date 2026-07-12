@@ -490,6 +490,42 @@ def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
     assert "QUICKSET-V7.5.3.10" in plans[0].backup_info_text
 
 
+def test_grouped_backups_processes_all_files_when_only_one_type_exists(
+    tmp_path: Path,
+) -> None:
+    project_dir = tmp_path / "IED-DES"
+    atu = tmp_path / "IED-ATU"
+    his = tmp_path / "IED-HIS"
+    project_dir.mkdir()
+    create_dz5(project_dir / "SE-AAA_20260526_1133.dz5", datetime(2026, 5, 26, 11, 33))
+    create_dz5(project_dir / "SE-AAA_20260526_1512.dz5", datetime(2026, 5, 26, 15, 12))
+
+    plans = plan_grouped_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="COLABORADOR-EXEMPLO",
+        stage=BackupStage.DEV,
+        project_types=[get_project_type("digsi5"), get_project_type("sel")],
+    )
+
+    assert [plan.source_file.name for plan in plans] == [
+        "SE-AAA_20260526_1133.dz5",
+        "SE-AAA_20260526_1512.dz5",
+    ]
+    assert [plan.status for plan in plans] == ["stored", "replaced_current"]
+
+    for plan in plans:
+        execute_backup_plan(plan=plan, atu_path=atu, his_path=his)
+
+    assert sorted(path.name for path in atu.glob("*.zip")) == [
+        "DIGSI5-V10.00_SE-AAA_20260526-1512_COLABORADOR-EXEMPLO_DEV.zip",
+    ]
+    assert sorted(path.name for path in his.glob("*.zip")) == [
+        "DIGSI5-V10.00_SE-AAA_20260526-1133_COLABORADOR-EXEMPLO_DEV.zip",
+    ]
+
+
 def create_dz5(path: Path, mtime: datetime) -> Path:
     with ZipFile(path, "w") as archive:
         archive.writestr(f"{path.stem}.dp5v100", "DIGSI project")

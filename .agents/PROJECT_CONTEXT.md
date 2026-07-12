@@ -23,6 +23,10 @@ generates consistent ZIP names for technical traceability.
 - Technical identity: `SOFTWARE_PROJECT_TIMESTAMP`.
 - Collaborator and stage are part of the ZIP name, but not part of technical
   identity.
+- When multiple IED types are selected, `IED-PACK` is created only for projects
+  that actually have more than one selected type present. If only one real type
+  exists for the project, process all files of that type unless the user checked
+  `Processar apenas a partir do backup atual`.
 
 ## Supported IED Types
 
@@ -60,6 +64,7 @@ compatible and are not marked as conflicts.
 - Startup instructions dialog: `src/gui/startup_instructions.py`
 - GUI application service: `src/gui/backup_application_service.py`
 - GUI confirmation text builders: `src/gui/backup_confirmation.py`
+- GUI HIS cleanup dialog: `src/gui/history_cleanup_window.py`
 - GUI preview-table rendering: `src/gui/preview_table.py`
 - GUI summary text formatting: `src/gui/summary_text.py`
 - User help document: `docs/HELP.md`
@@ -73,6 +78,7 @@ compatible and are not marked as conflicts.
   `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe`
 - License file: `LICENSE`
 - Core planning/execution rules: `src/core/backup_service.py`
+- HIS cleanup rules: `src/core/history_cleanup.py`
 - Backup data models/status constants: `src/core/backup_models.py`
 - Backup planning helpers: `src/core/backup_planner.py`
 - Backup execution helpers: `src/core/backup_executor.py`
@@ -166,6 +172,14 @@ Generate release executable:
 - After a successful backup, clean quarantine entries for the same technical key
   when the quarantined original timestamp is equal to or older than the
   successful backup; remove `IED-QUARENTENA` only when it becomes empty.
+- Controlled HIS cleanup uses a configurable retention period in days, default
+  `30`, and always preserves the newest backup for each `SOFTWARE + PROJECT +
+  STAGE`.
+- HIS cleanup deletion is manual only through the `Limpeza HIS` dialog. After a
+  successful backup, the app may report candidates in the final summary, but it
+  must not delete HIS files automatically.
+- HIS cleanup ignores ZIP files that do not match the standard backup naming
+  pattern.
 
 ## Progress Rules
 

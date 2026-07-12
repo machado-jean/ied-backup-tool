@@ -36,6 +36,7 @@ from src.core.backup_service import (
     BackupResult,
     summarize_results,
 )
+from src.core.history_cleanup import plan_history_cleanup
 from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
 from src.core.naming import BackupStage, normalize_stage
 from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
@@ -54,6 +55,8 @@ from src.gui.backup_confirmation import (
     integrity_conflict_details,
 )
 from src.gui.backup_worker import BackupExecutionWorker, BackupProgressEvent
+from src.gui.execution_summary_dialog import show_execution_summary_dialog
+from src.gui.history_cleanup_window import HistoryCleanupWindow
 from src.gui.language_button import configure_language_button
 from src.gui.preview_table import populate_preview_table, source_files_text
 from src.gui.resources import app_icon_path, help_document_url, language_flag_path, repository_url
@@ -295,6 +298,7 @@ class MainWindow(QMainWindow):
         open_buttons = QHBoxLayout()
         self.open_atu_button = QPushButton()
         self.open_his_button = QPushButton()
+        self.history_cleanup_button = QPushButton()
         self.open_atu_button.clicked.connect(
             lambda: self.open_folder(
                 self.config.atu_path if self.config else None,
@@ -310,6 +314,8 @@ class MainWindow(QMainWindow):
         open_buttons.addWidget(self.open_atu_button)
         open_buttons.addWidget(self.open_his_button)
         layout.addLayout(open_buttons)
+        self.history_cleanup_button.clicked.connect(self.open_history_cleanup)
+        layout.addWidget(self.history_cleanup_button)
         layout.addStretch()
         return self.action_group
 
@@ -352,6 +358,7 @@ class MainWindow(QMainWindow):
                 project_types=self.config.project_types,
                 software_versions=self.config.software_versions,
                 show_startup_instructions=False,
+                history_cleanup=self.config.history_cleanup,
             )
             save_config(self.config_path, self.config)
         else:
@@ -374,6 +381,7 @@ class MainWindow(QMainWindow):
                 project_types=self.config.project_types,
                 software_versions=self.config.software_versions,
                 show_startup_instructions=self.config.show_startup_instructions,
+                history_cleanup=self.config.history_cleanup,
             )
             save_config(self.config_path, self.config)
         self.retranslate_ui()
@@ -494,6 +502,7 @@ class MainWindow(QMainWindow):
                 project_types=config.project_types,
                 software_versions=config.software_versions,
                 show_startup_instructions=self.pending_show_startup_instructions,
+                history_cleanup=config.history_cleanup,
             )
             save_config(self.config_path, self.config)
             self.pending_show_startup_instructions = None
@@ -502,6 +511,25 @@ class MainWindow(QMainWindow):
         self._load_manual_software_version(self._manual_version_project_type())
         self.retranslate_ui()
         self.refresh_preview()
+
+    def open_history_cleanup(self) -> None:
+        """Open the controlled HIS cleanup dialog."""
+
+        if not self.config:
+            QMessageBox.warning(
+                self,
+                ui_text("settings_pending", self.language),
+                ui_text("settings_required", self.language),
+            )
+            return
+        dialog = HistoryCleanupWindow(
+            config_path=self.config_path,
+            config=self.config,
+            language=self.language,
+            parent=self,
+        )
+        dialog.saved.connect(self.on_settings_saved)
+        dialog.exec()
 
     def refresh_preview(self) -> None:
         """Rebuild the batch preview using the current config and selected filters."""
@@ -728,20 +756,45 @@ class MainWindow(QMainWindow):
         self.generate_button.setEnabled(True)
         self._write_execution_log(duplicate_results, results)
         summary = summarize_results([*results, *duplicate_results])
+        cleanup_message = ""
+        if not canceled:
+            cleanup_message = self._handle_history_cleanup_after_backup()
         if canceled:
             title = ui_text("backup_canceled_title", self.language)
-            body = (
-                ui_text("backup_canceled_message", self.language).format(
-                    completed=len(results) + len(duplicate_results)
-                )
-                + "\n\n"
-                + format_summary_text(summary, self.language)
+            canceled_message = ui_text("backup_canceled_message", self.language).format(
+                completed=len(results) + len(duplicate_results)
             )
         else:
             title = ui_text("backup_processed_title", self.language)
-            body = format_summary_text(summary, self.language)
-        QMessageBox.information(self, title, body)
+            canceled_message = None
+        show_execution_summary_dialog(
+            self,
+            title=title,
+            summary=summary,
+            language=self.language,
+            canceled_message=canceled_message,
+            cleanup_message=cleanup_message,
+            cleanup_action=self.open_history_cleanup if cleanup_message else None,
+        )
         self.refresh_preview()
+
+    def _handle_history_cleanup_after_backup(self) -> str:
+        """Report cleanup candidates after backup without deleting files."""
+
+        if not self.config:
+            return ""
+        plan = plan_history_cleanup(
+            self.config.his_path,
+            retention_days=self.config.history_cleanup.retention_days,
+        )
+        if not plan.candidates:
+            return ""
+        message = ui_text("history_cleanup_manual_after_backup", self.language).format(
+            count=len(plan.candidates),
+            size=_format_size(plan.candidate_size_bytes),
+        )
+        self.log_output.appendPlainText(message)
+        return message
 
     def _on_backup_failed(self, message: str) -> None:
         """Handle worker failure."""
@@ -874,6 +927,7 @@ class MainWindow(QMainWindow):
             ),
             software_versions=self.config.software_versions,
             show_startup_instructions=self.config.show_startup_instructions,
+            history_cleanup=self.config.history_cleanup,
         )
         save_config(self.config_path, self.config)
 
@@ -952,6 +1006,7 @@ class MainWindow(QMainWindow):
                 project_types=self.config.project_types,
                 software_versions=software_versions,
                 show_startup_instructions=self.config.show_startup_instructions,
+                history_cleanup=self.config.history_cleanup,
             )
             save_config(self.config_path, self.config)
         self.refresh_preview()
@@ -993,6 +1048,7 @@ class MainWindow(QMainWindow):
                 project_types=self.config.project_types,
                 software_versions=self.config.software_versions,
                 show_startup_instructions=self.config.show_startup_instructions,
+                history_cleanup=self.config.history_cleanup,
             )
             save_config(self.config_path, self.config)
         self.retranslate_ui()
@@ -1080,6 +1136,7 @@ class MainWindow(QMainWindow):
         self.generate_button.setText(ui_text("generate_backups", self.language))
         self.open_atu_button.setText(ui_text("open_atu", self.language))
         self.open_his_button.setText(ui_text("open_his", self.language))
+        self.history_cleanup_button.setText(ui_text("history_cleanup", self.language))
 
     def open_folder(self, folder: Path | None, label_key: str) -> None:
         """Open a configured folder, asking before recreating missing paths."""
@@ -1129,3 +1186,16 @@ class MainWindow(QMainWindow):
                 ui_text("storage_paths_invalid_title", self.language),
                 ui_text("storage_folder_open_failed", self.language).format(path=target),
             )
+
+
+def _format_size(size_bytes: int) -> str:
+    """Format bytes for compact messages."""
+
+    units = ["B", "KB", "MB", "GB", "TB"]
+    size = float(size_bytes)
+    for unit in units:
+        if size < 1024 or unit == units[-1]:
+            if unit == "B":
+                return f"{int(size)} {unit}"
+            return f"{size:.1f} {unit}"
+        size /= 1024

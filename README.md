@@ -4,7 +4,7 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um
 backup atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.12.0`
+Versao atual: `1.13.0`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 
@@ -51,6 +51,8 @@ arquivos finais.
   atual, reduzindo risco de estado parcial em falhas de arquivo ou permissao.
 - Quarentena operacional `IED-QUARENTENA` para arquivos parciais ou suspeitos
   gerados em falhas raras de copia/movimentacao, com registro do erro original.
+- Limpeza controlada de `HIS`, com retencao configuravel em dias, previa,
+  confirmacao e preservacao do backup mais recente por etapa.
 - Deteccao de duplicidades em `ATU`, com aviso do arquivo problematico.
 - Barra de progresso durante a geracao dos backups.
 - Progresso real por arquivo durante compactacao e copia para `ATU`/`HIS`.
@@ -104,7 +106,10 @@ O `config.json` fica ao lado do executavel:
   "software_versions": {
     "ingeteam": "5.5.4"
   },
-  "show_startup_instructions": true
+  "show_startup_instructions": true,
+  "history_cleanup": {
+    "retention_days": 30
+  }
 }
 ```
 
@@ -213,10 +218,7 @@ Itens desejados para evolucoes futuras:
 
 - Manter revisao periodica de dados sensiveis no repositorio publico.
 - Adicionar novos tipos de IED conforme surgirem arquivos reais de teste.
-- Criar ferramenta de limpeza controlada para backups antigos.
-- Permitir politicas de limpeza por idade, por exemplo backups com mais de 30
-  dias.
-- Permitir politicas de limpeza por tamanho ocupado em disco.
+- Evoluir a limpeza controlada de `HIS` conforme uso real.
 - Melhorar relatorios operacionais quando a base de uso real crescer.
 
 ## Releases

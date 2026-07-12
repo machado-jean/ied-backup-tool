@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from src.config.config_manager import AppConfig, save_config
+from src.config.config_manager import AppConfig, HistoryCleanupConfig, save_config
 from src.core.i18n import DEFAULT_LANGUAGE, ui_text
 from src.gui.storage_paths import confirm_storage_paths_ready
 
@@ -120,6 +120,9 @@ class SettingsWindow(QDialog):
             software_versions=self.config.software_versions if self.config else {},
             show_startup_instructions=(
                 self.config.show_startup_instructions if self.config else True
+            ),
+            history_cleanup=(
+                self.config.history_cleanup if self.config else HistoryCleanupConfig()
             ),
         )
         save_config(self.config_path, config)

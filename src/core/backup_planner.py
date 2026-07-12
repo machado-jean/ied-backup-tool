@@ -46,21 +46,52 @@ def plan_grouped_backups(
 ) -> list[BackupPlan]:
     """Build one backup package per substation using all selected project types."""
 
-    grouped_sources: dict[str, list[tuple[ProjectType, Path, tuple[Path, ...], str]]] = {}
+    grouped_sources: dict[str, dict[str, tuple[ProjectType, list[Path]]]] = {}
     for project_type in project_types:
         try:
             project_files = project_type.find_files(project_dir)
         except ProjectDetectionError:
             continue
 
-        latest_by_project: dict[str, Path] = {}
         for project_file in project_files:
             project = project_type.get_project_id(project_file)
-            current = latest_by_project.get(project)
-            if current is None or get_file_timestamp(project_file) > get_file_timestamp(current):
-                latest_by_project[project] = project_file
+            project_entries = grouped_sources.setdefault(project, {})
+            _, files = project_entries.setdefault(project_type.key, (project_type, []))
+            files.append(project_file)
 
-        for project, project_file in latest_by_project.items():
+    plans = []
+    current_by_key = virtual_current if virtual_current is not None else {}
+    for project, entries_by_type in sorted(grouped_sources.items()):
+        if len(entries_by_type) == 1:
+            project_type, project_files = next(iter(entries_by_type.values()))
+            for project_file in sorted(project_files, key=get_file_timestamp):
+                plan = plan_backup_file(
+                    project_file=project_file,
+                    atu_path=atu_path,
+                    his_path=his_path,
+                    collaborator=collaborator,
+                    stage=stage,
+                    project_type=project_type,
+                    software_version_override=_software_version_override_for(
+                        project_type,
+                        software_version_override,
+                        software_version_overrides,
+                    ),
+                    current_override=current_by_key,
+                )
+                plans.append(plan)
+                planned_info = parse_backup_filename(Path(plan.backup_name))
+                if plan.status in {
+                    STATUS_STORED,
+                    STATUS_REPLACED_CURRENT,
+                    STATUS_ALREADY_CURRENT,
+                }:
+                    current_by_key[planned_info.key] = plan.destination_path
+            continue
+
+        entries: list[tuple[ProjectType, Path, tuple[Path, ...], str]] = []
+        for project_type, project_files in entries_by_type.values():
+            project_file = max(project_files, key=get_file_timestamp)
             version = project_type.get_software_version(
                 project_file,
                 _software_version_override_for(
@@ -70,34 +101,7 @@ def plan_grouped_backups(
                 ),
             )
             source_files = tuple(project_type.get_related_files(project_file))
-            grouped_sources.setdefault(project, []).append(
-                (project_type, project_file, source_files, version)
-            )
-
-    plans = []
-    current_by_key = virtual_current if virtual_current is not None else {}
-    for project, entries in sorted(grouped_sources.items()):
-        if len(entries) == 1:
-            project_type, project_file, _, _ = entries[0]
-            plan = plan_backup_file(
-                project_file=project_file,
-                atu_path=atu_path,
-                his_path=his_path,
-                collaborator=collaborator,
-                stage=stage,
-                project_type=project_type,
-                software_version_override=_software_version_override_for(
-                    project_type,
-                    software_version_override,
-                    software_version_overrides,
-                ),
-                current_override=current_by_key,
-            )
-            plans.append(plan)
-            planned_info = parse_backup_filename(Path(plan.backup_name))
-            if plan.status in {STATUS_STORED, STATUS_REPLACED_CURRENT, STATUS_ALREADY_CURRENT}:
-                current_by_key[planned_info.key] = plan.destination_path
-            continue
+            entries.append((project_type, project_file, source_files, version))
 
         source_files = _unique_paths(path for _, _, files, _ in entries for path in files)
         primary_files = [project_file for _, project_file, _, _ in entries]
