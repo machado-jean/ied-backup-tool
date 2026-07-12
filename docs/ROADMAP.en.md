@@ -9,7 +9,7 @@ discarded decisions.
 
 | Estimated version | Milestone | Expected scope |
 | --- | --- | --- |
-| `v1.16.0` | Bilingual documentation and real-usage improvements | Separate Portuguese/English public files, GitHub language switch links, `Ajuda` / `Help` opening the document that matches the active UI language, and small improvements prioritized from real tests. |
+| `v1.17.0` | Improvements guided by real usage | Small UX, robustness, message, validation, or support improvements prioritized from real tests and user feedback. |
 
 ## Implemented History
 
@@ -27,6 +27,7 @@ discarded decisions.
 | `v1.14.0` | Public visual documentation | Screenshots, sanitized examples, contribution guidance, templates, and roadmap cleanup. |
 | `v1.15.0` | GE Multilin / EnerVista UR | GE folder-based adapter, optional `.ENV`, IED subfolders, preserved paths, and GE metadata. |
 | `v1.15.1` | Identification logic documentation | Public documentation for project-type detection, included files, automatic/manual versions, special INGETEAM and GE cases, and `IED-PACK`. |
+| `v1.16.0` | Bilingual documentation and language-aware Help | Separate Portuguese/English public files, GitHub language switch links, and `Ajuda` / `Help` opening the document that matches the active UI language. |
 
 ## Paused or Discarded Items
 

@@ -14,7 +14,7 @@ operacional claramente necessária.
 
 | Versão estimada | Marco | Entregas previstas |
 | --- | --- | --- |
-| `v1.16.0` | Documentação bilíngue e melhorias guiadas por uso real | Arquivos públicos separados em português/inglês, alternância entre idiomas no GitHub, botão `Ajuda` / `Help` abrindo a documentação conforme o idioma ativo e pequenos ajustes priorizados por testes reais. |
+| `v1.17.0` | Melhorias guiadas por uso real | Pequenos ajustes de experiência, robustez, mensagens, validações ou suporte, priorizados a partir de testes reais e feedback dos usuários. |
 
 ## Histórico Implementado
 
@@ -48,6 +48,7 @@ notes detalhadas, mas ajuda a entender a evolução técnica do projeto.
 | `v1.14.0` | Documentação visual e contribuição pública | Screenshots públicos, exemplos artificiais em `docs/examples`, README profissional, `CONTRIBUTING.md`, templates de issue/pull request e roadmap reorganizado para novos IEDs. |
 | `v1.15.0` | GE Multilin / EnerVista UR | Novo adaptador para ambientes GE por pasta de SE, incluindo `.ENV` opcional e subpastas de IED com `.urs`/`.urk`; ZIP preserva subpastas e metadados registram resumo dos IEDs e versões GE. |
 | `v1.15.1` | Documentação da lógica de identificação | Novo documento `docs/LOGICA_IDENTIFICACAO_IEDS.md` explicando regras de identificação, arquivos incluídos, versão automática/manual, casos especiais de INGETEAM e GE Multilin, e comportamento do `IED-PACK`. |
+| `v1.16.0` | Documentação bilíngue e Help por idioma | Arquivos públicos separados em português/inglês, alternância entre idiomas no GitHub e botão `Ajuda` / `Help` abrindo a documentação conforme o idioma ativo da interface. |
 
 ## Itens Pausados ou Descartados
 

@@ -171,7 +171,7 @@ Generate release executable:
 - The project is public/source-available under the `IED Backup Manager
   Non-Commercial License`, not OSI open source. Commercial use requires prior
   written permission from Jean Carlos Machado.
-- The active next roadmap milestone after `v1.15.1` is improvement guided by
+- The active next roadmap milestone after `v1.16.0` is improvement guided by
   real usage feedback. Operational reports and external `.sha256` files are
   intentionally outside the active roadmap for now.
 - After running tests or builds, remove generated caches/build folders when they

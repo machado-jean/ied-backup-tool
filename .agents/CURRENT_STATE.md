@@ -4,15 +4,15 @@ Last updated: 2026-07-12
 
 ## Current Version
 
-Current application version: `1.15.1`
+Current application version: `1.16.0`
 
 Latest generated executable:
 
 ```text
-releases/v1.15.1/IED_Backup_Manager.exe
+releases/v1.16.0/IED_Backup_Manager.exe
 ```
 
-The `v1.15.1` executable has been generated locally.
+The `v1.16.0` executable has been generated locally.
 
 ## Recently Completed
 
@@ -49,6 +49,7 @@ The `v1.15.1` executable has been generated locally.
   preserving GE IED subfolders and adding GE-specific metadata.
 - `v1.15.1`: public documentation of IED identification/version rules,
   including special cases for INGETEAM and GE Multilin.
+- `v1.16.0`: bilingual public documentation and language-aware in-app help URL.
 
 ## Current v1.6.0 Released Scope
 
@@ -297,9 +298,7 @@ pytest: 116 passed
 - Links the logic document from README, HELP, executable-use docs, and agent
   context.
 
-## Next Planned Work
-
-Unreleased work already implemented after `v1.15.1`:
+## Current v1.16.0 Scope
 
 - Adds separate English public documentation files:
   `README.en.md`, `CONTRIBUTING.en.md`, `docs/HELP.en.md`,
@@ -310,9 +309,10 @@ Unreleased work already implemented after `v1.15.1`:
 - Changes the GUI `Ajuda` / `Help` button to open the public help document that
   matches the active UI language: `docs/HELP.md` for `pt_BR` and
   `docs/HELP.en.md` for `en_US`.
-- No executable has been generated for this unreleased change yet.
 
-Planned next improvement after `v1.15.1`:
+## Next Planned Work
+
+Planned next improvement after `v1.16.0`:
 
 ```text
 real-usage improvements
@@ -327,6 +327,6 @@ Likely scope:
 
 Roadmap reference:
 
-- `docs/PLANO_MELHORIAS.md` now lists `v1.16.0` as the next estimated milestone
+- `docs/PLANO_MELHORIAS.md` now lists `v1.17.0` as the next estimated milestone
   for improvements guided by real use; code signing, operational reports, and
   external `.sha256` files remain outside the active roadmap.
