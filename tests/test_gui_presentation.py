@@ -14,7 +14,11 @@ from src.gui.backup_confirmation import execution_confirmation_message, integrit
 from src.gui.execution_summary_dialog import _summary_rows
 from src.gui.history_cleanup_window import HistoryCleanupWindow
 from src.gui.main_window import MainWindow
-from src.gui.preview_table import populate_preview_table, source_files_text
+from src.gui.preview_table import (
+    destination_display_text,
+    populate_preview_table,
+    source_files_text,
+)
 from src.gui.summary_text import format_summary_text
 
 
@@ -94,6 +98,14 @@ def test_populate_preview_table_writes_plan_columns(tmp_path: Path) -> None:
     assert table.item(0, 0).text() == "Novo"
     assert table.item(0, 1).text() == "SE-AAA_COMENTARIO.dz5"
     assert table.item(0, 2).text() == "SE-AAA"
+    assert table.item(0, 5).text() == "ATU\\backup.zip"
+    assert table.item(0, 5).toolTip() == str(tmp_path / "IED-ATU" / "backup.zip")
+
+
+def test_destination_display_text_uses_storage_folder_alias(tmp_path: Path) -> None:
+    assert destination_display_text(tmp_path / "IED-ATU" / "backup.zip") == "ATU\\backup.zip"
+    assert destination_display_text(tmp_path / "IED-HIS" / "backup.zip") == "HIS\\backup.zip"
+    assert destination_display_text(tmp_path / "OUTROS" / "backup.zip") == "backup.zip"
 
 
 def test_confirmation_helpers_format_execution_and_conflicts(tmp_path: Path) -> None:

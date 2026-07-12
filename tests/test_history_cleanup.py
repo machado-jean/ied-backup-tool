@@ -46,11 +46,13 @@ def test_execute_history_cleanup_deletes_selected_candidates(tmp_path: Path) -> 
     assert not old_dev.exists()
 
 
-def test_plan_history_cleanup_zero_days_disables_cleanup(tmp_path: Path) -> None:
+def test_plan_history_cleanup_zero_days_disables_candidates_but_keeps_totals(
+    tmp_path: Path,
+) -> None:
     his = tmp_path / "HIS"
     his.mkdir()
-    _backup(his, "DIGSI5-V10.00_SE-AAA_20260101-1000_COLABORADOR_DEV.zip")
-    _backup(his, "DIGSI5-V10.00_SE-AAA_20260201-1000_COLABORADOR_DEV.zip")
+    first = _backup(his, "DIGSI5-V10.00_SE-AAA_20260101-1000_COLABORADOR_DEV.zip")
+    second = _backup(his, "DIGSI5-V10.00_SE-AAA_20260201-1000_COLABORADOR_DEV.zip")
 
     plan = plan_history_cleanup(
         his,
@@ -59,8 +61,9 @@ def test_plan_history_cleanup_zero_days_disables_cleanup(tmp_path: Path) -> None
     )
 
     assert plan.candidates == []
-    assert plan.total_his_files == 0
-    assert plan.total_his_size_bytes == 0
+    assert plan.total_his_files == 2
+    assert plan.total_his_size_bytes == first.stat().st_size + second.stat().st_size
+    assert plan.candidate_size_bytes == 0
 
 
 def _backup(folder: Path, name: str) -> Path:

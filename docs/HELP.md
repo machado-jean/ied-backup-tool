@@ -88,7 +88,9 @@ A previa mostra:
 - `Projeto`: trecho usado como chave do projeto.
 - `Versao`: software e versao detectados.
 - `Data/Hora`: data usada no nome final.
-- `Destino`: local previsto para o backup.
+- `Destino`: pasta prevista e nome do ZIP, em formato compacto como
+  `ATU\arquivo.zip` ou `HIS\arquivo.zip`. Passe o mouse sobre a celula para ver
+  o caminho completo.
 
 Se aparecer `Conflito SHA`, a execucao fica bloqueada porque existe um backup
 com a mesma identidade tecnica, mas conteudo diferente. Verifique o arquivo
@@ -177,7 +179,9 @@ A limpeza exige marcar os arquivos pelo checkbox e confirmar na janela
 `Limpeza HIS`.
 Depois de um backup concluido, se existirem candidatos em `HIS`, o resumo final
 informa a quantidade e oferece acesso a `Limpeza HIS` para revisao manual.
-Com retencao `0`, essa verificacao apos backup fica desabilitada.
+Com retencao `0`, essa verificacao apos backup fica desabilitada. A janela
+manual continua mostrando o total de arquivos e tamanho de `HIS`, mas sem
+candidatos para exclusao.
 
 ## Limitacoes Conhecidas
 

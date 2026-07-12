@@ -16,16 +16,19 @@ prioritario.
 | `v1.11.0` | Refatoracao estrutural | Implementado: extracao de dialogo inicial, helpers de runtime/idioma, application service, renderizacao da previa, resumo/confirmacao textual, `BackupStatus`, planner, modelos, executor, metadados e tratamento de duplicados em modulos menores; testes adicionais de application service, apresentacao e metadados. |
 | `v1.12.0` | Recuperacao operacional | Implementado: pasta `IED-QUARENTENA` ao lado de `ATU`/`HIS` para arquivos parciais ou suspeitos em falhas raras de copia/publicacao/arquivamento; nota `.txt` com origem, motivo, erro original e orientacao; limpeza automatica quando backup da mesma chave tecnica e timestamp igual ou mais recente conclui com sucesso. |
 | `v1.13.0` | Limpeza controlada de historico | Implementado: janela `Limpeza HIS`, retencao default de 30 dias configuravel, preservacao do backup mais recente por chave tecnica e etapa, previa com tamanho estimado, aviso no resumo final e exclusao apenas por confirmacao manual. |
-| `v1.14.0` | Relatorios operacionais | Relatorio simples de execucao em `.txt` ou `.csv`, com resumo do lote, arquivos criados, ignorados, conflitos, hashes e mensagens relevantes. |
-| `v1.15.0` | Documentacao visual publica | Capturas reais e sanitizadas da tela principal, configuracoes, previa e fluxo de execucao; atualizacao do README e `docs/HELP.md` com imagens limpas. |
-| `v1.16.0` | Novos tipos de IED | Inclusao de novos fabricantes/formatos conforme surgirem arquivos reais de teste e regras de versao confiaveis, depois da documentacao base estar estavel. |
-| `v1.17.0` | Integridade externa opcional | Avaliar se vale gerar arquivo `.sha256` ao lado do ZIP final para verificacao independente; manter fora do fluxo principal se nao houver uso real. |
+| `v1.14.0` | Documentacao visual publica | Capturas reais e sanitizadas da tela principal, configuracoes, previa, limpeza HIS e fluxo de execucao; atualizacao do README e `docs/HELP.md` com imagens limpas. |
+| `v1.15.0` | Novos tipos de IED | Inclusao de novos fabricantes/formatos conforme surgirem arquivos reais de teste e regras de versao confiaveis, depois da documentacao base estar estavel. |
+| `v1.16.0` | Melhorias operacionais guiadas por uso real | Pequenos ajustes de experiencia, robustez ou suporte, priorizados a partir de testes reais e feedback dos usuarios. |
 
 Marcos removidos do roadmap ativo:
 
 - Assinatura de codigo: abortada por enquanto. O alerta do SmartScreen pode ser
   documentado como limitacao conhecida enquanto nao houver decisao de custo e
   distribuicao com certificado.
+- Relatorios operacionais: descartados por enquanto para evitar ruido no fluxo
+  principal.
+- Integridade externa `.sha256`: descartada por enquanto porque os metadados
+  internos com SHA256 dos arquivos de origem ja atendem melhor ao escopo atual.
 
 ## Prioridade Alta
 

@@ -45,6 +45,8 @@ def populate_preview_table(
         values = _row_values(plan, language)
         for column, value in enumerate(values):
             item = QTableWidgetItem(value)
+            if column == 5:
+                item.setToolTip(str(plan.destination_path))
             if column in {0, 2, 3, 4}:
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             if column == 0 and plan.status in STATUS_COLORS:
@@ -73,5 +75,16 @@ def _row_values(plan: BackupPlan | AtuDuplicatePlan, language: str) -> list[str]
         project,
         software,
         timestamp,
-        str(plan.destination_path),
+        destination_display_text(plan.destination_path),
     ]
+
+
+def destination_display_text(destination_path: Path) -> str:
+    """Format destination for compact preview display while preserving the file name."""
+
+    parent_name = destination_path.parent.name
+    if parent_name.upper().endswith("ATU"):
+        return f"ATU\\{destination_path.name}"
+    if parent_name.upper().endswith("HIS"):
+        return f"HIS\\{destination_path.name}"
+    return destination_path.name

@@ -104,7 +104,7 @@ Ao abrir o aplicativo, ele consulta o ultimo release publico no GitHub.
 
 Se existir uma versao mais recente, sera exibido o aviso `Nova versão
 disponível` no canto inferior esquerdo da tela principal. Clique no aviso para
-abrir a pagina do release no navegador.
+iniciar o download direto do executavel mais recente no navegador.
 
 Se o computador estiver sem internet, com GitHub bloqueado ou se voce ja estiver
 na versao mais recente, o aplicativo continua funcionando normalmente.
@@ -337,7 +337,9 @@ Colunas principais:
 - `Projeto`: identificador do projeto.
 - `Versao`: versao encontrada no arquivo ou conjunto de versoes do pacote.
 - `Data/Hora`: data do arquivo usada no nome do backup.
-- `Destino`: pasta ou arquivo de destino previsto.
+- `Destino`: destino previsto em formato compacto, como `ATU\arquivo.zip` ou
+  `HIS\arquivo.zip`. O caminho completo aparece ao passar o mouse sobre a
+  celula.
 
 Status possiveis:
 
@@ -417,7 +419,8 @@ abrir `Limpeza HIS`, selecionar os arquivos e confirmar manualmente.
 
 Se `Retenção em dias` estiver como `0`, o programa nao verifica candidatos apos
 o backup e nao mostra aviso no resumo final. A janela continua disponivel pelo
-botao `Limpeza HIS`.
+botao `Limpeza HIS` e ainda mostra o total de arquivos/tamanho em `HIS`, mas sem
+candidatos para exclusao.
 
 Arquivos ZIP fora do padrao de nome do IED Backup Manager sao ignorados pela
 limpeza.

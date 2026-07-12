@@ -38,24 +38,24 @@ def plan_history_cleanup(
 ) -> HistoryCleanupPlan:
     """Find old HIS backups while preserving the newest backup per key and stage."""
 
+    infos = _read_history_infos(his_path)
+    total_size = sum(_file_size(info.path) for info in infos)
+
     if retention_days <= 0:
         return HistoryCleanupPlan(
             candidates=[],
-            total_his_files=0,
-            total_his_size_bytes=0,
+            total_his_files=len(infos),
+            total_his_size_bytes=total_size,
             candidate_size_bytes=0,
         )
 
     reference = now or datetime.now()
     cutoff = reference - timedelta(days=retention_days)
-    infos = _read_history_infos(his_path)
     protected_paths = _latest_paths_by_key_and_stage(infos)
 
     candidates: list[HistoryCleanupCandidate] = []
-    total_size = 0
     for info in infos:
         size = _file_size(info.path)
-        total_size += size
         if info.timestamp >= cutoff:
             continue
         if info.path in protected_paths:

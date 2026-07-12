@@ -1,6 +1,6 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-07-11
+Last updated: 2026-07-12
 
 ## Current Version
 
@@ -60,7 +60,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 109 passed
+pytest: 110 passed
 ```
 
 ## Local-Safety Notes
@@ -242,16 +242,18 @@ pytest: 109 passed
 Planned next improvement after `v1.13.0`:
 
 ```text
-operational execution reports
+public visual documentation
 ```
 
 Likely scope:
 
-- simple `.txt` or `.csv` report per execution;
-- include created, ignored, conflicted, cleaned, hashes, and relevant messages;
-- keep report generation optional if it adds noise for normal users.
+- review GUI screens for public presentation quality;
+- create sanitized screenshots of the main window, settings, preview, HIS
+  cleanup, and execution-related dialogs;
+- update README and public help with clean visual examples.
 
 Roadmap reference:
 
 - `docs/PLANO_MELHORIAS.md` now includes estimated milestones from `v1.12.0`
-  through `v1.17.0`; code signing was removed from the active roadmap.
+  through `v1.16.0`; code signing, operational reports, and external `.sha256`
+  files are outside the active roadmap.
