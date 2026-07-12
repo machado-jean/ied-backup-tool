@@ -77,9 +77,21 @@ Rules:
 
 Version selection:
 
-1. Use the highest `GE Digital Energy UR Setup` version found in `.cid/.icd`.
-2. If no SCL setup version exists, use the highest `GEMULTILIN` version from
-   `.urs/.urk`.
+1. Use the highest IED/application `GEMULTILIN` version found in `.urs/.urk`
+   headers.
+2. This version is used in the ZIP name.
+3. The `GE Digital Energy UR Setup` version found in `.cid/.icd` is recorded
+   only as development information in `IEDS-BACKUP-INFO.txt`.
+
+Extraction method:
+
+- the app reads the first line of `.urs` and `.urk` files;
+- when the line follows `HEADER,GEMULTILIN,...`, the fifth field is treated as
+  the IED/application version;
+- three-digit numeric values are normalized to dotted versions: `840` becomes
+  `8.40`, `860` becomes `8.60`;
+- when multiple IEDs exist in the same environment folder, the highest detected
+  value is used in the ZIP name.
 
 ## IED-PACK
 

@@ -4,15 +4,15 @@ Last updated: 2026-07-12
 
 ## Current Version
 
-Current application version: `1.16.0`
+Current application version: `1.16.1`
 
 Latest generated executable:
 
 ```text
-releases/v1.16.0/IED_Backup_Manager.exe
+releases/v1.16.1/IED_Backup_Manager.exe
 ```
 
-The `v1.16.0` executable has been generated locally.
+The `v1.16.1` executable has been generated locally.
 
 ## Recently Completed
 
@@ -50,6 +50,8 @@ The `v1.16.0` executable has been generated locally.
 - `v1.15.1`: public documentation of IED identification/version rules,
   including special cases for INGETEAM and GE Multilin.
 - `v1.16.0`: bilingual public documentation and language-aware in-app help URL.
+- `v1.16.1`: GE ZIP software prefix now uses the highest IED/application
+  `GEMULTILIN` version from `.urs/.urk` headers.
 
 ## Current v1.6.0 Released Scope
 
@@ -310,9 +312,19 @@ pytest: 116 passed
   matches the active UI language: `docs/HELP.md` for `pt_BR` and
   `docs/HELP.en.md` for `en_US`.
 
+## Current v1.16.1 Scope
+
+- GE Multilin ZIP names now use the highest IED/application `GEMULTILIN`
+  version found in `.urs/.urk` headers.
+- `GE UR Setup` from `.cid/.icd` remains recorded in `IEDS-BACKUP-INFO.txt` as
+  development metadata, but no longer drives the ZIP software prefix.
+- The extraction method is documented in Portuguese and English: read first
+  `.urs/.urk` line, parse `HEADER,GEMULTILIN,...`, normalize values such as
+  `840 -> 8.40`, and use the highest detected IED/application version.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.16.0`:
+Planned next improvement after `v1.16.1`:
 
 ```text
 real-usage improvements

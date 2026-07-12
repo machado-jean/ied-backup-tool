@@ -223,18 +223,29 @@ que podem estar na mesma pasta de trabalho, mas não fazem parte do backup GE UR
 
 Regra de versão:
 
-1. O aplicativo procura a maior versão `GE Digital Energy UR Setup` encontrada
-   nos arquivos `.cid` e `.icd`.
-2. Se encontrar, usa essa versão no nome do ZIP.
-3. Se não houver `.cid/.icd` com versão de UR Setup, usa a maior versão
-   `GEMULTILIN` encontrada nos headers `.urs/.urk`.
+1. O aplicativo procura a maior versão de IED/aplicação `GEMULTILIN` encontrada
+   nos headers `.urs/.urk`.
+2. Essa versão é usada no nome do ZIP.
+3. A versão `GE Digital Energy UR Setup` encontrada em `.cid/.icd` é registrada
+   apenas como informação de desenvolvimento no `IEDS-BACKUP-INFO.txt`.
+
+Método de extração:
+
+- o programa lê a primeira linha dos arquivos `.urs` e `.urk`;
+- quando a linha segue o formato `HEADER,GEMULTILIN,...`, o quinto campo é
+  tratado como versão de IED/aplicação;
+- valores numéricos de três dígitos são normalizados para versão pontuada:
+  `840` vira `8.40`, `860` vira `8.60`;
+- quando houver vários IEDs na mesma pasta de ambiente, o maior valor encontrado
+  é usado no nome do ZIP.
 
 Exemplo com SCL:
 
 ```text
+HEADER,GEMULTILIN,5,T60-UEM,860,...
 Created by GE Digital Energy UR Setup 8.61
 
-Saída: GE-URSETUP-V8.61
+Saída: GE-MULTILIN-V8.60
 ```
 
 Exemplo somente com `.urs`:
@@ -247,7 +258,7 @@ Saída: GE-MULTILIN-V8.40
 
 Metadados especiais:
 
-No `IEDS-BACKUP-INFO.txt`, o GE inclui uma secao adicional com:
+No `IEDS-BACKUP-INFO.txt`, o GE inclui uma seção adicional com:
 
 - pasta do ambiente;
 - arquivo `.ENV`, quando existir;

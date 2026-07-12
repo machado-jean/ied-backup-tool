@@ -27,7 +27,7 @@ def test_ge_multilin_finds_one_environment_backup_and_uses_folder_project(
 
     assert len(files) == 1
     assert GE_MULTILIN_PROJECT_TYPE.get_project_id(files[0]) == "SE-LAGOS"
-    assert GE_MULTILIN_PROJECT_TYPE.get_software_version(files[0]) == "GE-URSETUP-V8.61"
+    assert GE_MULTILIN_PROJECT_TYPE.get_software_version(files[0]) == "GE-MULTILIN-V8.60"
 
 
 def test_ge_multilin_includes_env_and_only_ied_folders(tmp_path: Path) -> None:
@@ -48,7 +48,7 @@ def test_ge_multilin_includes_env_and_only_ied_folders(tmp_path: Path) -> None:
     assert [result.status for result in results] == ["stored"]
     [zip_path] = list(atu.glob("*.zip"))
     assert zip_path.name == (
-        "GE-URSETUP-V8.61_SE-LAGOS_20260721-1000_COLABORADOR-EXEMPLO_TAF.zip"
+        "GE-MULTILIN-V8.60_SE-LAGOS_20260721-1000_COLABORADOR-EXEMPLO_TAF.zip"
     )
     with zipfile.ZipFile(zip_path) as archive:
         names = archive.namelist()

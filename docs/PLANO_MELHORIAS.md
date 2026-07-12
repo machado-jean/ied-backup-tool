@@ -8,8 +8,8 @@ retomar decisões técnicas sem depender apenas do histórico de conversa.
 
 ## Roadmap Ativo
 
-As versões abaixo são estimativas pragmaticas. A ordem pode mudar se surgir uma
-correcao urgente, um novo tipo de IED com arquivo real de teste ou uma melhoria
+As versões abaixo são estimativas pragmáticas. A ordem pode mudar se surgir uma
+correção urgente, um novo tipo de IED com arquivo real de teste ou uma melhoria
 operacional claramente necessária.
 
 | Versão estimada | Marco | Entregas previstas |
@@ -18,7 +18,7 @@ operacional claramente necessária.
 
 ## Histórico Implementado
 
-Esta secao registra os principais marcos já entregues. Ela não substitui release
+Esta seção registra os principais marcos já entregues. Ela não substitui release
 notes detalhadas, mas ajuda a entender a evolução técnica do projeto.
 
 | Versão | Marco | Entregas principais |
@@ -49,6 +49,7 @@ notes detalhadas, mas ajuda a entender a evolução técnica do projeto.
 | `v1.15.0` | GE Multilin / EnerVista UR | Novo adaptador para ambientes GE por pasta de SE, incluindo `.ENV` opcional e subpastas de IED com `.urs`/`.urk`; ZIP preserva subpastas e metadados registram resumo dos IEDs e versões GE. |
 | `v1.15.1` | Documentação da lógica de identificação | Novo documento `docs/LOGICA_IDENTIFICACAO_IEDS.md` explicando regras de identificação, arquivos incluídos, versão automática/manual, casos especiais de INGETEAM e GE Multilin, e comportamento do `IED-PACK`. |
 | `v1.16.0` | Documentação bilíngue e Help por idioma | Arquivos públicos separados em português/inglês, alternância entre idiomas no GitHub e botão `Ajuda` / `Help` abrindo a documentação conforme o idioma ativo da interface. |
+| `v1.16.1` | Correção da versão GE no nome do ZIP | O prefixo GE passa a usar a maior versão de IED/aplicação `GEMULTILIN` dos headers `.urs/.urk`; `GE UR Setup` dos `.cid/.icd` permanece apenas como metadado de desenvolvimento. |
 
 ## Itens Pausados ou Descartados
 

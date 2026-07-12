@@ -6,7 +6,7 @@ Aplicação Windows para padronizar backups de projetos de IED, mantendo um back
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade técnica.
 
-Versão atual: `1.16.0`
+Versão atual: `1.16.1`
 
 - Manual do executável: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
@@ -86,7 +86,7 @@ Exemplo da interface em inglês:
 | SEL QuickSet / Architect | `.rdb`, com `.scd` ou `.selaprj` opcional | QuickSet e Architect, quando encontrados, gerando prefixos como `QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34`. |
 | ABB PCM600 | `.pcmp`, `.apcmp` | Detectada em `ProjectDataServer%versions.ini`, gerando prefixos como `PCM600-V2.10`. |
 | INGETEAM INGESYS | `.efsPro`, `.ITPro2` | Informada manualmente pelo usuário e salva em `config.json`, gerando prefixos como `INGESYS-V5.5.4`. |
-| GE Multilin / EnerVista UR | pastas com `.urs` ou `.urk`; `.ENV` opcional | Usa a maior versão `GE UR Setup` encontrada em `.cid/.icd`, gerando prefixos como `GE-URSETUP-V8.61`; se não houver SCL, usa a maior versão `GEMULTILIN` dos headers `.urs/.urk`. |
+| GE Multilin / EnerVista UR | pastas com `.urs` ou `.urk`; `.ENV` opcional | Usa a maior versão de IED/aplicação `GEMULTILIN` encontrada em `.urs/.urk`, gerando prefixos como `GE-MULTILIN-V8.60`; `GE UR Setup` fica como metadado de desenvolvimento. |
 
 ## Regra de Nome dos Arquivos
 
@@ -129,7 +129,7 @@ DIGSI5-V10.00_SE-AAA_20260712-1030_COLABORADOR-EXEMPLO_TAF.zip
 QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-BBB_20260712-1035_COLABORADOR-EXEMPLO_TAF.zip
 PCM600-V2.10_SE-DDD_20260712-1040_COLABORADOR-EXEMPLO_TAF.zip
 INGESYS-V5.5.4_VAO-ZZZ_20260712-1050_COLABORADOR-EXEMPLO_TAF.zip
-GE-URSETUP-V8.61_SE-AAA_20260712-1100_COLABORADOR-EXEMPLO_TAF.zip
+GE-MULTILIN-V8.60_SE-AAA_20260712-1100_COLABORADOR-EXEMPLO_TAF.zip
 IED-PACK_SE-AAA_20260712-1035_COLABORADOR-EXEMPLO_TAF.zip
 ```
 

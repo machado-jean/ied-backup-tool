@@ -64,22 +64,9 @@ class GeMultilinProjectType(BaseProjectType):
         project_file: Path,
         fallback_version: str | None = None,
     ) -> str:
-        """Return the highest detected GE UR Setup version.
-
-        When SCL files are unavailable, fall back to the highest GEMULTILIN
-        application version found in `.urs`/`.urk` headers.
-        """
+        """Return the highest detected GE IED/application version."""
 
         source_files = self.get_related_files(project_file)
-        setup_versions = [
-            version
-            for path in source_files
-            if path.suffix.lower() in {".cid", ".icd"}
-            for version in _ur_setup_versions(path)
-        ]
-        if setup_versions:
-            return f"GE-URSETUP-V{_max_version(setup_versions)}"
-
         ied_versions = [
             version
             for path in source_files
@@ -96,8 +83,8 @@ class GeMultilinProjectType(BaseProjectType):
                 if normalized.startswith("GE-"):
                     return normalized
                 if normalized.startswith("V"):
-                    return f"GE-URSETUP-{normalized}"
-                return f"GE-URSETUP-V{normalized}"
+                    return f"GE-MULTILIN-{normalized}"
+                return f"GE-MULTILIN-V{normalized}"
 
         raise ProjectDetectionError(
             f"Nao foi possivel detectar a versao GE Multilin em: {project_file}"

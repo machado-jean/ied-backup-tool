@@ -36,6 +36,9 @@ generates consistent ZIP names for technical traceability.
 - INGETEAM INGESYS: `.efsPro`, `.ITPro2`
 - GE Multilin / EnerVista UR: direct child folders containing `.urs` or `.urk`;
   optional top-level `.ENV`
+  - ZIP names use the highest IED/application `GEMULTILIN` version found in
+    `.urs/.urk` headers.
+  - `GE UR Setup` versions from `.cid/.icd` are metadata only.
 
 ## Backup Metadata
 
@@ -171,7 +174,7 @@ Generate release executable:
 - The project is public/source-available under the `IED Backup Manager
   Non-Commercial License`, not OSI open source. Commercial use requires prior
   written permission from Jean Carlos Machado.
-- The active next roadmap milestone after `v1.16.0` is improvement guided by
+- The active next roadmap milestone after `v1.16.1` is improvement guided by
   real usage feedback. Operational reports and external `.sha256` files are
   intentionally outside the active roadmap for now.
 - After running tests or builds, remove generated caches/build folders when they
