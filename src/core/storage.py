@@ -23,6 +23,7 @@ class StorageError(RuntimeError):
 
 
 BACKUP_TIMESTAMP_PATTERN = re.compile(r"^\d{8}-\d{4}$")
+QUARANTINE_FOLDER_NAME = "IED-QUARENTENA"
 
 
 @dataclass(frozen=True)
@@ -57,6 +58,14 @@ class AtuDuplicateInfo:
     history_path: Path
 
 
+@dataclass(frozen=True)
+class QuarantineInfo:
+    """Information about a file moved aside for manual recovery."""
+
+    path: Path
+    note_path: Path
+
+
 def update_storage(
     *,
     new_backup: Path,
@@ -80,6 +89,7 @@ def update_storage(
         # Same technical identity means the current backup already exists.
         if current.identity == new_info.identity:
             new_backup.unlink(missing_ok=True)
+            cleanup_quarantine_for_successful_backup(current.path)
             return current.path
         destination = atu_path / new_backup.name
         if destination.exists():
@@ -101,6 +111,7 @@ def update_storage(
                 destination.unlink(missing_ok=True)
                 raise
             new_backup.unlink()
+            cleanup_quarantine_for_successful_backup(destination)
             return destination
         except Exception:
             prepared_backup.unlink(missing_ok=True)
@@ -110,6 +121,7 @@ def update_storage(
     if new_backup.resolve() != destination.resolve():
         place_staged_backup(new_backup, destination, progress_callback=progress_callback)
     validate_backup_zip(destination)
+    cleanup_quarantine_for_successful_backup(destination)
     return destination
 
 
@@ -199,6 +211,7 @@ def move_to_history(
         progress_callback=progress_callback,
     )
     validate_backup_zip(moved)
+    cleanup_quarantine_for_successful_backup(moved)
     return moved
 
 
@@ -237,9 +250,34 @@ def place_staged_backup(
         os.replace(temp_path, destination)
         validate_backup_zip(destination)
         source.unlink()
-    except Exception:
-        temp_path.unlink(missing_ok=True)
-        destination.unlink(missing_ok=True)
+        cleanup_quarantine_for_successful_backup(destination)
+    except Exception as exc:
+        quarantined_paths = []
+        if temp_path.exists():
+            quarantined_paths.append(
+                quarantine_file(
+                    temp_path,
+                    quarantine_root=_quarantine_root_for(destination),
+                    original_path=destination,
+                    reason="Falha antes de publicar o backup final.",
+                    original_error=exc,
+                ).path
+            )
+        if destination.exists():
+            quarantined_paths.append(
+                quarantine_file(
+                    destination,
+                    quarantine_root=_quarantine_root_for(destination),
+                    original_path=destination,
+                    reason="Backup final suspeito apos falha de publicacao.",
+                    original_error=exc,
+                ).path
+            )
+        if quarantined_paths:
+            raise StorageError(
+                "Falha ao publicar backup. Arquivo movido para quarentena: "
+                + ", ".join(str(path) for path in quarantined_paths)
+            ) from exc
         raise
     return destination
 
@@ -270,10 +308,21 @@ def _copy_to_destination_temp(
                     total_bytes=source.stat().st_size,
                     phase=phase,
                     progress_callback=progress_callback,
-                )
+        )
         validate_backup_zip(temp_path)
-    except Exception:
-        temp_path.unlink(missing_ok=True)
+    except Exception as exc:
+        if temp_path.exists():
+            quarantined = quarantine_file(
+                temp_path,
+                quarantine_root=_quarantine_root_for(destination),
+                original_path=destination,
+                reason="Falha durante copia temporaria do backup.",
+                original_error=exc,
+            )
+            raise StorageError(
+                f"Falha ao copiar backup. Arquivo parcial movido para quarentena: "
+                f"{quarantined.path}"
+            ) from exc
         raise
     return temp_path
 
@@ -311,10 +360,158 @@ def _move_inheriting_destination_acl(
                 )
         os.replace(temp_path, destination)
         source.unlink()
-    except Exception:
-        temp_path.unlink(missing_ok=True)
+    except Exception as exc:
+        quarantined_paths = []
+        if temp_path.exists():
+            quarantined_paths.append(
+                quarantine_file(
+                    temp_path,
+                    quarantine_root=_quarantine_root_for(destination),
+                    original_path=destination,
+                    reason="Falha antes de arquivar backup em HIS.",
+                    original_error=exc,
+                ).path
+            )
+        if destination.exists() and source.exists():
+            quarantined_paths.append(
+                quarantine_file(
+                    destination,
+                    quarantine_root=_quarantine_root_for(destination),
+                    original_path=destination,
+                    reason="Arquivo arquivado suspeito; origem ainda existe.",
+                    original_error=exc,
+                ).path
+            )
+        if quarantined_paths:
+            raise StorageError(
+                "Falha ao arquivar backup. Arquivo movido para quarentena: "
+                + ", ".join(str(path) for path in quarantined_paths)
+            ) from exc
         raise
     return destination
+
+
+def quarantine_file(
+    path: Path,
+    *,
+    quarantine_root: Path,
+    original_path: Path,
+    reason: str,
+    original_error: BaseException | None = None,
+) -> QuarantineInfo:
+    """Move a suspicious file to quarantine and write a recovery note."""
+
+    quarantine_root.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    target = _unique_quarantine_path(quarantine_root / f"{timestamp}_{path.name}")
+    os.replace(path, target)
+    note_path = target.with_suffix(target.suffix + ".txt")
+    lines = [
+        "IED Backup Manager - Quarentena",
+        "",
+        f"Arquivo original: {original_path}",
+        f"Arquivo em quarentena: {target}",
+        f"Motivo: {reason}",
+    ]
+    if original_error is not None:
+        lines.append(
+            f"Erro original: {type(original_error).__name__}: {original_error}",
+        )
+    lines.extend(
+        [
+            f"Data/hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            "",
+            "Analise este arquivo manualmente antes de apagar ou restaurar.",
+        ]
+    )
+    note_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return QuarantineInfo(path=target, note_path=note_path)
+
+
+def cleanup_quarantine_for_successful_backup(successful_backup: Path) -> list[Path]:
+    """Remove older/equal quarantine entries covered by a successful backup."""
+
+    try:
+        successful_info = parse_backup_filename(successful_backup)
+    except ValueError:
+        return []
+
+    quarantine_root = _quarantine_root_for(successful_backup)
+    if not quarantine_root.exists():
+        return []
+
+    removed: list[Path] = []
+    for note_path in sorted(quarantine_root.glob("*.txt")):
+        note = _read_quarantine_note(note_path)
+        original_path_text = note.get("Arquivo original")
+        quarantined_path_text = note.get("Arquivo em quarentena")
+        if not original_path_text or not quarantined_path_text:
+            continue
+
+        try:
+            original_info = parse_backup_filename(Path(original_path_text))
+        except ValueError:
+            continue
+
+        if original_info.key != successful_info.key:
+            continue
+        if original_info.timestamp > successful_info.timestamp:
+            continue
+
+        quarantined_path = Path(quarantined_path_text)
+        if quarantined_path.exists():
+            quarantined_path.unlink()
+            removed.append(quarantined_path)
+        note_path.unlink(missing_ok=True)
+        removed.append(note_path)
+
+    _remove_empty_quarantine_folder(quarantine_root)
+    return removed
+
+
+def _quarantine_root_for(destination: Path) -> Path:
+    """Return the quarantine folder beside the destination storage folder."""
+
+    return destination.parent.parent / QUARANTINE_FOLDER_NAME
+
+
+def _read_quarantine_note(note_path: Path) -> dict[str, str]:
+    """Read key/value fields written beside quarantined files."""
+
+    fields: dict[str, str] = {}
+    try:
+        lines = note_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return fields
+    for line in lines:
+        if ": " not in line:
+            continue
+        key, value = line.split(": ", 1)
+        fields[key.strip()] = value.strip()
+    return fields
+
+
+def _remove_empty_quarantine_folder(quarantine_root: Path) -> None:
+    """Delete the quarantine folder only when there is nothing left inside."""
+
+    try:
+        next(quarantine_root.iterdir())
+    except StopIteration:
+        quarantine_root.rmdir()
+    except OSError:
+        return
+
+
+def _unique_quarantine_path(path: Path) -> Path:
+    """Avoid overwriting an existing quarantine file."""
+
+    if not path.exists():
+        return path
+    for index in range(1, 1000):
+        candidate = path.with_name(f"{path.stem}_{index}{path.suffix}")
+        if not candidate.exists():
+            return candidate
+    raise StorageError(f"Nao foi possivel criar caminho unico de quarentena: {path}")
 
 
 def find_backup_by_identity(folder: Path, identity: str) -> Path | None:

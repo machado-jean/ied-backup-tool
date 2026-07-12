@@ -163,6 +163,8 @@ tecnica, mas conteudo diferente.
   `"_"`; nomes fora da politica precisam ser corrigidos antes do backup.
 - ZIPs antigos sem `IEDS-BACKUP-INFO.txt` continuam compativeis, mas nao
   possuem dados de SHA256 para comparacao.
+- Em falhas raras de copia/publicacao, arquivos parciais ou suspeitos podem ser
+  movidos para `IED-QUARENTENA` para analise manual.
 
 ## Solucao de Problemas
 
@@ -193,6 +195,13 @@ nome da SE, ETD, vao ou equipamento fique antes do primeiro sublinhado `"_"`.
 Existe um backup com a mesma identidade tecnica, mas conteudo diferente.
 Compare os arquivos indicados, confirme qual e o correto e ajuste manualmente
 `ATU`/`HIS` antes de tentar novamente.
+
+### Apareceu mensagem de quarentena
+
+O programa encontrou uma falha durante copia, publicacao ou arquivamento e moveu
+um arquivo parcial ou suspeito para `IED-QUARENTENA`. Abra o `.txt` criado junto
+do arquivo para ver origem, motivo, erro original e horario antes de apagar ou
+restaurar.
 
 ## Privacidade
 

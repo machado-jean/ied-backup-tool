@@ -1,18 +1,15 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-07-06
+Last updated: 2026-07-11
 
 ## Current Version
 
-Current application version: `1.11.0`
-
-The `v1.11.0` source changes are implemented and the executable has been
-generated.
+Current application version: `1.12.0`
 
 Latest generated executable:
 
 ```text
-releases/v1.11.0/IED_Backup_Manager.exe
+releases/v1.12.0/IED_Backup_Manager.exe
 ```
 
 ## Recently Completed
@@ -39,6 +36,8 @@ releases/v1.11.0/IED_Backup_Manager.exe
   contrast fix.
 - `v1.11.0`: structural refactor of GUI and core modules without intended
   behavior changes.
+- `v1.12.0`: operational quarantine for suspicious/partial files after rare
+  copy, publication, or archive failures.
 
 ## Current v1.6.0 Released Scope
 
@@ -57,7 +56,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 94 passed
+pytest: 97 passed
 ```
 
 ## Local-Safety Notes
@@ -189,21 +188,35 @@ pytest: 94 passed
 - Progress dialog hides the progress bar's built-in percentage text and keeps
   only the explicit progress text above the bar.
 
+## Current v1.12.0 Scope
+
+- Adds `IED-QUARENTENA` beside the storage folders for suspicious or partial
+  files left by rare copy/publication/archive failures.
+- Moves partial temporary files to quarantine instead of silently deleting them
+  when destination copy fails.
+- Writes a `.txt` note beside each quarantined file with original path, reason,
+  original error, timestamp, and manual-analysis guidance.
+- Cleans matching quarantine entries automatically after a successful backup for
+  the same technical key with equal or newer timestamp; removes the quarantine
+  folder when it becomes empty.
+- Keeps normal ATU/HIS transactional behavior unchanged.
+- Updates README, executable usage docs, public help, and roadmap.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.11.0`:
+Planned next improvement after `v1.12.0`:
 
 ```text
-operational recovery and quarantine for rare copy/move failures
+controlled history cleanup by age, count, or size
 ```
 
 Likely scope:
 
-- define where suspicious/partially handled files should be placed;
-- add clear user-facing messages for quarantine cases;
-- keep existing transactional ATU/HIS behavior intact.
+- preview old backups before deleting anything;
+- allow cleanup criteria such as age, max count per key, or total folder size;
+- require explicit confirmation before deletion.
 
 Roadmap reference:
 
-- `docs/PLANO_MELHORIAS.md` now includes estimated milestones from `v1.11.0`
+- `docs/PLANO_MELHORIAS.md` now includes estimated milestones from `v1.12.0`
   through `v1.17.0`; code signing was removed from the active roadmap.

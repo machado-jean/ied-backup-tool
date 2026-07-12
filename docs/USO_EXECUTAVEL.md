@@ -383,6 +383,16 @@ Ao final, sera exibido um resumo com:
 - Arquivos ignorados por serem antigos.
 - Arquivos que ja estavam atuais.
 
+Se ocorrer uma falha rara de copia, publicacao ou arquivamento, o programa pode
+mover arquivos parciais ou suspeitos para `IED-QUARENTENA`, criada ao lado de
+`ATU`/`HIS`. Essa pasta inclui um `.txt` com origem, motivo e data/hora para
+analise manual. Quando houver erro do sistema operacional, como falta de espaco,
+permissao negada ou arquivo bloqueado, esse erro tambem e registrado no `.txt`.
+
+Quando a falha for resolvida e um backup da mesma chave tecnica for concluido
+com timestamp igual ou mais recente, os itens correspondentes da quarentena sao
+removidos automaticamente. Se a pasta ficar vazia, ela tambem e apagada.
+
 ## 13. Resultado dos arquivos
 
 O nome final do backup segue o padrao:
@@ -430,6 +440,8 @@ sem confirmacao.
 - Nao altere manualmente arquivos dentro de `ATU`, a menos que seja necessario.
 - Se aparecer `Corrigir ATU`, leia o arquivo problematico informado antes de
   confirmar a correcao.
+- Se existir `IED-QUARENTENA`, leia o `.txt` correspondente antes de apagar ou
+  restaurar qualquer arquivo que nao tenha sido limpo automaticamente.
 - Mantenha o `config.json` junto do executavel.
 
 ## 16. Atualizacao de versao

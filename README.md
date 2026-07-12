@@ -4,7 +4,7 @@ Aplicacao Windows para padronizar backups de projetos de IED, mantendo um
 backup atual em `ATU`, historico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade tecnica.
 
-Versao atual: `1.11.0`
+Versao atual: `1.12.0`
 
 Manual do executavel: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 
@@ -49,6 +49,8 @@ arquivos finais.
 - Atualizacao automatica de `ATU` e arquivamento do backup anterior em `HIS`.
 - Gravacao mais transacional: o novo ZIP e validado antes de substituir o backup
   atual, reduzindo risco de estado parcial em falhas de arquivo ou permissao.
+- Quarentena operacional `IED-QUARENTENA` para arquivos parciais ou suspeitos
+  gerados em falhas raras de copia/movimentacao, com registro do erro original.
 - Deteccao de duplicidades em `ATU`, com aviso do arquivo problematico.
 - Barra de progresso durante a geracao dos backups.
 - Progresso real por arquivo durante compactacao e copia para `ATU`/`HIS`.

@@ -160,6 +160,12 @@ Generate release executable:
 - Do not silently overwrite an unexpected destination ZIP.
 - When replacing the current ATU backup, publish the validated new ZIP first and
   remove it again if the previous current backup cannot be archived in `HIS`.
+- Move suspicious or partial files from rare copy/publication/archive failures
+  to `IED-QUARENTENA` with a `.txt` recovery note, including the original
+  exception text, instead of deleting them silently.
+- After a successful backup, clean quarantine entries for the same technical key
+  when the quarantined original timestamp is equal to or older than the
+  successful backup; remove `IED-QUARENTENA` only when it becomes empty.
 
 ## Progress Rules
 

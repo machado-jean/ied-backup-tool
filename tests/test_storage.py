@@ -3,7 +3,12 @@ from zipfile import ZipFile
 
 import pytest
 
-from src.core.storage import StorageError, parse_backup_filename, update_storage
+from src.core.storage import (
+    StorageError,
+    parse_backup_filename,
+    quarantine_file,
+    update_storage,
+)
 
 
 def test_parse_backup_filename_extracts_key_and_timestamp(tmp_path: Path) -> None:
@@ -69,6 +74,86 @@ def test_update_storage_reports_copy_progress(tmp_path: Path) -> None:
     assert events
     assert events[0] == ("copy_current", 0, total_bytes)
     assert events[-1] == ("copy_current", total_bytes, total_bytes)
+
+
+def test_update_storage_quarantines_partial_copy_when_destination_copy_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+    staged = tmp_path / "staging"
+    staged.mkdir()
+    new = staged / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    create_zip(new, "new")
+
+    def fail_copy(input_file, output_file, **kwargs):
+        output_file.write(input_file.read(16))
+        raise OSError("disk unavailable")
+
+    monkeypatch.setattr("src.core.storage.copy_stream_with_progress", fail_copy)
+
+    with pytest.raises(StorageError, match="quarentena"):
+        update_storage(new_backup=new, atu_path=atu, his_path=his)
+
+    quarantine = tmp_path / "IED-QUARENTENA"
+    quarantined_files = [path for path in quarantine.iterdir() if path.suffix == ".tmp"]
+    notes = list(quarantine.glob("*.tmp.txt"))
+    assert len(quarantined_files) == 1
+    assert len(notes) == 1
+    note_text = notes[0].read_text(encoding="utf-8")
+    assert "Falha durante copia temporaria" in note_text
+    assert "Erro original: OSError: disk unavailable" in note_text
+    assert not list(atu.glob("*.zip"))
+    assert new.exists()
+
+
+def test_update_storage_cleans_matching_quarantine_after_success(tmp_path: Path) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+    quarantine = tmp_path / "IED-QUARENTENA"
+    staged = tmp_path / "staging"
+    staged.mkdir()
+    partial = tmp_path / "partial.tmp"
+    partial.write_text("partial", encoding="utf-8")
+    original = atu / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    quarantine_file(
+        partial,
+        quarantine_root=quarantine,
+        original_path=original,
+        reason="teste",
+    )
+    new = staged / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    create_zip(new, "new")
+
+    update_storage(new_backup=new, atu_path=atu, his_path=his)
+
+    assert not quarantine.exists()
+
+
+def test_update_storage_keeps_newer_quarantine_after_success(tmp_path: Path) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+    quarantine = tmp_path / "IED-QUARENTENA"
+    staged = tmp_path / "staging"
+    staged.mkdir()
+    partial = tmp_path / "partial.tmp"
+    partial.write_text("partial", encoding="utf-8")
+    newer_original = atu / "DIGSI5-V10.00_SE-BBB_20260620-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    quarantine_file(
+        partial,
+        quarantine_root=quarantine,
+        original_path=newer_original,
+        reason="teste",
+    )
+    new = staged / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    create_zip(new, "new")
+
+    update_storage(new_backup=new, atu_path=atu, his_path=his)
+
+    assert quarantine.exists()
+    assert list(quarantine.glob("*.tmp"))
+    assert list(quarantine.glob("*.tmp.txt"))
 
 
 def test_update_storage_keeps_different_project_in_atu(tmp_path: Path) -> None:
