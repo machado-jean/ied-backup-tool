@@ -1,5 +1,7 @@
 # IED Backup Manager
 
+[Português](README.md) | [English](README.en.md)
+
 Aplicação Windows para padronizar backups de projetos de IED, mantendo um backup
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade técnica.
@@ -44,7 +46,7 @@ Exemplo da interface em inglês:
 
 ## Principais Recursos
 
-- Interface grafica para Windows com pré-visualização antes da execução.
+- Interface gráfica para Windows com pré-visualização antes da execução.
 - Tela inicial de instruções com opção `Não exibir novamente`.
 - Interface em português e inglês, com preferência salva em `config.json`.
 - Verificação automática de nova versão publicada no GitHub.
@@ -83,7 +85,7 @@ Exemplo da interface em inglês:
 | Siemens DIGSI | `.dz5` | Detectada por marcador interno `.dp4v###` ou `.dp5v###`, gerando prefixos como `DIGSI5-V10.00`. |
 | SEL QuickSet / Architect | `.rdb`, com `.scd` ou `.selaprj` opcional | QuickSet e Architect, quando encontrados, gerando prefixos como `QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34`. |
 | ABB PCM600 | `.pcmp`, `.apcmp` | Detectada em `ProjectDataServer%versions.ini`, gerando prefixos como `PCM600-V2.10`. |
-| INGETEAM INGESYS | `.efsPro`, `.ITPro2` | Informada manualmente pelo usuário é salva em `config.json`, gerando prefixos como `INGESYS-V5.5.4`. |
+| INGETEAM INGESYS | `.efsPro`, `.ITPro2` | Informada manualmente pelo usuário e salva em `config.json`, gerando prefixos como `INGESYS-V5.5.4`. |
 | GE Multilin / EnerVista UR | pastas com `.urs` ou `.urk`; `.ENV` opcional | Usa a maior versão `GE UR Setup` encontrada em `.cid/.icd`, gerando prefixos como `GE-URSETUP-V8.61`; se não houver SCL, usa a maior versão `GEMULTILIN` dos headers `.urs/.urk`. |
 
 ## Regra de Nome dos Arquivos
@@ -310,14 +312,14 @@ Consulte [docs/PLANO_MELHORIAS.md](docs/PLANO_MELHORIAS.md) para detalhes.
 
 ## Contribuicoes
 
-Contribuicoes são bem-vindas para correções, documentação, testes, exemplos
+Contribuições são bem-vindas para correções, documentação, testes, exemplos
 públicos e suporte a novos tipos de IED.
 
 Antes de abrir uma issue ou pull request, leia
 [CONTRIBUTING.md](CONTRIBUTING.md). O projeto possui templates para reportar
 bugs, sugerir melhorias, propor novos tipos de IED e abrir pull requests.
 
-Arquivos de exemplo so devem ser enviados quando forem artificiais, limpos ou
+Arquivos de exemplo só devem ser enviados quando forem artificiais, limpos ou
 sanitizados. Não envie backups com informações confidenciais, dados reais de
 cliente/projeto/subestação, IPs, usuários, credenciais, caminhos internos,
 ajustes ou lógicas operacionais.

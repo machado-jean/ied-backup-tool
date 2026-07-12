@@ -1,7 +1,9 @@
-# Plano de Melhorias Tecnicas
+# Plano de Melhorias Técnicas
+
+[Português](PLANO_MELHORIAS.md) | [English](ROADMAP.en.md)
 
 Este documento registra o roadmap ativo, o histórico de marcos implementados e
-decisões pausadas ou descartadas. Ele serve como referência pesquisavel para
+decisões pausadas ou descartadas. Ele serve como referência pesquisável para
 retomar decisões técnicas sem depender apenas do histórico de conversa.
 
 ## Roadmap Ativo
@@ -12,7 +14,7 @@ operacional claramente necessária.
 
 | Versão estimada | Marco | Entregas previstas |
 | --- | --- | --- |
-| `v1.16.0` | Melhorias guiadas por uso real | Pequenos ajustes de experiência, robustez, mensagens, validações ou suporte, priorizados a partir de testes reais e feedback dos usuários. |
+| `v1.16.0` | Documentação bilíngue e melhorias guiadas por uso real | Arquivos públicos separados em português/inglês, alternância entre idiomas no GitHub, botão `Ajuda` / `Help` abrindo a documentação conforme o idioma ativo e pequenos ajustes priorizados por testes reais. |
 
 ## Histórico Implementado
 

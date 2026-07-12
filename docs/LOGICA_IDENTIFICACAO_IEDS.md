@@ -1,10 +1,12 @@
 # Lógica de Identificação dos Tipos de IED
 
+[Português](LOGICA_IDENTIFICACAO_IEDS.md) | [English](IED_IDENTIFICATION_LOGIC.en.md)
+
 Este documento explica como o IED Backup Manager identifica cada tipo de backup,
 como escolhe os arquivos incluídos no ZIP e como determina a versão usada no nome
 do backup.
 
-O objetivo é deixar claro quais regras são automaticas, quais dependem de
+O objetivo é deixar claro quais regras são automáticas, quais dependem de
 entrada manual do usuário e quais casos exigem cuidado especial.
 
 ## Regra Geral do Projeto

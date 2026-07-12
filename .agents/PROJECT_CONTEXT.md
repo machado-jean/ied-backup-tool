@@ -74,10 +74,13 @@ compatible and are not marked as conflicts.
 - GUI HIS cleanup dialog: `src/gui/history_cleanup_window.py`
 - GUI preview-table rendering: `src/gui/preview_table.py`
 - GUI summary text formatting: `src/gui/summary_text.py`
-- User help document: `docs/HELP.md`
-- IED identification logic document: `docs/LOGICA_IDENTIFICACAO_IEDS.md`
-- Public help URL:
+- User help documents: `docs/HELP.md` and `docs/HELP.en.md`
+- IED identification logic documents: `docs/LOGICA_IDENTIFICACAO_IEDS.md` and
+  `docs/IED_IDENTIFICATION_LOGIC.en.md`
+- Public help URLs:
   `https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md`
+  and
+  `https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.en.md`
 - Public latest-release API:
   `https://api.github.com/repos/machado-jean/ied-backup-tool/releases/latest`
 - Public latest-release page:
@@ -162,6 +165,9 @@ Generate release executable:
   `.agents/PROJECT_CONTEXT.md`, and relevant docs/release notes.
 - Public-facing examples should use generic names such as `SE-AAA`, `ETD-BBB`,
   `VAO-ZZZ`, and `COLABORADOR-EXEMPLO`.
+- Public documentation should be maintained as separate Portuguese and English
+  Markdown files with language switch links at the top. The GUI help button
+  should open `HELP.md` for `pt_BR` and `HELP.en.md` for `en_US`.
 - The project is public/source-available under the `IED Backup Manager
   Non-Commercial License`, not OSI open source. Commercial use requires prior
   written permission from Jean Carlos Machado.

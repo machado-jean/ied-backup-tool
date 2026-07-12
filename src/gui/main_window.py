@@ -401,7 +401,7 @@ class MainWindow(QMainWindow):
     def open_help_document(self) -> None:
         """Open the public user help document with the system default browser."""
 
-        url = help_document_url()
+        url = help_document_url(self.language)
         if not QDesktopServices.openUrl(QUrl(url)):
             QMessageBox.warning(
                 self,

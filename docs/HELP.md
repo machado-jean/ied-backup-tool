@@ -1,5 +1,7 @@
 # IED Backup Manager - Help
 
+[Português](HELP.md) | [English](HELP.en.md)
+
 Este documento resume o uso operacional do IED Backup Manager. Ele usa apenas
 exemplos genéricos para que possa ser publicado junto do projeto.
 

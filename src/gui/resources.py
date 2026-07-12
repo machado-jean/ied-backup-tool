@@ -5,7 +5,10 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-HELP_DOCUMENT_URL = "https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md"
+HELP_DOCUMENT_URLS = {
+    "pt_BR": "https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md",
+    "en_US": "https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.en.md",
+}
 REPOSITORY_URL = "https://github.com/machado-jean/ied-backup-tool"
 
 
@@ -36,10 +39,10 @@ def help_document_path() -> Path:
     return resource_path("docs/HELP.md")
 
 
-def help_document_url() -> str:
-    """Return the public user help document URL."""
+def help_document_url(language: str = "pt_BR") -> str:
+    """Return the public user help document URL for the active UI language."""
 
-    return HELP_DOCUMENT_URL
+    return HELP_DOCUMENT_URLS.get(language, HELP_DOCUMENT_URLS["pt_BR"])
 
 
 def repository_url() -> str:

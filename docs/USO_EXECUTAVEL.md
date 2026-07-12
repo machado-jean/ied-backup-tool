@@ -1,5 +1,7 @@
 # IED Backup Manager - Uso do Executável
 
+[Português](USO_EXECUTAVEL.md) | [English](EXECUTABLE_USAGE.en.md)
+
 Este guia explica como usar o `IED_Backup_Manager.exe` para gerar backups
 padronizados de projetos de IED. Nesta versão, os tipos disponíveis são DIGSI 5
 (`.dz5`), SEL (`.rdb`), ABB PCM600 (`.pcmp`/`.apcmp`), INGETEAM

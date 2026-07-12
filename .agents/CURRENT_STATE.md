@@ -299,6 +299,19 @@ pytest: 116 passed
 
 ## Next Planned Work
 
+Unreleased work already implemented after `v1.15.1`:
+
+- Adds separate English public documentation files:
+  `README.en.md`, `CONTRIBUTING.en.md`, `docs/HELP.en.md`,
+  `docs/EXECUTABLE_USAGE.en.md`, `docs/IED_IDENTIFICATION_LOGIC.en.md`, and
+  `docs/ROADMAP.en.md`.
+- Adds language switch links at the top of the Portuguese and English public
+  documents.
+- Changes the GUI `Ajuda` / `Help` button to open the public help document that
+  matches the active UI language: `docs/HELP.md` for `pt_BR` and
+  `docs/HELP.en.md` for `en_US`.
+- No executable has been generated for this unreleased change yet.
+
 Planned next improvement after `v1.15.1`:
 
 ```text

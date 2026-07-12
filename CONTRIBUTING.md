@@ -1,5 +1,7 @@
 # Contribuindo com o IED Backup Manager
 
+[Português](CONTRIBUTING.md) | [English](CONTRIBUTING.en.md)
+
 Obrigado por considerar uma contribuição. Este projeto aceita correções,
 melhorias de documentação, novos exemplos públicos e suporte a novos tipos de
 IED, desde que os arquivos compartilhados não contenham informações
