@@ -1,249 +1,94 @@
 # Plano de Melhorias Tecnicas
 
-Este documento registra melhorias aprovadas ou candidatas para implementacao
-futura. Ele serve como referencia pesquisavel para retomar decisoes tecnicas
-sem depender apenas do historico de conversa.
+Este documento registra o roadmap ativo, o historico de marcos implementados e
+decisoes pausadas ou descartadas. Ele serve como referencia pesquisavel para
+retomar decisoes tecnicas sem depender apenas do historico de conversa.
 
-## Roadmap por Marcos
+## Roadmap Ativo
 
-Este roadmap parte da versao atual `v1.13.0`. As versoes sao estimativas
-pragmaticas e podem mudar se surgir uma correcao urgente ou um novo tipo de IED
-prioritario.
+As versoes abaixo sao estimativas pragmaticas. A ordem pode mudar se surgir uma
+correcao urgente, um novo tipo de IED com arquivo real de teste ou uma melhoria
+operacional claramente necessaria.
 
-| Versao estimada | Marco | Entregas principais |
+| Versao estimada | Marco | Entregas previstas |
 | --- | --- | --- |
-| `v1.10.5` | Revisao publica do repositorio | Implementado: varredura final de dados sensiveis, caminhos internos, nomes reais e arquivos locais; confirmacao de `.gitignore`; ajuste de contraste do indicador `©`; release note registrando a revisao. |
-| `v1.11.0` | Refatoracao estrutural | Implementado: extracao de dialogo inicial, helpers de runtime/idioma, application service, renderizacao da previa, resumo/confirmacao textual, `BackupStatus`, planner, modelos, executor, metadados e tratamento de duplicados em modulos menores; testes adicionais de application service, apresentacao e metadados. |
-| `v1.12.0` | Recuperacao operacional | Implementado: pasta `IED-QUARENTENA` ao lado de `ATU`/`HIS` para arquivos parciais ou suspeitos em falhas raras de copia/publicacao/arquivamento; nota `.txt` com origem, motivo, erro original e orientacao; limpeza automatica quando backup da mesma chave tecnica e timestamp igual ou mais recente conclui com sucesso. |
-| `v1.13.0` | Limpeza controlada de historico | Implementado: janela `Limpeza HIS`, retencao default de 30 dias configuravel, preservacao do backup mais recente por chave tecnica e etapa, previa com tamanho estimado, aviso no resumo final e exclusao apenas por confirmacao manual. |
-| `v1.14.0` | Documentacao visual publica | Capturas reais e sanitizadas da tela principal, configuracoes, previa, limpeza HIS e fluxo de execucao; atualizacao do README e `docs/HELP.md` com imagens limpas. |
-| `v1.15.0` | Novos tipos de IED | Inclusao de novos fabricantes/formatos conforme surgirem arquivos reais de teste e regras de versao confiaveis, depois da documentacao base estar estavel. |
-| `v1.16.0` | Melhorias operacionais guiadas por uso real | Pequenos ajustes de experiencia, robustez ou suporte, priorizados a partir de testes reais e feedback dos usuarios. |
+| `v1.14.0` | Documentacao visual publica | Concluir imagens publicas e sanitizadas da tela principal, configuracoes, instrucoes, limpeza HIS e interface em ingles; atualizar `README.md`, `docs/HELP.md` e exemplos publicos. |
+| `v1.15.0` | Novos tipos de IED | Adicionar novos fabricantes, softwares ou extensoes conforme surgirem arquivos reais, limpos ou sanitizados, e regras confiaveis de identificacao de versao. |
+| `v1.16.0` | Melhorias guiadas por uso real | Pequenos ajustes de experiencia, robustez, mensagens, validacoes ou suporte, priorizados a partir de testes reais e feedback dos usuarios. |
 
-Marcos removidos do roadmap ativo:
+## Historico Implementado
 
-- Assinatura de codigo: abortada por enquanto. O alerta do SmartScreen pode ser
-  documentado como limitacao conhecida enquanto nao houver decisao de custo e
-  distribuicao com certificado.
-- Relatorios operacionais: descartados por enquanto para evitar ruido no fluxo
-  principal.
-- Integridade externa `.sha256`: descartada por enquanto porque os metadados
-  internos com SHA256 dos arquivos de origem ja atendem melhor ao escopo atual.
+Esta secao registra os principais marcos ja entregues. Ela nao substitui release
+notes detalhadas, mas ajuda a entender a evolucao tecnica do projeto.
 
-## Prioridade Alta
+| Versao | Marco | Entregas principais |
+| --- | --- | --- |
+| `v1.0.0` | Versao inicial funcional | Primeira versao consolidada do fluxo de backup, com processamento de arquivos de projeto, geracao de ZIP padronizado e organizacao entre backup atual e historico. |
+| `v1.1.0` | Preparacao para multiplos tipos de IED | Estrutura preparada para receber adaptadores por fabricante/software, reduzindo acoplamento das regras especificas no fluxo principal. |
+| `v1.4.2` | Seguranca operacional de pastas | Validacao de `ATU`/`HIS`, bloqueio de pastas iguais, criacao assistida de pastas ausentes, revalidacao antes de gerar backup e aviso para pastas sincronizadas. |
+| `v1.5.0` | Metadados em todos os ZIPs | Criacao de `IEDS-BACKUP-INFO.txt` em todos os backups, com nome do backup, projeto, software, etapa, arquivos incluidos, tamanho e datas. |
+| `v1.5.2` | SHA256 dos arquivos de origem | Registro de SHA256 dos arquivos incluidos no ZIP, sem colocar hash no nome do backup. |
+| `v1.5.3` | Aviso para pastas sincronizadas | Alerta para `ATU`/`HIS` em pastas como OneDrive, SharePoint, Dropbox, Google Drive ou iCloud. |
+| `v1.5.4` | ABB PCM600 `.apcmp` | Suporte ampliado de ABB PCM600 de `.pcmp` para `.pcmp` e `.apcmp`. |
+| `v1.5.5` | Splash screen | Tela de carregamento e ajuste na ordem de inicializacao para melhorar a percepcao de abertura do executavel. |
+| `v1.6.0` | Integridade avancada | Leitura de SHA256 em ZIPs existentes, deteccao de mesma identidade tecnica com conteudo divergente, status `Conflito SHA` e bloqueio da execucao enquanto houver conflito. |
+| `v1.7.0` | Movimentacao mais transacional | Validacao do ZIP antes de tocar em `ATU`/`HIS`, copia temporaria dentro da pasta de destino, publicacao controlada e progresso real por bytes em compactacao/copia. |
+| `v1.8.0` | Worker thread e cancelamento | Execucao em `QThread`, GUI responsiva durante backups grandes e cancelamento controlado antes de publicar o proximo backup. |
+| `v1.9.0` | Ajuda publica/profissional | Criacao de `docs/HELP.md`, botao `Ajuda` / `Help`, documentacao de uso, limitacoes conhecidas, troubleshooting, privacidade e exemplos de metadados. |
+| `v1.9.1` | Ajuda online no GitHub | Botao `Ajuda` apontando para o `HELP.md` publico no repositorio. |
+| `v1.10.0` | Verificacao de atualizacoes | Consulta ao ultimo release publico no GitHub, aviso clicavel quando ha nova versao e tratamento silencioso de falhas de rede. |
+| `v1.10.1` | Nome fixo do executavel | Executavel distribuido como `IED_Backup_Manager.exe`, mantendo a versao na interface, splash, release folder e tag Git. |
+| `v1.10.2` | Licenca e autoria | Licenca non-commercial, notas publicas de licenca, indicador `©` na GUI e link para o repositorio. |
+| `v1.10.3` | Download direto do executavel | Aviso de atualizacao abrindo o link fixo `/releases/latest/download/IED_Backup_Manager.exe`. |
+| `v1.10.4` | Texto do aviso de atualizacao | Ajuste do texto para indicar que clicar no aviso baixa a nova versao. |
+| `v1.10.5` | Revisao publica do repositorio | Varredura de dados sensiveis, exemplos genericos, confirmacao do `.gitignore` e ajuste de contraste do indicador `©`. |
+| `v1.11.0` | Refatoracao estrutural | Extracao de componentes GUI, application service, renderizacao da previa, resumo/confirmacao textual, `BackupStatus`, planner, executor, duplicados e metadados em modulos menores. |
+| `v1.12.0` | Quarentena operacional | Pasta `IED-QUARENTENA` para arquivos parciais ou suspeitos em falhas raras, nota `.txt` com origem/motivo/erro e limpeza automatica quando um backup valido cobre o caso. |
+| `v1.13.0` | Limpeza controlada de HIS | Janela `Limpeza HIS`, retencao configuravel, preservacao do backup mais recente por `SOFTWARE + PROJETO + ETAPA`, previa com tamanho e exclusao apenas por selecao/confirmacao manual. |
+| `v1.14.0` | Documentacao visual e contribuicao publica | Em andamento: screenshots publicos, exemplos artificiais em `docs/examples`, README profissional, `CONTRIBUTING.md` e templates de issue/pull request. |
 
-### Validacao de ATU e HIS
+## Itens Pausados ou Descartados
 
-Objetivo: reduzir risco operacional antes de criar ou mover backups.
+Estes itens foram avaliados, mas nao fazem parte do roadmap ativo no momento.
 
-Status: implementado em `v1.4.2`.
+| Item | Decisao | Motivo |
+| --- | --- | --- |
+| Relatorios operacionais | Pausado/descartado por enquanto | Pode gerar ruido no fluxo principal e nao e uma necessidade operacional atual. |
+| Integridade externa `.sha256` | Pausado/descartado por enquanto | O SHA256 interno dos arquivos de origem ja atende melhor ao escopo atual; arquivos externos adicionariam manutencao e possivel confusao. |
+| Assinatura de codigo | Pausada | Pode reduzir alertas de SmartScreen, mas envolve custo, gestao de certificado e decisao de distribuicao. |
+| Empacotamento automatico em cada alteracao | Fora do fluxo normal | O executavel deve ser gerado apenas quando a versao estiver validada e o usuario solicitar release. |
 
-- [x] Validar, na tela de configuracoes, se `ATU` e `HIS` existem.
-- [x] Se alguma pasta nao existir, perguntar se o usuario deseja cria-la.
-- [x] Validar novamente antes de `Gerar backups`, pois uma pasta pode ter sido
-  apagada, desconectada ou ficar indisponivel depois da configuracao.
-- [x] Bloquear execucao quando `ATU` e `HIS` apontarem para a mesma pasta.
-- [x] Avisar quando uma pasta estiver dentro da outra, por exemplo `HIS` dentro de
-  `ATU`.
-- [x] Pedir confirmacao antes de recriar `ATU` ou `HIS` ao usar `Abrir ATU` ou
-  `Abrir HIS`.
-- [x] Avisar quando `ATU` ou `HIS` estiverem em pasta sincronizada, como
-  OneDrive, SharePoint ou similar.
+## Criterios Para Novos Tipos de IED
 
-### Metadados em Todos os ZIPs
+Para adicionar um novo fabricante/software, o projeto precisa de pelo menos uma
+das seguintes entradas:
 
-Objetivo: todo backup deve ser autoexplicativo e auditavel, inclusive backups
-individuais DIGSI, SEL, PCM600 e INGETEAM.
+- arquivo publico, artificial, limpo ou sanitizado;
+- backup gerado a partir de um projeto vazio no software do fabricante;
+- descricao confiavel de onde extrair versao e quais arquivos devem compor o ZIP;
+- regra clara de extensao principal e arquivos acompanhantes.
 
-Status: implementado em `v1.5.0`.
+Arquivos compartilhados publicamente nao devem conter:
 
-- [x] Criar um arquivo de informacoes dentro de todos os ZIPs.
-- [x] Nome adotado: `IEDS-BACKUP-INFO.txt`.
-- [x] Incluir versoes detectadas, arquivos incluidos, tamanho e data de
-  modificacao.
-- [x] Incluir SHA256 dos arquivos de origem em `v1.5.2`.
+- nomes reais de clientes, projetos, subestacoes ou colaboradores;
+- IPs, usuarios, credenciais ou caminhos internos;
+- dados eletricos, ajustes, logicas, topologias ou comunicacao reais;
+- qualquer informacao confidencial ou sem permissao de publicacao.
 
-Conteudo minimo sugerido:
+## Criterios Para Melhorias Operacionais
 
-```text
-IED Backup Manager - Backup Information
+Melhorias futuras devem preferencialmente:
 
-Backup: DIGSI5-V10.00_SE-XXX_20260622-1350_COLABORADOR_TAF.zip
-Project: SE-XXX
-Software: DIGSI5-V10.00
-Timestamp: 20260622-1350
-Collaborator: COLABORADOR
-Stage: TAF
+- resolver problema observado em teste real;
+- reduzir risco operacional;
+- melhorar clareza para o usuario;
+- preservar a politica de nomes e versionamento;
+- incluir testes quando alterarem comportamento;
+- atualizar documentacao quando mudarem a experiencia visivel.
 
-Included files:
-- SE-XXX_COMENTARIO-GENERICO_20260622_1350.dz5
-  Modified: 20260622-1350
-  Size: 12345678 bytes
-```
+## Referencias Relacionadas
 
-Para `IED-PACK`, manter tambem uma secao de versoes detectadas:
-
-```text
-Detected versions:
-- DIGSI 5 (.dz5): DIGSI5-V10.00
-- SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34
-```
-
-### SHA256 dos Arquivos de Origem
-
-Objetivo: registrar a impressao digital dos arquivos incluidos no ZIP.
-
-Status: registro de SHA256 implementado em `v1.5.2`; alerta de conflito por
-SHA256 implementado em `v1.6.0`.
-
-Vantagens:
-
-- Detectar arquivos diferentes com mesma identidade tecnica.
-- Ajudar auditoria futura.
-- Permitir conferir se um arquivo de origem foi alterado depois.
-- Melhorar investigacao quando alguem altera manualmente `ATU` ou `HIS`.
-
-Escopo inicial recomendado:
-
-- [x] Calcular SHA256 de cada arquivo de origem incluido no ZIP.
-- [x] Registrar SHA256, tamanho e data de modificacao no arquivo interno de
-  metadados.
-- [x] Nao colocar SHA256 no nome do ZIP.
-
-Escopo implementado em `v1.6.0`:
-
-- [x] Alertar quando existir mesma identidade tecnica com SHA256 diferente.
-- [x] Bloquear execucao enquanto houver conflito de integridade na previa.
-
-Escopo posterior opcional:
-
-- Gerar arquivo externo `.sha256` ao lado do ZIP final.
-
-## Prioridade Media
-
-### Operacao Mais Transacional
-
-Objetivo: reduzir estado parcial quando houver erro ao mover arquivos.
-
-Status: implementado em `v1.7.0`.
-
-- [x] Criar ZIP em pasta temporaria.
-- [x] Validar leitura/tamanho antes de mover.
-- [x] Preparar e validar o novo ZIP dentro da pasta de destino antes de arquivar
-  o backup atual.
-- [x] Remover o novo ZIP de `ATU` se a movimentacao do backup atual para `HIS`
-  falhar.
-- [x] Criar backups historicos faltantes em staging antes de publica-los em
-  `HIS`.
-
-Escopo posterior opcional:
-
-- Criar quarentena explicita para falhas raras em que um arquivo parcialmente
-  movido precise de analise manual.
-
-### Execucao em Worker Thread
-
-Objetivo: melhorar responsividade da GUI em backups grandes.
-
-Status: implementado em `v1.8.0`.
-
-TODO:
-
-- [x] Mostrar progresso real por arquivo durante compactacao e copia para
-  `ATU`/`HIS`.
-- [x] Mover o processamento para `QThread` ou worker dedicado.
-- [x] Atualizar progresso por sinal.
-- [x] Permitir cancelamento controlado antes de iniciar o proximo arquivo.
-- [x] Se o cancelamento ocorrer durante a compactacao, descartar o ZIP em
-  staging e nao copiar para `ATU`/`HIS`.
-
-### Documentacao para Usuario Final
-
-Status: implementado em `v1.9.0`.
-
-- [x] Adicionar documento operacional `docs/HELP.md`.
-- [x] Adicionar botao `Ajuda` / `Help` na tela principal.
-- [x] Empacotar o documento de ajuda dentro do `.exe`.
-- [x] Adicionar secao de limitacoes conhecidas.
-- [x] Adicionar solucao de problemas para OneDrive, arquivo bloqueado e projeto
-  identificado incorretamente.
-- [x] Adicionar exemplo do arquivo de metadados interno do ZIP.
-- [ ] Adicionar capturas reais da tela principal, configuracoes e previa quando
-  houver material publico revisado.
-
-### Limpeza Controlada de Historico
-
-Objetivo: reduzir acumulo de backups antigos em `HIS` sem apagar marcos
-importantes por acidente.
-
-Status: implementado em `v1.13.0`.
-
-- [x] Criar janela dedicada `Limpeza HIS`.
-- [x] Usar retencao em dias como unico parametro operacional.
-- [x] Default de retencao: `30` dias.
-- [x] Preservar sempre o backup mais recente de cada `SOFTWARE + PROJETO +
-  ETAPA`.
-- [x] Mostrar previa antes de apagar qualquer arquivo.
-- [x] Mostrar tamanho total de `HIS` e tamanho candidato a limpeza como
-  informacao de apoio.
-- [x] Exigir selecao e confirmacao antes da exclusao manual.
-- [x] Salvar preferencias em `config.json`.
-- [x] Avisar no resumo final quando houver candidatos apos backup concluido.
-- [x] Manter exclusao restrita a janela `Limpeza HIS`, com selecao e
-  confirmacao manual.
-
-### Preparacao Para Repositorio Publico
-
-Objetivo: reduzir risco de exposicao antes de abrir o GitHub para acesso
-publico.
-
-Status: implementado em `v1.10.5`.
-
-- [x] Apontar o botao `Ajuda` / `Help` para o `HELP.md` publico no GitHub.
-- [x] Fazer varredura final de nomes reais, caminhos internos e amostras
-  sensiveis.
-- [x] Confirmar que pastas locais com backups reais seguem ignoradas pelo Git.
-- [x] Revisar documentos publicos usando somente exemplos genericos.
-- [x] Registrar resultado da revisao em release note de patch.
-
-### Verificacao de Atualizacoes
-
-Objetivo: avisar o usuario quando existir uma versao nova publicada no GitHub,
-sem baixar ou substituir o executavel automaticamente.
-
-Status: implementado em `v1.10.0`.
-
-- [x] Consultar a ultima versao publicada no GitHub Releases.
-- [x] Comparar a versao publicada com `APP_VERSION`.
-- [x] Mostrar aviso quando houver uma versao mais recente.
-- [x] Permitir abrir o release no navegador ao clicar no aviso.
-- [x] Nao exibir aviso quando o usuario ja estiver na versao mais recente.
-- [x] Tratar falhas de internet ou bloqueio corporativo sem interromper o uso do
-  aplicativo.
-
-### Licenca e Autoria
-
-Objetivo: deixar claro que o projeto e publico/source-available para uso
-gratuito e nao comercial, preservando autoria e restringindo uso comercial sem
-autorizacao previa.
-
-Status: implementado em `v1.10.2`.
-
-- [x] Criar arquivo `LICENSE` com a `IED Backup Manager Non-Commercial License`.
-- [x] Adicionar secao de licenca no README.
-- [x] Adicionar nota curta de licenca no `docs/HELP.md`.
-- [x] Adicionar instrucao de licenca/autoria em `docs/USO_EXECUTAVEL.md`.
-- [x] Adicionar indicador `©` no canto inferior direito da GUI.
-- [x] Ao clicar em `©`, mostrar autoria, uso nao comercial e link do
-  repositorio.
-
-## Prioridade Baixa
-
-### Refatoracao Estrutural
-
-TODO:
-
-- Separar `src/gui/main_window.py` em componentes menores.
-- Separar `src/core/backup_service.py` em planejamento, execucao, agrupamento e
-  resumo.
-- Expandir testes de GUI com inicializacao em modo offscreen.
+- [README.md](../README.md)
+- [HELP.md](HELP.md)
+- [USO_EXECUTAVEL.md](USO_EXECUTAVEL.md)
+- [CONTRIBUTING.md](../CONTRIBUTING.md)

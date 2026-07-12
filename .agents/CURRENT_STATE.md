@@ -251,6 +251,8 @@ Likely scope:
 - create sanitized screenshots of the main window, settings, preview, HIS
   cleanup, and execution-related dialogs;
 - update README and public help with clean visual examples.
+- maintain public contribution guidance, including issue/PR templates and safe
+  rules for sharing new IED sample files.
 
 Roadmap reference:
 

@@ -10,6 +10,7 @@ Versao atual: `1.13.0`
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
 - Plano de melhorias: [docs/PLANO_MELHORIAS.md](docs/PLANO_MELHORIAS.md)
 - Arquivos publicos de exemplo: [docs/examples](docs/examples)
+- Como contribuir: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Visao Geral
 
@@ -300,6 +301,20 @@ Prioridades atuais:
   usuarios.
 
 Consulte [docs/PLANO_MELHORIAS.md](docs/PLANO_MELHORIAS.md) para detalhes.
+
+## Contribuicoes
+
+Contribuicoes sao bem-vindas para correcoes, documentacao, testes, exemplos
+publicos e suporte a novos tipos de IED.
+
+Antes de abrir uma issue ou pull request, leia
+[CONTRIBUTING.md](CONTRIBUTING.md). O projeto possui templates para reportar
+bugs, sugerir melhorias, propor novos tipos de IED e abrir pull requests.
+
+Arquivos de exemplo so devem ser enviados quando forem artificiais, limpos ou
+sanitizados. Nao envie backups com informacoes confidenciais, dados reais de
+cliente/projeto/subestacao, IPs, usuarios, credenciais, caminhos internos,
+ajustes ou logicas operacionais.
 
 ## Licenca
 
