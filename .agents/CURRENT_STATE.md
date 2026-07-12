@@ -4,15 +4,15 @@ Last updated: 2026-07-12
 
 ## Current Version
 
-Current application version: `1.16.0`
+Current application version: `1.15.1`
 
 Latest generated executable:
 
 ```text
-releases/v1.16.0/IED_Backup_Manager.exe
+releases/v1.15.1/IED_Backup_Manager.exe
 ```
 
-The `v1.16.0` executable has been generated locally.
+The `v1.15.1` executable has not been generated yet in this adjustment.
 
 ## Recently Completed
 
@@ -47,7 +47,7 @@ The `v1.16.0` executable has been generated locally.
   types as the next milestone.
 - `v1.15.0`: GE Multilin / EnerVista UR support for SE-level environments,
   preserving GE IED subfolders and adding GE-specific metadata.
-- `v1.16.0`: public documentation of IED identification/version rules,
+- `v1.15.1`: public documentation of IED identification/version rules,
   including special cases for INGETEAM and GE Multilin.
 
 ## Current v1.6.0 Released Scope
@@ -281,11 +281,9 @@ pytest: 116 passed
   optional `.ENV` versions, included IED folders, development version, and
   IED/application version.
 - Adds artificial GE examples under `docs/examples/ge-workspace/SE-AAA`.
-- Adds `docs/LOGICA_IDENTIFICACAO_IEDS.md` explaining detection/version rules
-  for DIGSI, SEL, PCM600, INGETEAM, GE Multilin, and `IED-PACK`.
-- Updates README, HELP, executable-use docs, roadmap, and tests.
+- Updates README, HELP, executable-use docs, roadmap, and tests for GE support.
 
-## Current v1.16.0 Scope
+## Current v1.15.1 Scope
 
 - Promotes `docs/LOGICA_IDENTIFICACAO_IEDS.md` as the public reference for IED
   identification logic.
@@ -301,7 +299,7 @@ pytest: 116 passed
 
 ## Next Planned Work
 
-Planned next improvement after `v1.16.0`:
+Planned next improvement after `v1.15.1`:
 
 ```text
 real-usage improvements
@@ -316,6 +314,6 @@ Likely scope:
 
 Roadmap reference:
 
-- `docs/PLANO_MELHORIAS.md` now lists `v1.17.0` as the next estimated milestone
+- `docs/PLANO_MELHORIAS.md` now lists `v1.16.0` as the next estimated milestone
   for improvements guided by real use; code signing, operational reports, and
   external `.sha256` files remain outside the active roadmap.
