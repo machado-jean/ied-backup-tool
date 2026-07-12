@@ -12,7 +12,7 @@ Latest generated executable:
 releases/v1.15.1/IED_Backup_Manager.exe
 ```
 
-The `v1.15.1` executable has not been generated yet in this adjustment.
+The `v1.15.1` executable has been generated locally.
 
 ## Recently Completed
 
