@@ -6,7 +6,7 @@ labels: bug
 assignees: ""
 ---
 
-## Versao
+## Versão
 
 - IED Backup Manager:
 - Windows:
@@ -19,7 +19,7 @@ assignees: ""
 - [ ] INGETEAM `.efsPro` / `.ITPro2`
 - [ ] Outro:
 
-## Descricao do problema
+## Descrição do problema
 
 Descreva o erro de forma objetiva.
 
@@ -39,11 +39,11 @@ Descreva o que aconteceu.
 
 ## Mensagens ou prints
 
-Cole mensagens de erro ou adicione prints, removendo dados sensiveis.
+Cole mensagens de erro ou adicione prints, removendo dados sensíveis.
 
 ## Checklist de privacidade
 
-- [ ] Nao anexei `config.json` real
-- [ ] Nao anexei backup operacional com dados confidenciais
-- [ ] Removi nomes reais de clientes, projetos, subestacoes e colaboradores
-- [ ] Removi IPs, usuarios, credenciais e caminhos internos
+- [ ] Não anexei `config.json` real
+- [ ] Não anexei backup operacional com dados confidenciais
+- [ ] Removi nomes reais de clientes, projetos, subestações e colaboradores
+- [ ] Removi IPs, usuários, credenciais e caminhos internos

@@ -2,23 +2,23 @@
 
 Descreva o objetivo do pull request.
 
-## Tipo de mudanca
+## Tipo de mudança
 
 - [ ] Correcao de bug
-- [ ] Melhoria de interface/experiencia
-- [ ] Documentacao
+- [ ] Melhoria de interface/experiência
+- [ ] Documentação
 - [ ] Novo tipo de IED
 - [ ] Testes
-- [ ] Refatoracao sem mudanca de comportamento
+- [ ] Refatoração sem mudança de comportamento
 
 ## Checklist
 
 - [ ] Rodei `.\.venv\Scripts\python.exe -m ruff check .`
 - [ ] Rodei `.\.venv\Scripts\python.exe -m pytest`
-- [ ] Atualizei testes quando houve mudanca de comportamento
-- [ ] Atualizei documentacao quando houve mudanca visivel ao usuario
-- [ ] Nao inclui `config.json`, `.venv/`, `releases/`, `.spec` ou `.exe`
-- [ ] Nao inclui arquivos com dados confidenciais
+- [ ] Atualizei testes quando houve mudança de comportamento
+- [ ] Atualizei documentação quando houve mudança visível ao usuário
+- [ ] Não inclui `config.json`, `.venv/`, `releases/`, `.spec` ou `.exe`
+- [ ] Não inclui arquivos com dados confidenciais
 
 ## Testes realizados
 
@@ -28,11 +28,11 @@ Descreva os testes executados e o resultado.
 
 Se este PR inclui exemplos de IED:
 
-- [ ] Os arquivos sao artificiais, limpos ou sanitizados
-- [ ] Os arquivos nao contem dados reais de cliente/projeto/subestacao
-- [ ] Os arquivos nao contem IPs, usuarios, credenciais ou caminhos internos
-- [ ] A origem e a versao esperada do software foram documentadas
+- [ ] Os arquivos são artificiais, limpos ou sanitizados
+- [ ] Os arquivos não contém dados reais de cliente/projeto/subestação
+- [ ] Os arquivos não contém IPs, usuários, credenciais ou caminhos internos
+- [ ] A origem e a versão esperada do software foram documentadas
 
 ## Observacoes
 
-Inclua riscos, limitacoes ou pontos que precisam de revisao cuidadosa.
+Inclua riscos, limitações ou pontos que precisam de revisão cuidadosa.

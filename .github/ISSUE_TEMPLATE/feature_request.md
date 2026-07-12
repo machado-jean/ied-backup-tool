@@ -16,7 +16,7 @@ Como o software se comporta hoje?
 
 ## Fluxo desejado
 
-Como voce gostaria que funcionasse?
+Como você gostaria que funcionasse?
 
 ## Impacto esperado
 
@@ -26,7 +26,7 @@ Como voce gostaria que funcionasse?
 - [ ] Nome dos arquivos
 - [ ] Metadados
 - [ ] Integridade/SHA
-- [ ] Documentacao
+- [ ] Documentação
 - [ ] Outro:
 
 ## Observacoes

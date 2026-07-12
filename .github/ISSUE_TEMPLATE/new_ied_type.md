@@ -1,6 +1,6 @@
 ---
 name: Novo tipo de IED
-about: Sugerir suporte a novo fabricante, software ou extensao
+about: Sugerir suporte a novo fabricante, software ou extensão
 title: "[Novo IED] "
 labels: enhancement, ied-type
 assignees: ""
@@ -10,35 +10,35 @@ assignees: ""
 
 - Fabricante:
 - Software:
-- Versao do software:
-- Extensao principal:
+- Versão do software:
+- Extensão principal:
 
 ## Arquivos relacionados
 
 Liste arquivos que devem entrar no ZIP junto com o arquivo principal, se
 existirem.
 
-## Como identificar a versao
+## Como identificar a versão
 
-Explique onde a versao do software aparece no arquivo, se souber.
+Explique onde a versão do software aparece no arquivo, se souber.
 
 Exemplo:
 
 ```text
-Campo=Versao
+Campo=Versão
 ```
 
 ## Arquivo de exemplo
 
 - [ ] Posso anexar um arquivo artificial, limpo ou sanitizado
-- [ ] Nao posso anexar arquivo, mas posso descrever a estrutura
+- [ ] Não posso anexar arquivo, mas posso descrever a estrutura
 
 ## Checklist de privacidade
 
-- [ ] O arquivo nao contem dados reais de cliente/projeto/subestacao
-- [ ] O arquivo nao contem dados eletricos, ajustes, logica ou comunicacao reais
-- [ ] O arquivo nao contem IPs, usuarios, credenciais ou caminhos internos
-- [ ] Tenho permissao para compartilhar o arquivo publicamente
+- [ ] O arquivo não contém dados reais de cliente/projeto/subestação
+- [ ] O arquivo não contém dados elétricos, ajustes, lógica ou comunicação reais
+- [ ] O arquivo não contém IPs, usuários, credenciais ou caminhos internos
+- [ ] Tenho permissão para compartilhar o arquivo publicamente
 
 ## Observacoes
 

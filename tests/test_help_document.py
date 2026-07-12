@@ -9,8 +9,8 @@ def test_help_document_exists_with_core_sections() -> None:
     assert path.exists()
 
     text = path.read_text(encoding="utf-8")
-    assert "## Limitacoes Conhecidas" in text
-    assert "## Solucao de Problemas" in text
+    assert "## Limitações Conhecidas" in text
+    assert "## Solução de Problemas" in text
     assert "IEDS-BACKUP-INFO.txt" in text
 
 

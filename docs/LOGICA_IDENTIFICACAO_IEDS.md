@@ -1,11 +1,11 @@
-# Logica de Identificacao dos Tipos de IED
+# Lógica de Identificação dos Tipos de IED
 
 Este documento explica como o IED Backup Manager identifica cada tipo de backup,
-como escolhe os arquivos incluidos no ZIP e como determina a versao usada no nome
+como escolhe os arquivos incluídos no ZIP e como determina a versão usada no nome
 do backup.
 
-O objetivo e deixar claro quais regras sao automaticas, quais dependem de
-entrada manual do usuario e quais casos exigem cuidado especial.
+O objetivo é deixar claro quais regras são automaticas, quais dependem de
+entrada manual do usuário e quais casos exigem cuidado especial.
 
 ## Regra Geral do Projeto
 
@@ -19,8 +19,8 @@ SE-AAA_COMENTARIO-GENERICO_20260712_1030.dz5 -> Projeto: SE-AAA
 ETD-BBB_OUTRO-COMENTARIO.rdb                 -> Projeto: ETD-BBB
 ```
 
-Todo texto depois do primeiro sublinhado `"_"` e tratado como comentario do
-usuario e nao entra na chave tecnica do backup.
+Todo texto depois do primeiro sublinhado `"_"` é tratado como comentário do
+usuário e não entra na chave técnica do backup.
 
 ## Siemens DIGSI
 
@@ -32,10 +32,10 @@ Arquivos considerados:
 
 Regra:
 
-- o arquivo principal e o `.dz5`;
-- o projeto e identificado pelo texto antes do primeiro sublinhado `"_"`;
+- o arquivo principal é o `.dz5`;
+- o projeto é identificado pelo texto antes do primeiro sublinhado `"_"`;
 - cada `.dz5` e processado como um backup individual;
-- a versao e detectada automaticamente por marcadores internos como `.dp4v###`
+- a versão é detectada automaticamente por marcadores internos como `.dp4v###`
   ou `.dp5v###`.
 
 Exemplos:
@@ -50,8 +50,8 @@ Resumo:
 
 ```text
 Automatica: sim
-Versao manual: nao
-Arquivos adicionais: nao
+Versão manual: não
+Arquivos adicionais: não
 ```
 
 ## SEL QuickSet / Architect
@@ -66,11 +66,11 @@ Arquivos considerados:
 
 Regra:
 
-- o arquivo principal e o `.rdb`;
-- o projeto e identificado pelo texto antes do primeiro sublinhado `"_"`;
+- o arquivo principal é o `.rdb`;
+- o projeto é identificado pelo texto antes do primeiro sublinhado `"_"`;
 - arquivos `.scd` ou `.selaprj` com o mesmo nome-base entram como acompanhantes;
-- a versao do QuickSet e lida no `.rdb`;
-- a versao do Architect e lida no `.scd` ou `.selaprj`, quando existir.
+- a versão do QuickSet é lida no `.rdb`;
+- a versão do Architect é lida no `.scd` ou `.selaprj`, quando existir.
 
 Exemplo:
 
@@ -78,14 +78,14 @@ Exemplo:
 QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_SE-AAA_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip
 ```
 
-Se o arquivo SEL for muito antigo e nao contiver a versao do QuickSet, o
-aplicativo pode solicitar uma versao manual.
+Se o arquivo SEL for muito antigo e não contiver a versão do QuickSet, o
+aplicativo pode solicitar uma versão manual.
 
 Resumo:
 
 ```text
 Automatica: normalmente sim
-Versao manual: somente quando a versao do QuickSet nao for encontrada
+Versão manual: somente quando a versão do QuickSet não for encontrada
 Arquivos adicionais: .scd ou .selaprj com mesmo nome-base
 ```
 
@@ -100,10 +100,10 @@ Arquivos considerados:
 
 Regra:
 
-- o arquivo principal e o pacote `.pcmp` ou `.apcmp`;
-- o projeto e identificado pelo texto antes do primeiro sublinhado `"_"`;
-- o pacote e inspecionado como arquivo compactado;
-- a versao e lida em `ProjectDataServer%versions.ini`, no campo
+- o arquivo principal é o pacote `.pcmp` ou `.apcmp`;
+- o projeto é identificado pelo texto antes do primeiro sublinhado `"_"`;
+- o pacote é inspecionado como arquivo compactado;
+- a versão é lida em `ProjectDataServer%versions.ini`, no campo
   `ProductVersion`.
 
 Exemplo:
@@ -112,15 +112,15 @@ Exemplo:
 ProductName=PCM600_210
 ProductVersion=2.10
 
-Saida: PCM600-V2.10
+Saída: PCM600-V2.10
 ```
 
 Resumo:
 
 ```text
 Automatica: sim
-Versao manual: nao
-Arquivos adicionais: nao
+Versão manual: não
+Arquivos adicionais: não
 ```
 
 ## INGETEAM INGESYS
@@ -134,42 +134,42 @@ Arquivos considerados:
 
 Regra:
 
-- o arquivo principal e o `.efsPro` ou `.ITPro2`;
-- o projeto e identificado pelo texto antes do primeiro sublinhado `"_"`;
-- a versao nao e determinada automaticamente;
-- o usuario informa a versao do software INGETEAM/INGESYS em uso;
-- a versao informada e salva no `config.json`.
+- o arquivo principal é o `.efsPro` ou `.ITPro2`;
+- o projeto é identificado pelo texto antes do primeiro sublinhado `"_"`;
+- a versão não é determinada automaticamente;
+- o usuário informa a versão do software INGETEAM/INGESYS em uso;
+- a versão informada é salva no `config.json`.
 
 Motivo da regra manual:
 
 Nos testes analisados, os arquivos INGETEAM podem conter identificadores,
-componentes ou estruturas importadas de versoes mais novas mesmo quando o projeto
-foi trabalhado em uma versao mais antiga do software. Isso torna arriscado usar
-apenas os marcadores internos para definir a versao do backup.
+componentes ou estruturas importadas de versões mais novas mesmo quando o projeto
+foi trabalhado em uma versão mais antiga do software. Isso torna arriscado usar
+apenas os marcadores internos para definir a versão do backup.
 
-Por esse motivo, a regra mais segura e operacionalmente clara e exigir que o
-usuario informe a versao em uso no momento do backup.
+Por esse motivo, a regra mais segura e operacionalmente clara é exigir que o
+usuário informe a versão em uso no momento do backup.
 
 Exemplo:
 
 ```text
-Versao informada pelo usuario: 5.5.4
-Saida: INGESYS-V5.5.4
+Versão informada pelo usuário: 5.5.4
+Saída: INGESYS-V5.5.4
 ```
 
 Resumo:
 
 ```text
-Automatica: nao
-Versao manual: sim
-Arquivos adicionais: nao
+Automatica: não
+Versão manual: sim
+Arquivos adicionais: não
 ```
 
 ## GE Multilin / EnerVista UR
 
-Este e um caso especial. Ao contrario dos outros tipos, o backup GE nao e
-representado por um unico arquivo na raiz da pasta. Ele representa um ambiente
-da SE/aplicacao contendo varias subpastas de IED.
+Este é um caso especial. Ao contrário dos outros tipos, o backup GE não é
+representado por um único arquivo na raiz da pasta. Ele representa um ambiente
+da SE/aplicação contendo várias subpastas de IED.
 
 Estrutura esperada:
 
@@ -187,15 +187,15 @@ SE-AAA/
 +-- SW-EXEMPLO
 ```
 
-Regra de identificacao:
+Regra de identificação:
 
-- o projeto e o nome da pasta da SE/aplicacao;
-- uma subpasta e considerada IED GE quando contem pelo menos um arquivo `.urs`
+- o projeto é o nome da pasta da SE/aplicação;
+- uma subpasta é considerada IED GE quando contém pelo menos um arquivo `.urs`
   ou `.urk`;
-- o `.ENV` do topo da pasta e incluido quando existir, mas nao e obrigatorio;
-- o `.ENV` sozinho nao caracteriza um backup GE valido.
+- o `.ENV` do topo da pasta é incluído quando existir, mas não é obrigatório;
+- o `.ENV` sozinho não caracteriza um backup GE válido.
 
-Arquivos incluidos:
+Arquivos incluídos:
 
 ```text
 .ENV do topo, se existir
@@ -205,26 +205,26 @@ Arquivos incluidos:
 .icd
 ```
 
-Arquivos nao incluidos automaticamente:
+Arquivos não incluídos automaticamente:
 
 ```text
 .cfg
 .xml
 .rt430
 .msf
-arquivos sem extensao
+arquivos sem extensão
 pastas sem .urs ou .urk
 ```
 
-Isso evita incluir configuracoes de RDP, switches, GPS ou outros equipamentos
-que podem estar na mesma pasta de trabalho, mas nao fazem parte do backup GE UR.
+Isso evita incluir configurações de RDP, switches, GPS ou outros equipamentos
+que podem estar na mesma pasta de trabalho, mas não fazem parte do backup GE UR.
 
-Regra de versao:
+Regra de versão:
 
-1. O aplicativo procura a maior versao `GE Digital Energy UR Setup` encontrada
+1. O aplicativo procura a maior versão `GE Digital Energy UR Setup` encontrada
    nos arquivos `.cid` e `.icd`.
-2. Se encontrar, usa essa versao no nome do ZIP.
-3. Se nao houver `.cid/.icd` com versao de UR Setup, usa a maior versao
+2. Se encontrar, usa essa versão no nome do ZIP.
+3. Se não houver `.cid/.icd` com versão de UR Setup, usa a maior versão
    `GEMULTILIN` encontrada nos headers `.urs/.urk`.
 
 Exemplo com SCL:
@@ -232,7 +232,7 @@ Exemplo com SCL:
 ```text
 Created by GE Digital Energy UR Setup 8.61
 
-Saida: GE-URSETUP-V8.61
+Saída: GE-URSETUP-V8.61
 ```
 
 Exemplo somente com `.urs`:
@@ -240,7 +240,7 @@ Exemplo somente com `.urs`:
 ```text
 HEADER,GEMULTILIN,5,C60-UE3,840,...
 
-Saida: GE-MULTILIN-V8.40
+Saída: GE-MULTILIN-V8.40
 ```
 
 Metadados especiais:
@@ -250,21 +250,21 @@ No `IEDS-BACKUP-INFO.txt`, o GE inclui uma secao adicional com:
 - pasta do ambiente;
 - arquivo `.ENV`, quando existir;
 - `Environment Version` e `Application Version`, quando existirem no `.ENV`;
-- pastas de IED incluidas;
-- versao `GE UR Setup` usada no desenvolvimento, quando encontrada;
-- versao de aplicacao do IED encontrada nos `.urs/.urk`.
+- pastas de IED incluídas;
+- versão `GE UR Setup` usada no desenvolvimento, quando encontrada;
+- versão de aplicação do IED encontrada nos `.urs/.urk`.
 
 Resumo:
 
 ```text
 Automatica: sim
-Versao manual: nao, salvo se surgirem arquivos antigos sem marcadores suficientes
+Versão manual: não, salvo se surgirem arquivos antigos sem marcadores suficientes
 Arquivos adicionais: .ENV opcional e subpastas GE com .urs/.urk/.cid/.icd
 ```
 
 ## IED-PACK
 
-Quando mais de um tipo de IED esta selecionado e mais de um tipo real e
+Quando mais de um tipo de IED está selecionado e mais de um tipo real é
 encontrado para o mesmo projeto, o aplicativo cria um `IED-PACK`.
 
 Regra:
@@ -272,8 +272,8 @@ Regra:
 - se apenas um tipo real for encontrado, o backup usa o nome desse tipo;
 - se dois ou mais tipos reais forem encontrados para o mesmo projeto, o backup
   usa `IED-PACK`;
-- dentro do ZIP, o arquivo `IEDS-BACKUP-INFO.txt` registra as versoes detectadas
-  de cada tipo incluido.
+- dentro do ZIP, o arquivo `IEDS-BACKUP-INFO.txt` registra as versões detectadas
+  de cada tipo incluído.
 
 Exemplo:
 
@@ -281,13 +281,13 @@ Exemplo:
 IED-PACK_SE-AAA_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip
 ```
 
-## Quando Atualizar Esta Logica
+## Quando Atualizar Esta Lógica
 
 Este documento deve ser atualizado sempre que:
 
 - um novo fabricante/software for adicionado;
-- uma nova extensao for suportada;
-- a regra de versao mudar;
-- um tipo passar a exigir versao manual;
+- uma nova extensão for suportada;
+- a regra de versão mudar;
+- um tipo passar a exigir versão manual;
 - arquivos adicionais passarem a entrar ou sair do ZIP;
-- forem descobertos casos reais que mudem a interpretacao de um formato.
+- forem descobertos casos reais que mudem a interpretação de um formato.
