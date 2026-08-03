@@ -10,6 +10,10 @@ manual testing. They do not contain real engineering data.
 - `sample-storage/ATU/`: sample current-backup folder.
 - `sample-storage/HIS/`: sample history folder with old ZIPs for `Limpeza HIS`.
 
+`sample-workspace/` intentionally does not include `config.json`. This keeps the
+first GUI test close to a real first run: the application starts without stored
+settings and the user must fill `Configurações`.
+
 ## Suggested GUI Test
 
 Run the application against the sample workspace:

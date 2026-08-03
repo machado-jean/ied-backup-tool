@@ -193,6 +193,10 @@ prints e demonstrações públicas. Eles cobrem DIGSI, SEL, PCM600, INGETEAM e
 GE Multilin, além de uma estrutura `ATU`/`HIS` para demonstrar a tela
 `Limpeza HIS`.
 
+A pasta de exemplo não inclui `config.json` de propósito. Assim, na primeira
+execução, a aplicação abre sem configuração prévia e o usuário precisa preencher
+os dados em `Configurações`, simulando o uso inicial real.
+
 Executar a GUI com os exemplos:
 
 ```powershell

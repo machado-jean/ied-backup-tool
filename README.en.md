@@ -68,6 +68,23 @@ VAO-ZZZ_GENERIC-COMMENT_20260712_1050.efsPro -> Project: VAO-ZZZ
 Everything after the first underscore is treated as a user comment and is not
 part of the technical backup key.
 
+## Public Sample Files
+
+The [docs/examples](docs/examples) folder contains artificial files for public
+testing and documentation screenshots. The sample workspace intentionally does
+not include `config.json`, so the first GUI run starts without previous settings
+and requires the user to fill `Settings`.
+
+Suggested GUI command:
+
+```powershell
+.\.venv\Scripts\python.exe -m src.gui.app --project-dir ".\docs\examples\sample-workspace"
+```
+
+Use `COLABORADOR-EXEMPLO` as collaborator and point `ATU`/`HIS` to
+`docs\examples\sample-storage\ATU` and `docs\examples\sample-storage\HIS`.
+For INGETEAM examples, use manual version `5.5.4`.
+
 ## Development
 
 ```powershell
