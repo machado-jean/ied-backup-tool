@@ -223,29 +223,32 @@ que podem estar na mesma pasta de trabalho, mas não fazem parte do backup GE UR
 
 Regra de versão:
 
-1. O aplicativo procura a maior versão de IED/aplicação `GEMULTILIN` encontrada
-   nos headers `.urs/.urk`.
-2. Essa versão é usada no nome do ZIP.
-3. A versão `GE Digital Energy UR Setup` encontrada em `.cid/.icd` é registrada
-   apenas como informação de desenvolvimento no `IEDS-BACKUP-INFO.txt`.
+1. O aplicativo procura versões de IED/aplicação nos headers `.urs/.urk`.
+2. Também procura a versão do software `UR Setup` nos arquivos `.cid/.icd`,
+   quando existirem.
+3. A maior versão encontrada entre essas fontes é usada no nome do ZIP.
+4. As versões por IED continuam registradas no `IEDS-BACKUP-INFO.txt`.
 
 Método de extração:
 
 - o programa lê a primeira linha dos arquivos `.urs` e `.urk`;
-- quando a linha segue o formato `HEADER,GEMULTILIN,...`, o quinto campo é
-  tratado como versão de IED/aplicação;
+- quando a linha segue o formato `HEADER,GEMULTILIN,...` ou
+  `HEADER,GEVERNOVA,...`, o quinto campo é tratado como versão de
+  IED/aplicação;
 - valores numéricos de três dígitos são normalizados para versão pontuada:
-  `840` vira `8.40`, `860` vira `8.60`;
-- quando houver vários IEDs na mesma pasta de ambiente, o maior valor encontrado
-  é usado no nome do ZIP.
+  `780` vira `7.80`, `870` vira `8.70`;
+- em `.cid/.icd`, cabeçalhos como `Created by GE Digital Energy UR Setup 8.61`
+  ou `Created by Multilin UR Setup 8.71` também entram na comparação;
+- quando houver vários IEDs ou versões de software na mesma pasta de ambiente,
+  o maior valor encontrado é usado no nome do ZIP.
 
 Exemplo com SCL:
 
 ```text
-HEADER,GEMULTILIN,5,T60-UEM,860,...
-Created by GE Digital Energy UR Setup 8.61
+HEADER,GEVERNOVA,5,T60-UEM,870,...
+Created by Multilin UR Setup 8.71
 
-Saída: GE-MULTILIN-V8.60
+Saída: GE-MULTILIN-V8.71
 ```
 
 Exemplo somente com `.urs`:

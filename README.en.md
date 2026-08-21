@@ -6,7 +6,7 @@ Windows application for standardizing IED project backups, keeping the current
 backup in `ATU`, historical backups in `HIS`, and consistent ZIP names for
 technical traceability.
 
-Current version: `1.16.1`
+Current version: `1.16.2`
 
 - Executable usage guide: [docs/EXECUTABLE_USAGE.en.md](docs/EXECUTABLE_USAGE.en.md)
 - Operational help: [docs/HELP.en.md](docs/HELP.en.md)
@@ -52,7 +52,7 @@ backup files manually.
 | SEL QuickSet / Architect | `.rdb`, optional `.scd` or `.selaprj` | QuickSet and Architect versions when found. |
 | ABB PCM600 | `.pcmp`, `.apcmp` | `ProjectDataServer%versions.ini` inside the package. |
 | INGETEAM INGESYS | `.efsPro`, `.ITPro2` | Manually entered by the user and saved in `config.json`. |
-| GE Multilin / EnerVista UR | folders with `.urs` or `.urk`; optional `.ENV` | Highest IED/application `GEMULTILIN` version found in `.urs/.urk`; `GE UR Setup` is kept as development metadata. |
+| GE Multilin / EnerVista UR | folders with `.urs` or `.urk`; optional `.ENV` | Highest version found between `GEMULTILIN`/`GEVERNOVA` headers in `.urs/.urk` and `UR Setup` headers in `.cid/.icd`, for example `GE-MULTILIN-V8.71`. |
 
 ## Naming Rule
 

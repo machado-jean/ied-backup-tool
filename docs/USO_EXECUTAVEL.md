@@ -239,6 +239,40 @@ o prefixo de software:
 INGESYS-V5.5.4
 ```
 
+### GE Multilin / EnerVista UR
+
+O backup GE usa a pasta da SE/aplicação como projeto. Dentro dela, o programa
+procura subpastas diretas que contenham `.urs` ou `.urk`.
+
+Quando uma subpasta é identificada como IED GE, entram no ZIP apenas:
+
+```text
+.urs
+.urk
+.cid
+.icd
+```
+
+O `.ENV` do topo da pasta também entra quando existir.
+
+A versão usada no nome do ZIP é a maior versão encontrada entre:
+
+- headers `GEMULTILIN` ou `GEVERNOVA` na primeira linha de `.urs/.urk`;
+- cabeçalhos `GE Digital Energy UR Setup` ou `Multilin UR Setup` em `.cid/.icd`.
+
+Exemplo:
+
+```text
+HEADER,GEVERNOVA,5,T60,870,...
+Created by Multilin UR Setup 8.71
+
+Saída: GE-MULTILIN-V8.71
+```
+
+No `IEDS-BACKUP-INFO.txt`, o programa mantém o resumo por IED, incluindo a
+versão de aplicação do relé e a versão do software usado no desenvolvimento,
+quando encontradas.
+
 ### Agrupamento por subestação
 
 Quando apenas um tipo de IED estiver selecionado, o programa gera backups

@@ -50,6 +50,7 @@ notes detalhadas, mas ajuda a entender a evolução técnica do projeto.
 | `v1.15.1` | Documentação da lógica de identificação | Novo documento `docs/LOGICA_IDENTIFICACAO_IEDS.md` explicando regras de identificação, arquivos incluídos, versão automática/manual, casos especiais de INGETEAM e GE Multilin, e comportamento do `IED-PACK`. |
 | `v1.16.0` | Documentação bilíngue e Help por idioma | Arquivos públicos separados em português/inglês, alternância entre idiomas no GitHub e botão `Ajuda` / `Help` abrindo a documentação conforme o idioma ativo da interface. |
 | `v1.16.1` | Correção da versão GE no nome do ZIP | O prefixo GE passa a usar a maior versão de IED/aplicação `GEMULTILIN` dos headers `.urs/.urk`; `GE UR Setup` dos `.cid/.icd` permanece apenas como metadado de desenvolvimento. |
+| `v1.16.2` | Compatibilidade GE Vernova / UR Setup | O prefixo GE passa a aceitar headers `GEVERNOVA` em `.urs/.urk` e a comparar também versões `GE Digital Energy UR Setup` / `Multilin UR Setup` em `.cid/.icd`, usando a maior versão encontrada. |
 
 ## Itens Pausados ou Descartados
 

@@ -12,9 +12,11 @@ from src.core.project_types.base import BaseProjectType, ProjectDetectionError
 IED_MARKER_EXTENSIONS = (".urs", ".urk")
 INCLUDED_EXTENSIONS = (".urs", ".urk", ".cid", ".icd")
 ENV_EXTENSION = ".env"
+GE_HEADER_PRODUCTS = {"GEMULTILIN", "GEVERNOVA"}
 
 UR_SETUP_VERSION_RE = re.compile(
-    r"GE\s+Digital\s+Energy\s+UR\s+Setup\s+([0-9]+(?:\.[0-9]+)+)",
+    r"(?:GE\s+Digital\s+Energy\s+UR\s+Setup|Multilin\s+UR\s+Setup)\s+"
+    r"([0-9]+(?:\.[0-9]+)+)",
     re.IGNORECASE,
 )
 SCL_HEADER_VERSION_RE = re.compile(
@@ -64,18 +66,12 @@ class GeMultilinProjectType(BaseProjectType):
         project_file: Path,
         fallback_version: str | None = None,
     ) -> str:
-        """Return the highest detected GE IED/application version."""
+        """Return the highest detected GE software or IED/application version."""
 
         source_files = self.get_related_files(project_file)
-        ied_versions = [
-            version
-            for path in source_files
-            if path.suffix.lower() in IED_MARKER_EXTENSIONS
-            for version in [_gemultilin_header_version(path)]
-            if version
-        ]
-        if ied_versions:
-            return f"GE-MULTILIN-V{_max_version(ied_versions)}"
+        detected_versions = _detected_ge_versions(source_files)
+        if detected_versions:
+            return f"GE-MULTILIN-V{_max_version(detected_versions)}"
 
         if fallback_version:
             normalized = sanitize_filename_part(fallback_version)
@@ -211,15 +207,34 @@ def _ur_setup_versions(path: Path) -> list[str]:
     return UR_SETUP_VERSION_RE.findall(text)
 
 
+def _detected_ge_versions(source_files: list[Path]) -> list[str]:
+    """Return all GE versions that can influence compatibility."""
+
+    versions = [
+        version
+        for path in source_files
+        if path.suffix.lower() in IED_MARKER_EXTENSIONS
+        for version in [_gemultilin_header_version(path)]
+        if version
+    ]
+    versions.extend(
+        version
+        for path in source_files
+        if path.suffix.lower() in {".cid", ".icd"}
+        for version in _ur_setup_versions(path)
+    )
+    return versions
+
+
 def _gemultilin_header_version(path: Path) -> str | None:
-    """Extract and normalize the version field from a GEMULTILIN header."""
+    """Extract and normalize the version field from a GE settings header."""
 
     try:
         line = path.read_text(encoding="utf-8", errors="ignore").splitlines()[0]
     except IndexError:
         return None
     parts = line.split(",")
-    if len(parts) < 5 or parts[0] != "HEADER" or parts[1] != "GEMULTILIN":
+    if len(parts) < 5 or parts[0] != "HEADER" or parts[1] not in GE_HEADER_PRODUCTS:
         return None
     raw_version = parts[4].strip()
     if raw_version.isdigit() and len(raw_version) == 3:

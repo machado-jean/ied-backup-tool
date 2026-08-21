@@ -62,7 +62,7 @@ DEV_SE-AAA_20260622_1350.dz5
 | SEL QuickSet / Architect | `.rdb`, optional `.scd` or `.selaprj` | QuickSet and Architect when found. |
 | ABB PCM600 | `.pcmp`, `.apcmp` | Internal `ProjectDataServer%versions.ini`. |
 | INGETEAM INGESYS | `.efsPro`, `.ITPro2` | Manually entered and saved in `config.json`. |
-| GE Multilin / EnerVista UR | folders with `.urs` or `.urk`; optional `.ENV` | Highest IED/application `GEMULTILIN` version found in `.urs/.urk`; `GE UR Setup` is kept as development metadata. |
+| GE Multilin / EnerVista UR | folders with `.urs` or `.urk`; optional `.ENV` | Highest version found between `GEMULTILIN`/`GEVERNOVA` headers in `.urs/.urk` and `UR Setup` headers in `.cid/.icd`. |
 
 ## Basic Flow
 
@@ -95,7 +95,7 @@ technical identity has different source-file content.
 DIGSI5-V10.00_SE-AAA_20260622-1350_COLLABORATOR-EXAMPLE_TAF.zip
 QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-BBB_20260612-0350_COLLABORATOR-EXAMPLE_TAF.zip
 IED-PACK_ETD-BBB_20260612-0350_COLLABORATOR-EXAMPLE_TAF.zip
-GE-MULTILIN-V8.60_SE-AAA_20260712-1100_COLLABORATOR-EXAMPLE_TAF.zip
+GE-MULTILIN-V8.71_SE-AAA_20260712-1100_COLLABORATOR-EXAMPLE_TAF.zip
 ```
 
 ## ZIP Metadata

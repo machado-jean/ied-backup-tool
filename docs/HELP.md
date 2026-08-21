@@ -97,7 +97,7 @@ Nesses casos, o projeto pode ser identificado incorretamente.
 | SEL QuickSet / Architect | `.rdb`, com `.scd` ou `.selaprj` opcional | QuickSet e Architect quando encontrados. |
 | ABB PCM600 | `.pcmp`, `.apcmp` | Detectada no arquivo interno `ProjectDataServer%versions.ini`. |
 | INGETEAM INGESYS | `.efsPro`, `.ITPro2` | Informada manualmente pelo usuário e salva em `config.json`. |
-| GE Multilin / EnerVista UR | subpastas com `.urs` ou `.urk`; `.ENV` opcional | Maior versão de IED/aplicação `GEMULTILIN` encontrada em `.urs/.urk`; `GE UR Setup` fica como metadado de desenvolvimento. |
+| GE Multilin / EnerVista UR | subpastas com `.urs` ou `.urk`; `.ENV` opcional | Maior versão entre headers `GEMULTILIN`/`GEVERNOVA` em `.urs/.urk` e `UR Setup` em `.cid/.icd`. |
 
 ## Fluxo Básico
 
@@ -180,7 +180,7 @@ GE-IED-B/
   GE-IED-B.urs
 
 Saída:
-GE-MULTILIN-V8.60_SE-AAA_20260712-1100_COLABORADOR-EXEMPLO_TAF.zip
+GE-MULTILIN-V8.71_SE-AAA_20260712-1100_COLABORADOR-EXEMPLO_TAF.zip
 ```
 
 Para GE Multilin, o programa inclui o `.ENV` do topo quando existir e somente

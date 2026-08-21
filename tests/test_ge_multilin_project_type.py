@@ -27,7 +27,7 @@ def test_ge_multilin_finds_one_environment_backup_and_uses_folder_project(
 
     assert len(files) == 1
     assert GE_MULTILIN_PROJECT_TYPE.get_project_id(files[0]) == "SE-LAGOS"
-    assert GE_MULTILIN_PROJECT_TYPE.get_software_version(files[0]) == "GE-MULTILIN-V8.60"
+    assert GE_MULTILIN_PROJECT_TYPE.get_software_version(files[0]) == "GE-MULTILIN-V8.71"
 
 
 def test_ge_multilin_includes_env_and_only_ied_folders(tmp_path: Path) -> None:
@@ -48,7 +48,7 @@ def test_ge_multilin_includes_env_and_only_ied_folders(tmp_path: Path) -> None:
     assert [result.status for result in results] == ["stored"]
     [zip_path] = list(atu.glob("*.zip"))
     assert zip_path.name == (
-        "GE-MULTILIN-V8.60_SE-LAGOS_20260721-1000_COLABORADOR-EXEMPLO_TAF.zip"
+        "GE-MULTILIN-V8.71_SE-LAGOS_20260721-1000_COLABORADOR-EXEMPLO_TAF.zip"
     )
     with zipfile.ZipFile(zip_path) as archive:
         names = archive.namelist()
@@ -69,7 +69,8 @@ def test_ge_multilin_includes_env_and_only_ied_folders(tmp_path: Path) -> None:
         assert "- IED-A" in backup_info
         assert "IED/application version: V8.40" in backup_info
         assert "- IED-B" in backup_info
-        assert "Developed with: GE UR Setup V8.61" in backup_info
+        assert "Developed with: GE UR Setup V8.71" in backup_info
+        assert "IED/application version: V8.70" in backup_info
         assert "IED-B/IED-B.urs" in backup_info
 
 
@@ -129,15 +130,15 @@ def _write_ge_sample(project_dir: Path) -> None:
     ied_b.mkdir()
     ied_b_urs = ied_b / "IED-B.urs"
     ied_b_urs.write_text(
-        "HEADER,GEMULTILIN,5,T60-UEM,860,,01/01/2026 11:00:00\n",
+        "HEADER,GEVERNOVA,5,T60-UEM,870,,01/01/2026 11:00:00\n",
         encoding="utf-8",
     )
     _set_mtime(ied_b_urs, datetime(2026, 7, 21, 9, 0))
     cid = ied_b / "IED-B.cid"
     cid.write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        "<!--Created by GE Digital Energy UR Setup 8.61 on Mon Jul 21 10:00:00 2025-->\n"
-        '<Header id="T60-UEM_8.60" version="0" revision="" toolID="ICDGenerator"/>',
+        "<!--Created by Multilin UR Setup 8.71 on Fri Aug 14 00:25:50 2026-->\n"
+        '<Header id="T60-UEM_8.70" version="0" revision="" toolID="ICDGenerator"/>',
         encoding="utf-8",
     )
     _set_mtime(cid, datetime(2026, 7, 21, 10, 0))

@@ -1,18 +1,18 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-07-12
+Last updated: 2026-08-21
 
 ## Current Version
 
-Current application version: `1.16.1`
+Current application version: `1.16.2`
 
 Latest generated executable:
 
 ```text
-releases/v1.16.1/IED_Backup_Manager.exe
+releases/v1.16.2/IED_Backup_Manager.exe
 ```
 
-The `v1.16.1` executable has been generated locally.
+The `v1.16.2` executable has been generated locally.
 
 ## Recently Completed
 
@@ -52,6 +52,9 @@ The `v1.16.1` executable has been generated locally.
 - `v1.16.0`: bilingual public documentation and language-aware in-app help URL.
 - `v1.16.1`: GE ZIP software prefix now uses the highest IED/application
   `GEMULTILIN` version from `.urs/.urk` headers.
+- `v1.16.2`: GE ZIP software prefix now also accepts `GEVERNOVA` headers and
+  compares `UR Setup` versions from `.cid/.icd`, using the highest detected
+  compatible version.
 
 ## Current v1.6.0 Released Scope
 
@@ -322,9 +325,24 @@ pytest: 116 passed
   `.urs/.urk` line, parse `HEADER,GEMULTILIN,...`, normalize values such as
   `840 -> 8.40`, and use the highest detected IED/application version.
 
+## Current v1.16.2 Scope
+
+- GE Multilin ZIP names now accept both `GEMULTILIN` and `GEVERNOVA` headers in
+  `.urs/.urk`.
+- `GEVERNOVA` header values such as `870` are normalized to `8.70`.
+- `.cid/.icd` headers created by `GE Digital Energy UR Setup` or
+  `Multilin UR Setup` are also considered when selecting the ZIP software
+  prefix.
+- The final GE ZIP prefix uses the highest version found across IED/application
+  headers and UR Setup software headers, for example `GE-MULTILIN-V8.71`.
+- `IEDS-BACKUP-INFO.txt` continues to include per-IED details with files,
+  development software version, and IED/application version.
+- Portuguese and English documentation now explain the updated GE extraction
+  rule.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.16.1`:
+Planned next improvement after `v1.16.2`:
 
 ```text
 real-usage improvements

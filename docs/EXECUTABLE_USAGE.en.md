@@ -55,6 +55,14 @@ saved in `config.json`.
 Select the delivery stage. The stage is part of the generated ZIP name. Returning
 to an earlier stage is allowed for long projects that need rework.
 
+For GE Multilin / EnerVista UR, the app treats the selected folder as the
+SE/application environment. Direct child folders containing `.urs` or `.urk` are
+included as GE IED folders, with `.urs`, `.urk`, `.cid`, and `.icd` files. The
+ZIP prefix uses the highest version found between `GEMULTILIN`/`GEVERNOVA`
+headers in `.urs/.urk` and `GE Digital Energy UR Setup` / `Multilin UR Setup`
+headers in `.cid/.icd`. Per-IED details remain available in
+`IEDS-BACKUP-INFO.txt`.
+
 ## 5. Preview and Execution
 
 Before generating backups, review the batch preview:

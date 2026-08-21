@@ -29,6 +29,7 @@ discarded decisions.
 | `v1.15.1` | Identification logic documentation | Public documentation for project-type detection, included files, automatic/manual versions, special INGETEAM and GE cases, and `IED-PACK`. |
 | `v1.16.0` | Bilingual documentation and language-aware Help | Separate Portuguese/English public files, GitHub language switch links, and `Ajuda` / `Help` opening the document that matches the active UI language. |
 | `v1.16.1` | GE ZIP version correction | GE prefixes now use the highest IED/application `GEMULTILIN` version from `.urs/.urk` headers; `GE UR Setup` from `.cid/.icd` remains development metadata only. |
+| `v1.16.2` | GE Vernova / UR Setup compatibility | GE prefixes now accept `GEVERNOVA` headers in `.urs/.urk` and also compare `GE Digital Energy UR Setup` / `Multilin UR Setup` versions in `.cid/.icd`, using the highest detected version. |
 
 ## Paused or Discarded Items
 

@@ -77,21 +77,23 @@ Rules:
 
 Version selection:
 
-1. Use the highest IED/application `GEMULTILIN` version found in `.urs/.urk`
-   headers.
-2. This version is used in the ZIP name.
-3. The `GE Digital Energy UR Setup` version found in `.cid/.icd` is recorded
-   only as development information in `IEDS-BACKUP-INFO.txt`.
+1. The app searches IED/application versions in `.urs/.urk` headers.
+2. It also searches the `UR Setup` software version in `.cid/.icd` files when
+   present.
+3. The highest version found across these sources is used in the ZIP name.
+4. Per-IED versions remain recorded in `IEDS-BACKUP-INFO.txt`.
 
 Extraction method:
 
 - the app reads the first line of `.urs` and `.urk` files;
-- when the line follows `HEADER,GEMULTILIN,...`, the fifth field is treated as
-  the IED/application version;
-- three-digit numeric values are normalized to dotted versions: `840` becomes
-  `8.40`, `860` becomes `8.60`;
-- when multiple IEDs exist in the same environment folder, the highest detected
-  value is used in the ZIP name.
+- when the line follows `HEADER,GEMULTILIN,...` or `HEADER,GEVERNOVA,...`, the
+  fifth field is treated as the IED/application version;
+- three-digit numeric values are normalized to dotted versions: `780` becomes
+  `7.80`, `870` becomes `8.70`;
+- in `.cid/.icd`, headers such as `Created by GE Digital Energy UR Setup 8.61`
+  or `Created by Multilin UR Setup 8.71` also enter the comparison;
+- when multiple IEDs or software versions exist in the same environment folder,
+  the highest detected value is used in the ZIP name.
 
 ## IED-PACK
 
