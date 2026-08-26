@@ -5,30 +5,71 @@ import pytest
 
 from src.core.storage import (
     StorageError,
+    find_legacy_backup_rename_plans,
     parse_backup_filename,
+    parse_legacy_backup_filename,
     quarantine_file,
+    rename_legacy_backups,
     update_storage,
 )
 
 
 def test_parse_backup_filename_extracts_key_and_timestamp(tmp_path: Path) -> None:
-    path = tmp_path / "DIGSI5-V10.00_SE_AAA_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    path = tmp_path / "DIGSI5-V10.00_SE_AAA_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
     path.write_text("backup", encoding="utf-8")
 
     info = parse_backup_filename(path)
 
     assert info.key == "DIGSI5-V10.00_SE_AAA"
     assert info.project == "SE_AAA"
+    assert info.identity == "DIGSI5-V10.00_SE_AAA_20260612-1739"
+    assert info.collaborator == "COLABORADOR EXEMPLO"
     assert info.stage == "DEV"
+
+
+def test_parse_backup_filename_rejects_legacy_timestamp_pattern(tmp_path: Path) -> None:
+    path = tmp_path / "DIGSI5-V10.00_SE_AAA_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    path.write_text("backup", encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        parse_backup_filename(path)
+
+
+def test_legacy_backup_rename_plan_converts_old_zip_name(tmp_path: Path) -> None:
+    path = tmp_path / "DIGSI5-V10.00_SE_AAA_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
+    create_zip(path, "legacy")
+
+    info = parse_legacy_backup_filename(path)
+    plans = find_legacy_backup_rename_plans((tmp_path,))
+    renamed = rename_legacy_backups(plans)
+
+    assert info.identity == "DIGSI5-V10.00_SE_AAA_20260612-1739"
+    assert info.collaborator == "JEAN-CARLOS-MACHADO"
+    assert len(plans) == 1
+    assert renamed == [
+        tmp_path / "DIGSI5-V10.00_SE_AAA_2026-06-12_17h39_JEAN MACHADO_DEV.zip"
+    ]
+    assert not path.exists()
+    assert renamed[0].exists()
+
+
+def test_legacy_backup_rename_plan_keeps_single_collaborator_name(tmp_path: Path) -> None:
+    path = tmp_path / "DIGSI5-V10.00_SE_AAA_20260612-1739_JEAN_DEV.zip"
+    create_zip(path, "legacy")
+
+    plans = find_legacy_backup_rename_plans((tmp_path,))
+    renamed = rename_legacy_backups(plans)
+
+    assert renamed == [tmp_path / "DIGSI5-V10.00_SE_AAA_2026-06-12_17h39_JEAN_DEV.zip"]
 
 
 def test_update_storage_moves_previous_atu_backup_to_his(tmp_path: Path) -> None:
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    old = atu / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    old = atu / "DIGSI5-V10.00_SE-BBB_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(old, "old")
-    new = tmp_path / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new = tmp_path / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(new, "new")
 
     final_path = update_storage(new_backup=new, atu_path=atu, his_path=his)
@@ -44,7 +85,7 @@ def test_update_storage_recreates_files_in_destination(tmp_path: Path) -> None:
     his = tmp_path / "HIS"
     staged = tmp_path / "staging"
     staged.mkdir()
-    new = staged / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new = staged / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(new, "new")
 
     final_path = update_storage(new_backup=new, atu_path=atu, his_path=his)
@@ -59,7 +100,7 @@ def test_update_storage_reports_copy_progress(tmp_path: Path) -> None:
     his = tmp_path / "HIS"
     staged = tmp_path / "staging"
     staged.mkdir()
-    new = staged / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new = staged / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(new, "new")
     total_bytes = new.stat().st_size
     events = []
@@ -84,7 +125,7 @@ def test_update_storage_quarantines_partial_copy_when_destination_copy_fails(
     his = tmp_path / "HIS"
     staged = tmp_path / "staging"
     staged.mkdir()
-    new = staged / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new = staged / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(new, "new")
 
     def fail_copy(input_file, output_file, **kwargs):
@@ -116,14 +157,14 @@ def test_update_storage_cleans_matching_quarantine_after_success(tmp_path: Path)
     staged.mkdir()
     partial = tmp_path / "partial.tmp"
     partial.write_text("partial", encoding="utf-8")
-    original = atu / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    original = atu / "DIGSI5-V10.00_SE-BBB_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
     quarantine_file(
         partial,
         quarantine_root=quarantine,
         original_path=original,
         reason="teste",
     )
-    new = staged / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new = staged / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(new, "new")
 
     update_storage(new_backup=new, atu_path=atu, his_path=his)
@@ -139,14 +180,14 @@ def test_update_storage_keeps_newer_quarantine_after_success(tmp_path: Path) -> 
     staged.mkdir()
     partial = tmp_path / "partial.tmp"
     partial.write_text("partial", encoding="utf-8")
-    newer_original = atu / "DIGSI5-V10.00_SE-BBB_20260620-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    newer_original = atu / "DIGSI5-V10.00_SE-BBB_2026-06-20_09h10_COLABORADOR EXEMPLO_DEV.zip"
     quarantine_file(
         partial,
         quarantine_root=quarantine,
         original_path=newer_original,
         reason="teste",
     )
-    new = staged / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new = staged / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(new, "new")
 
     update_storage(new_backup=new, atu_path=atu, his_path=his)
@@ -160,9 +201,9 @@ def test_update_storage_keeps_different_project_in_atu(tmp_path: Path) -> None:
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    other = atu / "DIGSI5-V10.00_SE-GGG_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    other = atu / "DIGSI5-V10.00_SE-GGG_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(other, "other")
-    new = tmp_path / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new = tmp_path / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(new, "new")
 
     update_storage(new_backup=new, atu_path=atu, his_path=his)
@@ -176,9 +217,9 @@ def test_update_storage_rejects_older_backup(tmp_path: Path) -> None:
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    current = atu / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    current = atu / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(current, "current")
-    older = tmp_path / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    older = tmp_path / "DIGSI5-V10.00_SE-BBB_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(older, "older")
 
     with pytest.raises(StorageError, match="mais recente"):
@@ -194,11 +235,11 @@ def test_update_storage_does_not_duplicate_identical_his_file(tmp_path: Path) ->
     his = tmp_path / "HIS"
     atu.mkdir()
     his.mkdir()
-    old = atu / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    old = atu / "DIGSI5-V10.00_SE-BBB_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(old, "old atu")
     existing_his = his / old.name
     create_zip(existing_his, "old his")
-    new = tmp_path / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new = tmp_path / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(new, "new")
 
     update_storage(new_backup=new, atu_path=atu, his_path=his)
@@ -214,9 +255,9 @@ def test_update_storage_treats_same_timestamp_with_different_stage_as_same_backu
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    current = atu / "DIGSI5-V10.00_SE-AAA_20260529-1624_COLABORADOR-EXEMPLO_DEV.zip"
+    current = atu / "DIGSI5-V10.00_SE-AAA_2026-05-29_16h24_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(current, "current")
-    same_identity = tmp_path / "DIGSI5-V10.00_SE-AAA_20260529-1624_COLABORADOR-EXEMPLO_TAC.zip"
+    same_identity = tmp_path / "DIGSI5-V10.00_SE-AAA_2026-05-29_16h24_OUTRO COLABORADOR_TAC.zip"
     create_zip(same_identity, "same")
 
     final_path = update_storage(new_backup=same_identity, atu_path=atu, his_path=his)
@@ -231,9 +272,9 @@ def test_update_storage_validates_new_zip_before_touching_current(tmp_path: Path
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    current = atu / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    current = atu / "DIGSI5-V10.00_SE-BBB_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(current, "current")
-    invalid = tmp_path / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    invalid = tmp_path / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     invalid.write_text("not a zip", encoding="utf-8")
 
     with pytest.raises(StorageError, match="invalido|ilegivel"):
@@ -251,9 +292,9 @@ def test_update_storage_rolls_back_new_current_when_history_move_fails(
     atu = tmp_path / "ATU"
     his = tmp_path / "HIS"
     atu.mkdir()
-    current = atu / "DIGSI5-V10.00_SE-BBB_20260612-1739_COLABORADOR-EXEMPLO_DEV.zip"
+    current = atu / "DIGSI5-V10.00_SE-BBB_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(current, "current")
-    new = tmp_path / "DIGSI5-V10.00_SE-BBB_20260615-0910_COLABORADOR-EXEMPLO_DEV.zip"
+    new = tmp_path / "DIGSI5-V10.00_SE-BBB_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
     create_zip(new, "new")
 
     def fail_history(*args, **kwargs):

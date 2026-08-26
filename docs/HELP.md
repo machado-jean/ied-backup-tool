@@ -22,7 +22,7 @@ destino compacto:
 
 ![Tela principal com prévia](images/pt-main-window-preview.png)
 
-Configuração do colaborador e das pastas de armazenamento:
+Configuração do nome/sobrenome e das pastas de armazenamento:
 
 ![Tela de configurações](images/pt-settings-window.png)
 
@@ -103,7 +103,7 @@ Nesses casos, o projeto pode ser identificado incorretamente.
 
 1. Coloque o executável na pasta dos arquivos de trabalho.
 2. Abra o programa.
-3. Configure colaborador, `ATU`, `HIS`, idioma e tipos de IED.
+3. Configure nome, sobrenome, `ATU`, `HIS`, idioma e tipos de IED.
 4. Selecione a etapa.
 5. Confira a prévia do lote.
 6. Clique em `Gerar backups`.
@@ -138,7 +138,7 @@ Entrada:
 SE-AAA_COMENTARIO-GENERICO_20260622_1350.dz5
 
 Saída:
-DIGSI5-V10.00_SE-AAA_20260622-1350_COLABORADOR-EXEMPLO_TAF.zip
+DIGSI5-V10.00_SE-AAA_2026-06-22_13h50_NOME SOBRENOME_TAF.zip
 ```
 
 Backup SEL:
@@ -149,7 +149,7 @@ ETD-BBB_OUTRO-COMENTARIO.rdb
 ETD-BBB_OUTRO-COMENTARIO.scd
 
 Saída:
-QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-BBB_20260612-0350_COLABORADOR-EXEMPLO_TAF.zip
+QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-BBB_2026-06-12_03h50_NOME SOBRENOME_TAF.zip
 ```
 
 Backup agrupado:
@@ -160,7 +160,7 @@ ETD-BBB_COMENTARIO-GENERICO_20260612_0350.dz5
 ETD-BBB_OUTRO-COMENTARIO.rdb
 
 Saída:
-IED-PACK_ETD-BBB_20260612-0350_COLABORADOR-EXEMPLO_TAF.zip
+IED-PACK_ETD-BBB_2026-06-12_03h50_NOME SOBRENOME_TAF.zip
 ```
 
 Se vários tipos estiverem marcados, mas apenas um tipo real existir para a SE,
@@ -180,7 +180,7 @@ GE-IED-B/
   GE-IED-B.urs
 
 Saída:
-GE-MULTILIN-V8.71_SE-AAA_20260712-1100_COLABORADOR-EXEMPLO_TAF.zip
+GE-MULTILIN-V8.71_SE-AAA_2026-07-12_11h00_NOME SOBRENOME_TAF.zip
 ```
 
 Para GE Multilin, o programa inclui o `.ENV` do topo quando existir e somente
@@ -197,16 +197,16 @@ Exemplo simplificado:
 ```text
 IED Backup Manager - Backup Information
 
-Backup: DIGSI5-V10.00_SE-AAA_20260622-1350_COLABORADOR-EXEMPLO_TAF.zip
+Backup: DIGSI5-V10.00_SE-AAA_2026-06-22_13h50_NOME SOBRENOME_TAF.zip
 Project: SE-AAA
 Software: DIGSI5-V10.00
-Timestamp: 20260622-1350
-Collaborator: COLABORADOR-EXEMPLO
+Timestamp: 2026-06-22_13h50
+Collaborator: NOME SOBRENOME
 Stage: TAF
 
 Included files:
 - SE-AAA_COMENTARIO-GENERICO_20260622_1350.dz5
-  Modified: 20260622-1350
+  Modified: 2026-06-22_13h50
   Size: 12345678 bytes
   SHA256: exemplo-de-hash-sha256
 ```
@@ -260,6 +260,25 @@ No executável `.exe`, o Windows pode levar alguns segundos para extrair e
 preparar a aplicação. O splash screen indica que o carregamento está em
 andamento.
 
+### O programa fechou sozinho ou travou ao abrir
+
+Verifique o log diário em:
+
+```text
+%LOCALAPPDATA%\IED Backup Manager\logs\
+```
+
+O arquivo tem o formato:
+
+```text
+ied-backup-manager-AAAA-MM-DD.log
+```
+
+Esse log registra inicialização, carregamento de configuração, varredura da
+prévia, execução de backup, falhas e exceções não tratadas. Ao reportar um
+problema, envie o log do dia em que ocorreu a falha, removendo antes qualquer
+informação sensível se necessário.
+
 ### O programa não abre em pasta sincronizada
 
 Teste copiar o executável para uma pasta local não sincronizada. Se abrir
@@ -294,7 +313,7 @@ restaurar.
 Não publique arquivos reais de backup, `config.json` local, caminhos internos de
 empresa ou nomes reais de colaboradores em repositórios públicos. Para exemplos,
 use nomes genéricos como `SE-AAA`, `ETD-BBB`, `VAO-ZZZ` e
-`COLABORADOR-EXEMPLO`.
+`NOME SOBRENOME`.
 
 ## Licença
 

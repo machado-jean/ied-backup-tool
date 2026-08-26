@@ -14,7 +14,7 @@ operacional claramente necessária.
 
 | Versão estimada | Marco | Entregas previstas |
 | --- | --- | --- |
-| `v1.17.0` | Melhorias guiadas por uso real | Pequenos ajustes de experiência, robustez, mensagens, validações ou suporte, priorizados a partir de testes reais e feedback dos usuários. |
+| `v1.18.0` | Novos tipos de IED | Adicionar novos fabricantes/softwares somente quando houver amostras limpas/sanitizadas e regra confiável de identificação, versão e arquivos incluídos. |
 
 ## Histórico Implementado
 
@@ -51,6 +51,8 @@ notes detalhadas, mas ajuda a entender a evolução técnica do projeto.
 | `v1.16.0` | Documentação bilíngue e Help por idioma | Arquivos públicos separados em português/inglês, alternância entre idiomas no GitHub e botão `Ajuda` / `Help` abrindo a documentação conforme o idioma ativo da interface. |
 | `v1.16.1` | Correção da versão GE no nome do ZIP | O prefixo GE passa a usar a maior versão de IED/aplicação `GEMULTILIN` dos headers `.urs/.urk`; `GE UR Setup` dos `.cid/.icd` permanece apenas como metadado de desenvolvimento. |
 | `v1.16.2` | Compatibilidade GE Vernova / UR Setup | O prefixo GE passa a aceitar headers `GEVERNOVA` em `.urs/.urk` e a comparar também versões `GE Digital Energy UR Setup` / `Multilin UR Setup` em `.cid/.icd`, usando a maior versão encontrada. |
+| `v1.16.3` | Diagnóstico e prévia em segundo plano | Correção da data de modificação dentro do ZIP, log diário em `%LOCALAPPDATA%`, captura de exceções não tratadas e prévia do lote em worker para reduzir travamentos em pastas grandes. |
+| `v1.17.0` | Padrão de nomes e polimento de uso real | Novo formato de nome do ZIP com data/hora legível e `NOME SOBRENOME`, campos separados de nome/sobrenome, detecção e renomeação assistida de backups antigos, revisão de traduções e ordem de inicialização corrigida para mostrar instruções antes da sugestão de renomeio. |
 
 ## Itens Pausados ou Descartados
 

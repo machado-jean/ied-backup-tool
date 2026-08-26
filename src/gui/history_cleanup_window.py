@@ -24,6 +24,8 @@ from src.core.history_cleanup import (
     plan_history_cleanup,
 )
 from src.core.i18n import DEFAULT_LANGUAGE, ui_text
+from src.core.naming import format_backup_timestamp
+from src.gui.message_box import question_yes_no
 
 
 class HistoryCleanupWindow(QDialog):
@@ -133,15 +135,15 @@ class HistoryCleanupWindow(QDialog):
             )
             return
 
-        answer = QMessageBox.question(
+        answer = question_yes_no(
             self,
-            ui_text("history_cleanup_confirm_title", self.language),
-            ui_text("history_cleanup_confirm_message", self.language).format(
+            title=ui_text("history_cleanup_confirm_title", self.language),
+            text=ui_text("history_cleanup_confirm_message", self.language).format(
                 count=len(selected_candidates),
                 size=_format_size(sum(candidate.size_bytes for candidate in selected_candidates)),
             ),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
+            language=self.language,
+            default_button=QMessageBox.StandardButton.No,
         )
         if answer != QMessageBox.StandardButton.Yes:
             return
@@ -175,7 +177,7 @@ class HistoryCleanupWindow(QDialog):
                 candidate.path.name,
                 candidate.info.project,
                 candidate.info.stage or "-",
-                candidate.info.timestamp.strftime("%Y%m%d-%H%M"),
+                format_backup_timestamp(candidate.info.timestamp),
                 str(candidate.age_days),
                 _format_size(candidate.size_bytes),
                 candidate.reason,

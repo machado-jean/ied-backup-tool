@@ -12,6 +12,7 @@ from src.core.path_validation import (
     create_missing_storage_paths,
     validate_storage_paths,
 )
+from src.gui.message_box import question_yes_no
 
 
 def confirm_storage_paths_ready(
@@ -34,14 +35,14 @@ def confirm_storage_paths_ready(
         return False
 
     if validation.nested_warning:
-        answer = QMessageBox.question(
+        answer = question_yes_no(
             parent,
-            ui_text("storage_paths_nested_title", language),
-            ui_text("storage_paths_nested_message", language).format(
-                detail=validation.nested_warning
+            title=ui_text("storage_paths_nested_title", language),
+            text=ui_text("storage_paths_nested_message", language).format(
+                detail=validation.nested_warning,
             ),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
+            language=language,
+            default_button=QMessageBox.StandardButton.No,
         )
         if answer != QMessageBox.StandardButton.Yes:
             return False
@@ -58,12 +59,12 @@ def confirm_storage_paths_ready(
         return True
 
     paths = "\n".join(f"- {path}" for path in validation.missing_paths)
-    answer = QMessageBox.question(
+    answer = question_yes_no(
         parent,
-        ui_text("storage_paths_missing_title", language),
-        ui_text("storage_paths_missing_message", language).format(paths=paths),
-        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-        QMessageBox.StandardButton.Yes,
+        title=ui_text("storage_paths_missing_title", language),
+        text=ui_text("storage_paths_missing_message", language).format(paths=paths),
+        language=language,
+        default_button=QMessageBox.StandardButton.Yes,
     )
     if answer != QMessageBox.StandardButton.Yes:
         return False

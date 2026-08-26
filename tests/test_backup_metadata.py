@@ -13,14 +13,14 @@ def test_build_backup_info_text_includes_source_hash_and_detected_versions(
 ) -> None:
     source = tmp_path / "SE-AAA_COMENTARIO_20260622_1350.dz5"
     source.write_bytes(b"backup-content")
-    backup_name = "DIGSI5-V10.00_SE-AAA_20260622-1350_COLABORADOR-EXEMPLO_DEV.zip"
+    backup_name = "DIGSI5-V10.00_SE-AAA_2026-06-22_13h50_COLABORADOR EXEMPLO_DEV.zip"
 
     text = build_backup_info_text(
         backup_name=backup_name,
         project="SE-AAA",
         software="DIGSI5-V10.00",
         timestamp=datetime(2026, 6, 22, 13, 50),
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
         project_type_label="DIGSI 5 (.dz5)",
         source_file=source,
@@ -45,7 +45,7 @@ def test_build_backup_info_text_uses_relative_paths_for_nested_sources(
     nested.write_text("urs", encoding="utf-8")
 
     text = build_backup_info_text(
-        backup_name="GE-MULTILIN-V8.40_SE-AAA_20260622-1350_COLABORADOR_DEV.zip",
+        backup_name="GE-MULTILIN-V8.40_SE-AAA_2026-06-22_13h50_COLABORADOR_DEV.zip",
         project="SE-AAA",
         software="GE-MULTILIN-V8.40",
         timestamp=datetime(2026, 6, 22, 13, 50),

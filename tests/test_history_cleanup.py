@@ -9,10 +9,10 @@ from src.core.history_cleanup import execute_history_cleanup, plan_history_clean
 def test_plan_history_cleanup_keeps_latest_backup_per_stage(tmp_path: Path) -> None:
     his = tmp_path / "HIS"
     his.mkdir()
-    old_dev = _backup(his, "DIGSI5-V10.00_SE-AAA_20260101-1000_COLABORADOR_DEV.zip")
-    latest_dev = _backup(his, "DIGSI5-V10.00_SE-AAA_20260201-1000_COLABORADOR_DEV.zip")
-    latest_taf = _backup(his, "DIGSI5-V10.00_SE-AAA_20260105-1000_COLABORADOR_TAF.zip")
-    recent_dev = _backup(his, "DIGSI5-V10.00_SE-BBB_20260620-1000_COLABORADOR_DEV.zip")
+    old_dev = _backup(his, "DIGSI5-V10.00_SE-AAA_2026-01-01_10h00_COLABORADOR_DEV.zip")
+    latest_dev = _backup(his, "DIGSI5-V10.00_SE-AAA_2026-02-01_10h00_COLABORADOR_DEV.zip")
+    latest_taf = _backup(his, "DIGSI5-V10.00_SE-AAA_2026-01-05_10h00_COLABORADOR_TAF.zip")
+    recent_dev = _backup(his, "DIGSI5-V10.00_SE-BBB_2026-06-20_10h00_COLABORADOR_DEV.zip")
 
     plan = plan_history_cleanup(
         his,
@@ -32,8 +32,8 @@ def test_plan_history_cleanup_keeps_latest_backup_per_stage(tmp_path: Path) -> N
 def test_execute_history_cleanup_deletes_selected_candidates(tmp_path: Path) -> None:
     his = tmp_path / "HIS"
     his.mkdir()
-    old_dev = _backup(his, "DIGSI5-V10.00_SE-AAA_20260101-1000_COLABORADOR_DEV.zip")
-    _backup(his, "DIGSI5-V10.00_SE-AAA_20260201-1000_COLABORADOR_DEV.zip")
+    old_dev = _backup(his, "DIGSI5-V10.00_SE-AAA_2026-01-01_10h00_COLABORADOR_DEV.zip")
+    _backup(his, "DIGSI5-V10.00_SE-AAA_2026-02-01_10h00_COLABORADOR_DEV.zip")
     plan = plan_history_cleanup(
         his,
         retention_days=30,
@@ -51,8 +51,8 @@ def test_plan_history_cleanup_zero_days_disables_candidates_but_keeps_totals(
 ) -> None:
     his = tmp_path / "HIS"
     his.mkdir()
-    first = _backup(his, "DIGSI5-V10.00_SE-AAA_20260101-1000_COLABORADOR_DEV.zip")
-    second = _backup(his, "DIGSI5-V10.00_SE-AAA_20260201-1000_COLABORADOR_DEV.zip")
+    first = _backup(his, "DIGSI5-V10.00_SE-AAA_2026-01-01_10h00_COLABORADOR_DEV.zip")
+    second = _backup(his, "DIGSI5-V10.00_SE-AAA_2026-02-01_10h00_COLABORADOR_DEV.zip")
 
     plan = plan_history_cleanup(
         his,

@@ -6,7 +6,7 @@ Windows application for standardizing IED project backups, keeping the current
 backup in `ATU`, historical backups in `HIS`, and consistent ZIP names for
 technical traceability.
 
-Current version: `1.16.2`
+Current version: `1.17.0`
 
 - Executable usage guide: [docs/EXECUTABLE_USAGE.en.md](docs/EXECUTABLE_USAGE.en.md)
 - Operational help: [docs/HELP.en.md](docs/HELP.en.md)
@@ -26,6 +26,10 @@ The goal is to reduce inconsistent manual backups, avoid technical duplicates,
 preserve history, and make audits easier without requiring users to rename final
 backup files manually.
 
+When older backups exist in `ATU`/`HIS` using the previous `YYYYMMDD-HHMM`
+format, the application identifies them and asks whether the user wants to
+rename them to the current pattern.
+
 ## Main Features
 
 - Windows GUI with batch preview before execution.
@@ -42,6 +46,8 @@ backup files manually.
 - Operational quarantine folder `IED-QUARENTENA` for rare partial/suspicious
   files after copy or archive failures.
 - Controlled `HIS` cleanup with retention, preview, and manual confirmation.
+- Batch preview runs in the background to reduce freezes in large folders.
+- Daily local log for startup, preview, backup, and failure diagnostics.
 - Responsive execution with per-file progress and controlled cancellation.
 
 ## Supported Types
@@ -81,7 +87,7 @@ Suggested GUI command:
 .\.venv\Scripts\python.exe -m src.gui.app --project-dir ".\docs\examples\sample-workspace"
 ```
 
-Use `COLABORADOR-EXEMPLO` as collaborator and point `ATU`/`HIS` to
+Use `FIRST` and `LAST` as first/last name and point `ATU`/`HIS` to
 `docs\examples\sample-storage\ATU` and `docs\examples\sample-storage\HIS`.
 For INGETEAM examples, use manual version `5.5.4`.
 
@@ -106,7 +112,7 @@ Generate a local release executable only after validation:
 Do not publish real backup files, local `config.json`, internal company paths,
 real collaborator names, IP addresses, credentials, or operational engineering
 data. Public examples should use generic names such as `SE-AAA`, `ETD-BBB`,
-`VAO-ZZZ`, and `COLABORADOR-EXEMPLO`.
+`VAO-ZZZ`, and `FIRST LAST`.
 
 ## License
 

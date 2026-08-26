@@ -25,7 +25,8 @@ Run the application against the sample workspace:
 In `Configurações`, use:
 
 ```text
-Colaborador: COLABORADOR-EXEMPLO
+Nome: NOME
+Sobrenome: SOBRENOME
 Pasta ATU: docs\examples\sample-storage\ATU
 Pasta HIS: docs\examples\sample-storage\HIS
 ```

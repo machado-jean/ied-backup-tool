@@ -34,17 +34,17 @@ def test_process_all_backups_versions_atu_and_his(tmp_path: Path) -> None:
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
 
     assert [result.source_file for result in results] == [first, second, third]
     assert [path.name for path in atu.glob("*.zip")] == [
-        "DIGSI5-V10.00_SE-AAA_20260525-1809_COLABORADOR-EXEMPLO_DEV.zip"
+        "DIGSI5-V10.00_SE-AAA_2026-05-25_18h09_COLABORADOR EXEMPLO_DEV.zip"
     ]
     assert sorted(path.name for path in his.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-AAA_20260525-1218_COLABORADOR-EXEMPLO_DEV.zip",
-        "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_2026-05-25_12h18_COLABORADOR EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_2026-05-25_17h19_COLABORADOR EXEMPLO_DEV.zip",
     ]
     assert first.exists()
     assert second.exists()
@@ -74,14 +74,14 @@ def test_process_all_backups_skips_older_files_when_atu_has_newest(tmp_path: Pat
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
     second_run = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
 
@@ -106,14 +106,14 @@ def test_process_all_backups_archives_missing_history_when_atu_has_newest(
     create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
     create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
     create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
-    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1809_COLABORADOR-EXEMPLO_DEV.zip"
+    current = atu / "DIGSI5-V10.00_SE-AAA_2026-05-25_18h09_COLABORADOR EXEMPLO_DEV.zip"
     create_plain_zip(current, "current")
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
 
@@ -124,8 +124,8 @@ def test_process_all_backups_archives_missing_history_when_atu_has_newest(
     ]
     assert [path.name for path in atu.glob("*.zip")] == [current.name]
     assert sorted(path.name for path in his.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-AAA_20260525-1218_COLABORADOR-EXEMPLO_DEV.zip",
-        "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_2026-05-25_12h18_COLABORADOR EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_2026-05-25_17h19_COLABORADOR EXEMPLO_DEV.zip",
     ]
 
 
@@ -140,16 +140,16 @@ def test_process_all_backups_does_not_archive_when_same_identity_exists_in_his(
     his.mkdir()
 
     create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
-    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_TAC.zip"
+    current = atu / "DIGSI5-V10.00_SE-AAA_2026-05-25_17h19_COLABORADOR EXEMPLO_TAC.zip"
     create_plain_zip(current, "current")
-    existing_history = his / "DIGSI5-V10.00_SE-AAA_20260525-1218_OUTRO-COLABORADOR_DEV.zip"
+    existing_history = his / "DIGSI5-V10.00_SE-AAA_2026-05-25_12h18_OUTRO COLABORADOR_DEV.zip"
     create_plain_zip(existing_history, "history")
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.TAC,
     )
 
@@ -168,14 +168,14 @@ def test_process_all_backups_treats_same_identity_in_atu_as_current(
     atu.mkdir()
 
     create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
-    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip"
+    current = atu / "DIGSI5-V10.00_SE-AAA_2026-05-25_17h19_COLABORADOR EXEMPLO_DEV.zip"
     create_plain_zip(current, "current")
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.TAC,
     )
 
@@ -202,7 +202,7 @@ def test_plan_all_backups_flags_same_identity_with_different_sha(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
     current_backup = next(atu.glob("*.zip"))
@@ -212,14 +212,14 @@ def test_plan_all_backups_flags_same_identity_with_different_sha(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="OUTRO-COLABORADOR",
+        collaborator="OUTRO COLABORADOR",
         stage=BackupStage.TAF,
     )
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="OUTRO-COLABORADOR",
+        collaborator="OUTRO COLABORADOR",
         stage=BackupStage.TAF,
     )
 
@@ -249,7 +249,7 @@ def test_plan_all_backups_flags_same_identity_history_with_different_sha(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
     current_backup = next(atu.glob("*.zip"))
@@ -262,7 +262,7 @@ def test_plan_all_backups_flags_same_identity_history_with_different_sha(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
 
@@ -279,21 +279,21 @@ def test_process_all_backups_allows_newer_backup_with_any_stage(tmp_path: Path) 
     atu.mkdir()
 
     create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
-    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_POS-TAC.zip"
+    current = atu / "DIGSI5-V10.00_SE-AAA_2026-05-25_17h19_COLABORADOR EXEMPLO_POS-TAC.zip"
     create_plain_zip(current, "current")
 
     results = process_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
 
     assert [result.status for result in results] == ["replaced_current"]
     assert (his / current.name).exists()
     assert [path.name for path in atu.glob("*.zip")] == [
-        "DIGSI5-V10.00_SE-AAA_20260525-1809_COLABORADOR-EXEMPLO_DEV.zip"
+        "DIGSI5-V10.00_SE-AAA_2026-05-25_18h09_COLABORADOR EXEMPLO_DEV.zip"
     ]
 
 
@@ -301,8 +301,8 @@ def test_plan_and_fix_atu_duplicate_backups(tmp_path: Path) -> None:
     atu = tmp_path / "IED-ATU"
     his = tmp_path / "IED-HIS"
     atu.mkdir()
-    older = atu / "DIGSI5-V10.00_SE-AAA_20260525-1218_COLABORADOR-EXEMPLO_DEV.zip"
-    newer = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip"
+    older = atu / "DIGSI5-V10.00_SE-AAA_2026-05-25_12h18_COLABORADOR EXEMPLO_DEV.zip"
+    newer = atu / "DIGSI5-V10.00_SE-AAA_2026-05-25_17h19_COLABORADOR EXEMPLO_DEV.zip"
     create_plain_zip(older, "older")
     create_plain_zip(newer, "newer")
 
@@ -337,18 +337,18 @@ def test_process_all_backups_keeps_one_current_per_project(tmp_path: Path) -> No
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
 
     assert summarize_results(results).replaced_current == 2
     assert sorted(path.name for path in atu.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip",
-        "DIGSI5-V10.00_SE-BBB_20260526-1512_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_2026-05-25_17h19_COLABORADOR EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-BBB_2026-05-26_15h12_COLABORADOR EXEMPLO_DEV.zip",
     ]
     assert sorted(path.name for path in his.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-AAA_20260525-1218_COLABORADOR-EXEMPLO_DEV.zip",
-        "DIGSI5-V10.00_SE-BBB_20260526-1133_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_2026-05-25_12h18_COLABORADOR EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-BBB_2026-05-26_11h33_COLABORADOR EXEMPLO_DEV.zip",
     ]
 
 
@@ -362,14 +362,14 @@ def test_filter_current_and_newer_plans_omits_previous_history(tmp_path: Path) -
     create_dz5(project_dir / "SE-AAA_20260525_1218.dz5", datetime(2026, 5, 25, 12, 18))
     create_dz5(project_dir / "SE-AAA_20260525_1719.dz5", datetime(2026, 5, 25, 17, 19))
     create_dz5(project_dir / "SE-AAA_20260525_1809.dz5", datetime(2026, 5, 25, 18, 9))
-    current = atu / "DIGSI5-V10.00_SE-AAA_20260525-1719_COLABORADOR-EXEMPLO_DEV.zip"
+    current = atu / "DIGSI5-V10.00_SE-AAA_2026-05-25_17h19_COLABORADOR EXEMPLO_DEV.zip"
     create_plain_zip(current, "current")
 
     plans = plan_all_backups(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
     filtered = filter_current_and_newer_plans(plans)
@@ -394,7 +394,7 @@ def test_plan_all_backups_does_not_create_atu_or_his(tmp_path: Path) -> None:
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
 
@@ -428,14 +428,14 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.TAF,
         project_types=[get_project_type("digsi5"), get_project_type("sel")],
     )
 
     assert len(plans) == 1
     assert plans[0].backup_name == (
-        "IED-PACK_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip"
+        "IED-PACK_SE-AAA_2026-06-19_12h30_COLABORADOR EXEMPLO_TAF.zip"
     )
     assert plans[0].software == "DIGSI5-V10.00 + QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34"
     assert plans[0].source_files == (dz5, rdb, scd)
@@ -477,14 +477,14 @@ def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.TAF,
         project_types=[get_project_type("digsi5"), get_project_type("sel")],
     )
 
     assert len(plans) == 1
     assert plans[0].backup_name == (
-        "QUICKSET-V7.5.3.10_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip"
+        "QUICKSET-V7.5.3.10_SE-AAA_2026-06-19_12h30_COLABORADOR EXEMPLO_TAF.zip"
     )
     assert plans[0].backup_info_text is not None
     assert "QUICKSET-V7.5.3.10" in plans[0].backup_info_text
@@ -504,7 +504,7 @@ def test_grouped_backups_processes_all_files_when_only_one_type_exists(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
         project_types=[get_project_type("digsi5"), get_project_type("sel")],
     )
@@ -519,10 +519,10 @@ def test_grouped_backups_processes_all_files_when_only_one_type_exists(
         execute_backup_plan(plan=plan, atu_path=atu, his_path=his)
 
     assert sorted(path.name for path in atu.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-AAA_20260526-1512_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_2026-05-26_15h12_COLABORADOR EXEMPLO_DEV.zip",
     ]
     assert sorted(path.name for path in his.glob("*.zip")) == [
-        "DIGSI5-V10.00_SE-AAA_20260526-1133_COLABORADOR-EXEMPLO_DEV.zip",
+        "DIGSI5-V10.00_SE-AAA_2026-05-26_11h33_COLABORADOR EXEMPLO_DEV.zip",
     ]
 
 

@@ -9,7 +9,7 @@ discarded decisions.
 
 | Estimated version | Milestone | Expected scope |
 | --- | --- | --- |
-| `v1.17.0` | Improvements guided by real usage | Small UX, robustness, message, validation, or support improvements prioritized from real tests and user feedback. |
+| `v1.18.0` | New IED types | Add new vendors/software only when clean/sanitized samples and reliable identification, version, and included-file rules are available. |
 
 ## Implemented History
 
@@ -30,6 +30,8 @@ discarded decisions.
 | `v1.16.0` | Bilingual documentation and language-aware Help | Separate Portuguese/English public files, GitHub language switch links, and `Ajuda` / `Help` opening the document that matches the active UI language. |
 | `v1.16.1` | GE ZIP version correction | GE prefixes now use the highest IED/application `GEMULTILIN` version from `.urs/.urk` headers; `GE UR Setup` from `.cid/.icd` remains development metadata only. |
 | `v1.16.2` | GE Vernova / UR Setup compatibility | GE prefixes now accept `GEVERNOVA` headers in `.urs/.urk` and also compare `GE Digital Energy UR Setup` / `Multilin UR Setup` versions in `.cid/.icd`, using the highest detected version. |
+| `v1.16.3` | Diagnostics and background preview | Preserves source modified time inside ZIPs, adds daily logs under `%LOCALAPPDATA%`, captures unhandled exceptions, and runs batch preview in a worker to reduce freezes in large folders. |
+| `v1.17.0` | Naming policy and real-usage polish | New ZIP filename format with readable date/time and `FIRST LAST`, separate first/last name fields, assisted detection and renaming of old backups, translation review, and startup ordering fixed so instructions appear before legacy-rename prompts. |
 
 ## Paused or Discarded Items
 

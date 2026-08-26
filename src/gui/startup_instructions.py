@@ -116,7 +116,7 @@ class StartupInstructionsDialog(QDialog):
                 <p>Input file:</p>
                 <pre>SE-XXX_GENERIC-COMMENT_20260622_1350.dz5</pre>
                 <p>Output:</p>
-                <pre>DIGSIn-Vmmm_SE-XXX_YYYYMMDD-HHMM_COLLABORATOR_STAGE.zip</pre>
+                <pre>DIGSIn-Vmmm_SE-XXX_YYYY-MM-DD_HHhMM_FIRST LAST_STAGE.zip</pre>
                 <p><code>DIGSIn</code> represents the DIGSI family, for example
                 <code>DIGSI5</code>, and <code>Vmmm</code> represents the detected
                 version, for example <code>V10.00</code>.</p>
@@ -126,7 +126,7 @@ class StartupInstructionsDialog(QDialog):
                 <pre>ETD-YYY_GENERIC-COMMENT_20260612_0350.dz5
 ETD-YYY_OTHER-COMMENT.rdb</pre>
                 <p>Output:</p>
-                <pre>IED-PACK_ETD-YYY_YYYYMMDD-HHMM_COLLABORATOR_STAGE.zip</pre>
+                <pre>IED-PACK_ETD-YYY_YYYY-MM-DD_HHhMM_FIRST LAST_STAGE.zip</pre>
                 <p>The ZIP will include <code>IEDS-BACKUP-INFO.txt</code> with
                 versions and included file details.</p>
 
@@ -170,7 +170,7 @@ ETD-YYY_OTHER-COMMENT.rdb</pre>
             <p>Arquivo de entrada:</p>
             <pre>SE-XXX_COMENTARIO-GENERICO_20260622_1350.dz5</pre>
             <p>Saída:</p>
-            <pre>DIGSIn-Vmmm_SE-XXX_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip</pre>
+            <pre>DIGSIn-Vmmm_SE-XXX_YYYY-MM-DD_HHhMM_NOME SOBRENOME_ETAPA.zip</pre>
             <p>Onde <code>DIGSIn</code> representa a família do DIGSI, por exemplo
             <code>DIGSI5</code>, e <code>Vmmm</code> representa a versão detectada,
             por exemplo <code>V10.00</code>.</p>
@@ -180,7 +180,7 @@ ETD-YYY_OTHER-COMMENT.rdb</pre>
             <pre>ETD-YYY_COMENTARIO-GENERICO_20260612_0350.dz5
 ETD-YYY_OUTRO-COMENTARIO.rdb</pre>
             <p>Saída:</p>
-            <pre>IED-PACK_ETD-YYY_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip</pre>
+            <pre>IED-PACK_ETD-YYY_YYYY-MM-DD_HHhMM_NOME SOBRENOME_ETAPA.zip</pre>
             <p>Dentro do ZIP haverá o arquivo <code>IEDS-BACKUP-INFO.txt</code> com
             versões e detalhes dos arquivos incluídos.</p>
 

@@ -77,7 +77,7 @@ Regra:
 Exemplo:
 
 ```text
-QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_SE-AAA_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip
+QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_SE-AAA_YYYY-MM-DD_HHhMM_NOME SOBRENOME_ETAPA.zip
 ```
 
 Se o arquivo SEL for muito antigo e não contiver a versão do QuickSet, o
@@ -294,7 +294,7 @@ Regra:
 Exemplo:
 
 ```text
-IED-PACK_SE-AAA_YYYYMMDD-HHMM_COLABORADOR_ETAPA.zip
+IED-PACK_SE-AAA_YYYY-MM-DD_HHhMM_NOME SOBRENOME_ETAPA.zip
 ```
 
 ## Quando Atualizar Esta Lógica

@@ -69,7 +69,7 @@ def test_manual_version_project_type_returns_selected_manual_type() -> None:
 
 def _config(tmp_path: Path) -> AppConfig:
     return AppConfig(
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         atu_path=tmp_path / "IED-ATU",
         his_path=tmp_path / "IED-HIS",
     )

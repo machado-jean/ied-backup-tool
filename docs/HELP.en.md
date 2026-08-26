@@ -68,7 +68,7 @@ DEV_SE-AAA_20260622_1350.dz5
 
 1. Put the executable in the working-files folder.
 2. Open the application.
-3. Configure collaborator, `ATU`, `HIS`, language, and IED types.
+3. Configure first name, last name, `ATU`, `HIS`, language, and IED types.
 4. Select the stage.
 5. Check the batch preview.
 6. Click `Generate backups`.
@@ -92,10 +92,10 @@ technical identity has different source-file content.
 ## Expected Outputs
 
 ```text
-DIGSI5-V10.00_SE-AAA_20260622-1350_COLLABORATOR-EXAMPLE_TAF.zip
-QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-BBB_20260612-0350_COLLABORATOR-EXAMPLE_TAF.zip
-IED-PACK_ETD-BBB_20260612-0350_COLLABORATOR-EXAMPLE_TAF.zip
-GE-MULTILIN-V8.71_SE-AAA_20260712-1100_COLLABORATOR-EXAMPLE_TAF.zip
+DIGSI5-V10.00_SE-AAA_2026-06-22_13h50_FIRST LAST_TAF.zip
+QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-BBB_2026-06-12_03h50_FIRST LAST_TAF.zip
+IED-PACK_ETD-BBB_2026-06-12_03h50_FIRST LAST_TAF.zip
+GE-MULTILIN-V8.71_SE-AAA_2026-07-12_11h00_FIRST LAST_TAF.zip
 ```
 
 ## ZIP Metadata
@@ -132,6 +132,25 @@ Default rule:
 
 The Windows `.exe` may take a few seconds to extract and prepare the application.
 The splash screen indicates that loading is in progress.
+
+### The app closed by itself or froze during startup
+
+Check the daily log under:
+
+```text
+%LOCALAPPDATA%\IED Backup Manager\logs\
+```
+
+The file name uses this format:
+
+```text
+ied-backup-manager-YYYY-MM-DD.log
+```
+
+This log records startup, configuration loading, preview scanning, backup
+execution, failures, and unhandled exceptions. When reporting a problem, send
+the log from the day of the failure after removing sensitive information if
+needed.
 
 ### The app does not open in a synced folder
 

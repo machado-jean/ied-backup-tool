@@ -14,10 +14,56 @@ def test_parse_config_normalizes_collaborator() -> None:
         }
     )
 
-    assert config.collaborator == "COLABORADOR-EXEMPLO"
+    assert config.collaborator == "COLABORADOR EXEMPLO"
+    assert config.collaborator_first_name == "COLABORADOR"
+    assert config.collaborator_last_name == "EXEMPLO"
     assert config.atu_path == Path("C:/BKP/ATU")
     assert config.his_path == Path("C:/BKP/HIS")
     assert config.language == "pt_BR"
+
+
+def test_parse_config_prefers_first_and_last_name_fields() -> None:
+    config = parse_config(
+        {
+            "nome": "Colaborador",
+            "sobrenome": "Exemplo",
+            "colaborador": "LEGADO",
+            "atu_path": "C:/BKP/ATU",
+            "his_path": "C:/BKP/HIS",
+        }
+    )
+
+    assert config.collaborator == "COLABORADOR EXEMPLO"
+    assert config.collaborator_first_name == "COLABORADOR"
+    assert config.collaborator_last_name == "EXEMPLO"
+
+
+def test_parse_config_compacts_legacy_collaborator_to_first_and_last_name() -> None:
+    config = parse_config(
+        {
+            "colaborador": "Jean Carlos Machado",
+            "atu_path": "C:/BKP/ATU",
+            "his_path": "C:/BKP/HIS",
+        }
+    )
+
+    assert config.collaborator == "JEAN MACHADO"
+    assert config.collaborator_first_name == "JEAN"
+    assert config.collaborator_last_name == "MACHADO"
+
+
+def test_parse_config_keeps_single_legacy_collaborator_name() -> None:
+    config = parse_config(
+        {
+            "colaborador": "Jean",
+            "atu_path": "C:/BKP/ATU",
+            "his_path": "C:/BKP/HIS",
+        }
+    )
+
+    assert config.collaborator == "JEAN"
+    assert config.collaborator_first_name == "JEAN"
+    assert config.collaborator_last_name == ""
 
 
 def test_parse_config_accepts_language() -> None:
@@ -133,6 +179,7 @@ def test_save_config_writes_history_cleanup_retention_only(tmp_path: Path) -> No
 
     assert '"history_cleanup"' in text
     assert '"retention_days": 30' in text
+    assert '"nome": "COLABORADOR"' in text
 
 
 def test_parse_config_requires_paths() -> None:

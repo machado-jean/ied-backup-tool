@@ -31,7 +31,7 @@ again`.
 
 Then configure:
 
-- collaborator;
+- first name and last name;
 - `ATU` folder;
 - `HIS` folder;
 - language;
@@ -74,6 +74,10 @@ Action | File | Project | Version | Date/Time | Destination
 Click `Generate backups` only after the preview is correct. During execution,
 the progress dialog shows the current file and byte progress.
 
+In large folders, the preview is calculated in the background. While scanning is
+in progress, the preview area shows `Processing files...` and `Generate backups`
+remains disabled.
+
 If cancellation is requested during ZIP staging, the staged ZIP is discarded and
 is not copied to `ATU`/`HIS`.
 
@@ -100,3 +104,12 @@ IED_Backup_Manager.exe
 
 Replace the old executable with the new one. Existing `config.json`, `ATU`, and
 `HIS` folders can remain in place.
+
+If the app closes by itself or freezes during startup, check the daily log under:
+
+```text
+%LOCALAPPDATA%\IED Backup Manager\logs\
+```
+
+Send the log from the day of the failure after removing sensitive information if
+needed.

@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 from src.core.hashing import calculate_sha256
-from src.core.naming import BackupStage, get_file_timestamp
+from src.core.naming import BackupStage, format_backup_timestamp, get_file_timestamp
 
 StageValue = BackupStage | str
 
@@ -35,7 +35,7 @@ def build_backup_info_text(
         f"Backup: {backup_name}",
         f"Project: {project}",
         f"Software: {software}",
-        f"Timestamp: {timestamp.strftime('%Y%m%d-%H%M')}",
+        f"Timestamp: {format_backup_timestamp(timestamp)}",
         f"Collaborator: {collaborator}",
         f"Stage: {stage_text}",
         "",
@@ -54,7 +54,7 @@ def build_backup_info_text(
             f"- {_display_path(path, display_root)}",
         )
         lines.append(
-            f"  Modified: {get_file_timestamp(path).strftime('%Y%m%d-%H%M')}",
+            f"  Modified: {format_backup_timestamp(get_file_timestamp(path))}",
         )
         lines.append(f"  Size: {path.stat().st_size} bytes")
         lines.append(f"  SHA256: {calculate_sha256(path)}")

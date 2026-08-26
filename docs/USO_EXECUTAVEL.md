@@ -52,7 +52,8 @@ Nessa tela, você pode:
 
 Depois, a tela de configurações será exibida. Preencha:
 
-- `Colaborador`: nome usado no arquivo final do backup.
+- `Nome`: primeiro nome usado no arquivo final do backup.
+- `Sobrenome`: sobrenome usado no arquivo final do backup.
 - `Pasta ATU`: pasta onde ficará o backup atual de cada projeto.
 - `Pasta HIS`: pasta onde ficará o histórico de backups antigos.
 
@@ -72,7 +73,9 @@ Exemplo de `config.json`:
 
 ```json
 {
-  "colaborador": "COLABORADOR-EXEMPLO",
+  "nome": "NOME",
+  "sobrenome": "SOBRENOME",
+  "colaborador": "NOME SOBRENOME",
   "atu_path": "C:/Backups/Exemplo/ATU",
   "his_path": "C:/Backups/Exemplo/HIS",
   "language": "pt_BR",
@@ -302,7 +305,7 @@ SE-AAA.scd
 Com `DIGSI 5` e `SEL` selecionados, o resultado será um único pacote:
 
 ```text
-IED-PACK_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
+IED-PACK_SE-AAA_2026-06-19_12h30_NOME SOBRENOME_TAF.zip
 ```
 
 Dentro do ZIP ficaráo somente os arquivos dos tipos selecionados. Se `SEL` não
@@ -375,6 +378,10 @@ Cuidados:
 
 Depois de selecionar a etapa, a tela mostra uma prévia dos arquivos suportados
 encontrados na pasta.
+
+Em pastas grandes, a prévia é calculada em segundo plano. Enquanto a varredura
+estiver em andamento, a área da prévia mostra `Processando arquivos...` e o
+botão `Gerar backups` permanece desabilitado.
 
 Colunas principais:
 
@@ -472,29 +479,34 @@ candidatos para exclusão.
 Arquivos ZIP fora do padrão de nome do IED Backup Manager são ignorados pela
 limpeza.
 
+Backups gerados em versões antigas, com data/hora no formato `YYYYMMDD-HHMM`,
+são detectados como legado em `ATU`/`HIS`. Quando encontrados, o aplicativo
+pergunta se o usuário deseja renomeá-los para o padrão atual antes de continuar
+o versionamento.
+
 ## 14. Resultado dos arquivos
 
 O nome final do backup segue o padrão:
 
 ```text
-SOFTWARE_PROJETO_DATAHORA_COLABORADOR_ETAPA.zip
+SOFTWARE_PROJETO_YYYY-MM-DD_HHhMM_NOME SOBRENOME_ETAPA.zip
 ```
 
 Exemplo:
 
 ```text
-DIGSI5-V10.00_SE-AAA_20260529-1625_COLABORADOR-EXEMPLO_TAF.zip
-QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ESD-AAA_20260623-0031_COLABORADOR-EXEMPLO_TAF.zip
-PCM600-V2.10_SE-DDD_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
-INGESYS-V5.5.4_SE-EEE_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
-IED-PACK_SE-AAA_20260619-1230_COLABORADOR-EXEMPLO_TAF.zip
+DIGSI5-V10.00_SE-AAA_2026-05-29_16h25_NOME SOBRENOME_TAF.zip
+QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ESD-AAA_2026-06-23_00h31_NOME SOBRENOME_TAF.zip
+PCM600-V2.10_SE-DDD_2026-06-19_12h30_NOME SOBRENOME_TAF.zip
+INGESYS-V5.5.4_SE-EEE_2026-06-19_12h30_NOME SOBRENOME_TAF.zip
+IED-PACK_SE-AAA_2026-06-19_12h30_NOME SOBRENOME_TAF.zip
 ```
 
 Regras principais:
 
 - `ATU` mantém apenas o backup mais recente de cada projeto.
 - `HIS` mantém os backups anteriores.
-- A comparação técnica considera `SOFTWARE_PROJETO_DATAHORA`.
+- A comparação técnica considera `SOFTWARE_PROJETO_YYYYMMDD-HHMM`.
 - Mudanças apenas de colaborador ou etapa não criam duplicidade técnica.
 
 ## 15. Abrir pastas ATU e HIS
@@ -524,6 +536,9 @@ sem confirmação.
 - Antes de usar `Limpeza HIS`, confira a prévia. A remoção exige seleção e
   confirmação manual.
 - Mantenha o `config.json` junto do executável.
+- Se o programa fechar sozinho ou travar ao abrir, envie o log do dia em
+  `%LOCALAPPDATA%\IED Backup Manager\logs\`, removendo informações sensíveis se
+  necessário.
 
 ## 17. Atualização de versão
 

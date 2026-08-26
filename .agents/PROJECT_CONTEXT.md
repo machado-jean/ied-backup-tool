@@ -23,6 +23,13 @@ generates consistent ZIP names for technical traceability.
 - Technical identity: `SOFTWARE_PROJECT_TIMESTAMP`.
 - Collaborator and stage are part of the ZIP name, but not part of technical
   identity.
+- Current ZIP filename policy:
+  `SOFTWARE_PROJECT_YYYY-MM-DD_HHhMM_FIRST LAST_STAGE.zip`.
+- The GUI stores collaborator data as first name and last name. Legacy
+  collaborator strings are compacted to first/last format when migrated.
+- ZIPs using the old `YYYYMMDD-HHMM` filename pattern are detected as legacy
+  and should be renamed through the assisted GUI prompt before normal
+  versioning rules use them.
 - When multiple IED types are selected, `IED-PACK` is created only for projects
   that actually have more than one selected type present. If only one real type
   exists for the project, process all files of that type unless the user checked
@@ -77,6 +84,7 @@ compatible and are not marked as conflicts.
 - GUI application service: `src/gui/backup_application_service.py`
 - GUI confirmation text builders: `src/gui/backup_confirmation.py`
 - GUI HIS cleanup dialog: `src/gui/history_cleanup_window.py`
+- GUI preview worker: `src/gui/preview_worker.py`
 - GUI preview-table rendering: `src/gui/preview_table.py`
 - GUI summary text formatting: `src/gui/summary_text.py`
 - User help documents: `docs/HELP.md` and `docs/HELP.en.md`
@@ -138,7 +146,7 @@ Run GUI against a specific local source folder:
 Run CLI dry-run:
 
 ```powershell
-.\.venv\Scripts\python.exe -m src.main --project-dir ".\SOURCE-FOLDER" --process-all --dry-run --collaborator "COLABORADOR-EXEMPLO" --atu-path ".\ATU-FOLDER" --his-path ".\HIS-FOLDER"
+.\.venv\Scripts\python.exe -m src.main --project-dir ".\SOURCE-FOLDER" --process-all --dry-run --collaborator "NOME SOBRENOME" --atu-path ".\ATU-FOLDER" --his-path ".\HIS-FOLDER"
 ```
 
 Validate:
@@ -169,16 +177,20 @@ Generate release executable:
 - Every release should update `.agents/CURRENT_STATE.md`,
   `.agents/PROJECT_CONTEXT.md`, and relevant docs/release notes.
 - Public-facing examples should use generic names such as `SE-AAA`, `ETD-BBB`,
-  `VAO-ZZZ`, and `COLABORADOR-EXEMPLO`.
+  `VAO-ZZZ`, and `NOME SOBRENOME`.
 - Public documentation should be maintained as separate Portuguese and English
   Markdown files with language switch links at the top. The GUI help button
   should open `HELP.md` for `pt_BR` and `HELP.en.md` for `en_US`.
 - The project is public/source-available under the `IED Backup Manager
   Non-Commercial License`, not OSI open source. Commercial use requires prior
   written permission from Jean Carlos Machado.
-- The active next roadmap milestone after `v1.16.2` is improvement guided by
-  real usage feedback. Operational reports and external `.sha256` files are
-  intentionally outside the active roadmap for now.
+- Local diagnostics log directory:
+  `%LOCALAPPDATA%\IED Backup Manager\logs\`
+- Logs are daily files named `ied-backup-manager-YYYY-MM-DD.log`.
+- The active next roadmap milestone after `v1.17.0` is new IED types when
+  clean/sanitized samples and reliable version rules are available.
+  Operational reports and external `.sha256` files are intentionally outside
+  the active roadmap for now.
 - After running tests or builds, remove generated caches/build folders when they
   are not needed: `.pytest_cache`, `.ruff_cache`, `__pycache__`, `build`, `dist`.
 
@@ -206,6 +218,8 @@ Generate release executable:
 
 ## Progress Rules
 
+- Batch preview planning should run in a worker thread and show an indeterminate
+  loading state, especially for large GE folders.
 - Long file operations should accept optional progress callbacks.
 - GUI progress should show the current item as `file X/N`.
 - ZIP creation and final destination copies should report byte progress, not only

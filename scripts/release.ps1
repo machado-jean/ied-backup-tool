@@ -20,22 +20,38 @@ $ExePath = Join-Path $Root "dist\$ExeName.exe"
 $ReleaseDir = Join-Path $Root "releases\$Tag"
 $ReleaseExe = Join-Path $ReleaseDir "$ExeName.exe"
 $ReleaseNotes = Join-Path $ReleaseDir "RELEASE_NOTES.md"
+$VenvScripts = Join-Path $Root ".venv\Scripts"
+$SystemPath = @(
+    $VenvScripts,
+    "$env:SystemRoot\System32",
+    "$env:SystemRoot",
+    "$env:SystemRoot\System32\Wbem",
+    "$env:SystemRoot\System32\WindowsPowerShell\v1.0"
+) -join [IO.Path]::PathSeparator
 
 if (-not $SkipTests) {
     .\.venv\Scripts\python.exe -m ruff check .
     .\.venv\Scripts\python.exe -m pytest
 }
 
-.\.venv\Scripts\python.exe -m PyInstaller `
-    --noconfirm `
-    --clean `
-    --onefile `
-    --windowed `
-    --icon "assets\app_icon.ico" `
-    --add-data "assets;assets" `
-    --name $ExeName `
-    --paths . `
-    src\gui\app.py
+$OriginalPath = $env:PATH
+try {
+    # Keep PyInstaller from collecting unrelated DLLs injected by developer tools.
+    $env:PATH = $SystemPath
+    .\.venv\Scripts\python.exe -m PyInstaller `
+        --noconfirm `
+        --clean `
+        --onefile `
+        --windowed `
+        --icon "assets\app_icon.ico" `
+        --add-data "assets;assets" `
+        --name $ExeName `
+        --paths . `
+        src\gui\app.py
+}
+finally {
+    $env:PATH = $OriginalPath
+}
 
 New-Item -ItemType Directory -Force -Path $ReleaseDir | Out-Null
 Copy-Item -LiteralPath $ExePath -Destination $ReleaseExe -Force

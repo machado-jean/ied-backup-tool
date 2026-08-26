@@ -40,7 +40,7 @@ def test_ge_multilin_includes_env_and_only_ied_folders(tmp_path: Path) -> None:
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.TAF,
         project_type=GE_MULTILIN_PROJECT_TYPE,
     )
@@ -48,7 +48,7 @@ def test_ge_multilin_includes_env_and_only_ied_folders(tmp_path: Path) -> None:
     assert [result.status for result in results] == ["stored"]
     [zip_path] = list(atu.glob("*.zip"))
     assert zip_path.name == (
-        "GE-MULTILIN-V8.71_SE-LAGOS_20260721-1000_COLABORADOR-EXEMPLO_TAF.zip"
+        "GE-MULTILIN-V8.71_SE-LAGOS_2026-07-21_10h00_COLABORADOR EXEMPLO_TAF.zip"
     )
     with zipfile.ZipFile(zip_path) as archive:
         names = archive.namelist()
@@ -93,14 +93,14 @@ def test_ge_multilin_backup_works_without_env_and_with_only_urs(
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
         project_type=GE_MULTILIN_PROJECT_TYPE,
     )
 
     assert [result.status for result in results] == ["stored"]
     [zip_path] = list(atu.glob("*.zip"))
-    assert zip_path.name == "GE-MULTILIN-V8.40_SE-AAA_20260101-1000_COLABORADOR-EXEMPLO_DEV.zip"
+    assert zip_path.name == "GE-MULTILIN-V8.40_SE-AAA_2026-01-01_10h00_COLABORADOR EXEMPLO_DEV.zip"
     with zipfile.ZipFile(zip_path) as archive:
         assert archive.namelist() == [BACKUP_INFO_FILENAME, "IED-A.urs"]
         backup_info = archive.read(BACKUP_INFO_FILENAME).decode("utf-8")

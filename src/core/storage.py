@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+from src.core.naming import build_backup_name, compact_collaborator_name, format_technical_timestamp
 from src.core.progress import ProgressCallback, copy_stream_with_progress
 
 
@@ -22,7 +23,9 @@ class StorageError(RuntimeError):
     pass
 
 
-BACKUP_TIMESTAMP_PATTERN = re.compile(r"^\d{8}-\d{4}$")
+LEGACY_BACKUP_TIMESTAMP_PATTERN = re.compile(r"^\d{8}-\d{4}$")
+BACKUP_DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+BACKUP_TIME_PATTERN = re.compile(r"^\d{2}h\d{2}$")
 QUARANTINE_FOLDER_NAME = "IED-QUARENTENA"
 
 
@@ -45,7 +48,7 @@ class BackupFileInfo:
     @property
     def identity(self) -> str:
         """Technical identity used to avoid duplicates across ATU and HIS."""
-        return f"{self.key}_{self.timestamp.strftime('%Y%m%d-%H%M')}"
+        return f"{self.key}_{format_technical_timestamp(self.timestamp)}"
 
 
 @dataclass(frozen=True)
@@ -64,6 +67,14 @@ class QuarantineInfo:
 
     path: Path
     note_path: Path
+
+
+@dataclass(frozen=True)
+class LegacyBackupRenamePlan:
+    """Planned filename migration from the legacy ZIP naming pattern."""
+
+    source_path: Path
+    destination_path: Path
 
 
 def update_storage(
@@ -532,25 +543,81 @@ def find_backup_by_identity(folder: Path, identity: str) -> Path | None:
 def parse_backup_filename(path: Path) -> BackupFileInfo:
     """Parse the standard backup filename into structured metadata."""
 
+    timestamp_parts = _find_current_backup_timestamp_parts(path.stem.split("_"))
+    return _parse_backup_filename_with_timestamp_parts(path, timestamp_parts)
+
+
+def parse_legacy_backup_filename(path: Path) -> BackupFileInfo:
+    """Parse a legacy backup filename only for explicit migration."""
+
+    timestamp_parts = _find_legacy_backup_timestamp_parts(path.stem.split("_"))
+    return _parse_backup_filename_with_timestamp_parts(path, timestamp_parts)
+
+
+def find_legacy_backup_rename_plans(
+    folders: list[Path] | tuple[Path, ...],
+) -> list[LegacyBackupRenamePlan]:
+    """Find legacy ZIP files that can be renamed to the current filename pattern."""
+
+    plans: list[LegacyBackupRenamePlan] = []
+    for folder in folders:
+        if not folder.exists():
+            continue
+        for path in sorted(folder.glob("*.zip")):
+            try:
+                info = parse_legacy_backup_filename(path)
+            except ValueError:
+                continue
+            migrated_name = build_backup_name(
+                software_version=info.software,
+                project_id=info.project,
+                timestamp=info.timestamp,
+                collaborator=compact_collaborator_name(info.collaborator),
+                stage=info.stage,
+            )
+            destination = path.with_name(migrated_name)
+            if destination == path:
+                continue
+            plans.append(LegacyBackupRenamePlan(source_path=path, destination_path=destination))
+    return plans
+
+
+def rename_legacy_backups(plans: list[LegacyBackupRenamePlan]) -> list[Path]:
+    """Rename legacy backup files after user confirmation."""
+
+    renamed: list[Path] = []
+    for plan in plans:
+        if plan.destination_path.exists():
+            raise StorageError(f"Ja existe um backup no destino: {plan.destination_path}")
+        plan.source_path.rename(plan.destination_path)
+        renamed.append(plan.destination_path)
+    return renamed
+
+
+def _parse_backup_filename_with_timestamp_parts(
+    path: Path,
+    timestamp_parts: tuple[int, int, str, str] | None,
+) -> BackupFileInfo:
+    """Parse a backup filename using preselected timestamp tokens."""
+
     stem = path.stem
     parts = stem.split("_")
     if len(parts) < 5:
         raise ValueError(f"Nome de backup invalido: {path.name}")
 
-    timestamp_index = next(
-        (index for index, part in enumerate(parts) if BACKUP_TIMESTAMP_PATTERN.match(part)),
-        None,
-    )
-    if timestamp_index is None or timestamp_index < 2 or timestamp_index >= len(parts) - 2:
+    if timestamp_parts is None:
+        raise ValueError(f"Nome de backup invalido: {path.name}")
+    timestamp_index, timestamp_end_index, raw_timestamp, timestamp_format = timestamp_parts
+
+    if timestamp_index < 2 or timestamp_end_index > len(parts) - 2:
         raise ValueError(f"Nome de backup invalido: {path.name}")
 
     software = parts[0]
     project = "_".join(parts[1:timestamp_index])
-    raw_timestamp = parts[timestamp_index]
-    collaborator = "_".join(parts[timestamp_index + 1 : -1])
+    collaborator = "_".join(parts[timestamp_end_index:-1])
     stage = parts[-1]
     try:
-        timestamp = datetime.strptime(raw_timestamp, "%Y%m%d-%H%M")
+        timestamp = datetime.strptime(raw_timestamp, timestamp_format)
     except ValueError as exc:
         raise ValueError(f"Data/hora invalida no backup: {path.name}") from exc
 
@@ -562,3 +629,29 @@ def parse_backup_filename(path: Path) -> BackupFileInfo:
         collaborator=collaborator,
         stage=stage,
     )
+
+
+def _find_current_backup_timestamp_parts(
+    parts: list[str],
+) -> tuple[int, int, str, str] | None:
+    """Locate the current timestamp format in a ZIP name."""
+
+    for index, part in enumerate(parts):
+        if (
+            BACKUP_DATE_PATTERN.match(part)
+            and index + 1 < len(parts)
+            and BACKUP_TIME_PATTERN.match(parts[index + 1])
+        ):
+            return index, index + 2, f"{part}_{parts[index + 1]}", "%Y-%m-%d_%Hh%M"
+    return None
+
+
+def _find_legacy_backup_timestamp_parts(
+    parts: list[str],
+) -> tuple[int, int, str, str] | None:
+    """Locate the legacy timestamp format in a ZIP name."""
+
+    for index, part in enumerate(parts):
+        if LEGACY_BACKUP_TIMESTAMP_PATTERN.match(part):
+            return index, index + 1, part, "%Y%m%d-%H%M"
+    return None

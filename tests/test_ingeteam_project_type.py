@@ -43,7 +43,7 @@ def test_ingeteam_plan_uses_configured_version(tmp_path: Path) -> None:
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage="TAF",
         project_type=INGETEAM_PROJECT_TYPE,
         software_version_override="5.5.4",

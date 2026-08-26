@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import time
 import zipfile
 from collections.abc import Sequence
 from pathlib import Path
@@ -47,7 +48,8 @@ def create_backup_zip(
             archive.writestr(BACKUP_INFO_FILENAME, backup_info_text)
         for path, arc_name in zip(source_files, arc_names, strict=True):
             try:
-                with path.open("rb") as source, archive.open(arc_name, "w") as target:
+                zip_info = _zip_info_for_file(path, arc_name)
+                with path.open("rb") as source, archive.open(zip_info, "w") as target:
                     copy_stream_with_progress(
                         source,
                         target,
@@ -85,6 +87,25 @@ def _archive_name(path: Path, archive_root: Path | None) -> str:
     if archive_root is None:
         return path.name
     return path.resolve().relative_to(archive_root).as_posix()
+
+
+def _zip_info_for_file(path: Path, arc_name: str) -> zipfile.ZipInfo:
+    """Build ZIP metadata from the source file, including modification time."""
+
+    stat = path.stat()
+    timestamp = max(stat.st_mtime, _minimum_zip_timestamp())
+    date_time = time.localtime(timestamp)[:6]
+    info = zipfile.ZipInfo(arc_name, date_time=date_time)
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.external_attr = (stat.st_mode & 0xFFFF) << 16
+    info.file_size = stat.st_size
+    return info
+
+
+def _minimum_zip_timestamp() -> float:
+    """Return the earliest timestamp representable by the ZIP date format."""
+
+    return time.mktime((1980, 1, 1, 0, 0, 0, 0, 1, -1))
 
 
 def ensure_source_is_readable(source_file: Path) -> None:

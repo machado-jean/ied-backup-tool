@@ -6,7 +6,7 @@ Aplicação Windows para padronizar backups de projetos de IED, mantendo um back
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade técnica.
 
-Versão atual: `1.16.2`
+Versão atual: `1.17.0`
 
 - Manual do executável: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
@@ -25,6 +25,10 @@ O objetivo é reduzir backups manuais inconsistentes, evitar duplicidades
 técnicas, preservar histórico e facilitar auditoria sem exigir que o usuário
 renomeie manualmente os arquivos finais.
 
+Quando houver backups antigos em `ATU`/`HIS` usando o formato anterior
+`YYYYMMDD-HHMM`, o aplicativo identifica esses arquivos e pergunta se o usuário
+deseja renomeá-los para o padrão atual.
+
 ## Interface
 
 Tela principal com prévia do lote, resumo, seleção de tipos de IED, etapa e
@@ -32,7 +36,7 @@ destino compacto:
 
 ![Tela principal com prévia](docs/images/pt-main-window-preview.png)
 
-Configuração do colaborador e das pastas de armazenamento:
+Configuração do nome/sobrenome e das pastas de armazenamento:
 
 ![Tela de configurações](docs/images/pt-settings-window.png)
 
@@ -74,6 +78,9 @@ Exemplo da interface em inglês:
 - Detecção de duplicidades em `ATU`, com indicação do arquivo problemático.
 - Progresso real por arquivo durante compactação e cópia para `ATU`/`HIS`.
 - Execução em worker dedicado para manter a GUI responsiva.
+- Prévia do lote calculada em segundo plano para reduzir travamentos em pastas
+  grandes.
+- Log diário local para diagnóstico de inicialização, prévia, backup e falhas.
 - Cancelamento controlado antes de iniciar o próximo arquivo.
 - Botão `Ajuda` / `Help` apontando para a documentação operacional pública.
 - Indicador `©` com autoria, licença e link do repositório.
@@ -119,18 +126,18 @@ Nesses casos, o projeto pode ser identificado incorretamente.
 O nome final segue o padrão:
 
 ```text
-SOFTWARE_PROJETO_DATAHORA_COLABORADOR_ETAPA.zip
+SOFTWARE_PROJETO_YYYY-MM-DD_HHhMM_NOME SOBRENOME_ETAPA.zip
 ```
 
 Exemplos:
 
 ```text
-DIGSI5-V10.00_SE-AAA_20260712-1030_COLABORADOR-EXEMPLO_TAF.zip
-QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-BBB_20260712-1035_COLABORADOR-EXEMPLO_TAF.zip
-PCM600-V2.10_SE-DDD_20260712-1040_COLABORADOR-EXEMPLO_TAF.zip
-INGESYS-V5.5.4_VAO-ZZZ_20260712-1050_COLABORADOR-EXEMPLO_TAF.zip
-GE-MULTILIN-V8.71_SE-AAA_20260712-1100_COLABORADOR-EXEMPLO_TAF.zip
-IED-PACK_SE-AAA_20260712-1035_COLABORADOR-EXEMPLO_TAF.zip
+DIGSI5-V10.00_SE-AAA_2026-07-12_10h30_NOME SOBRENOME_TAF.zip
+QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_ETD-BBB_2026-07-12_10h35_NOME SOBRENOME_TAF.zip
+PCM600-V2.10_SE-DDD_2026-07-12_10h40_NOME SOBRENOME_TAF.zip
+INGESYS-V5.5.4_VAO-ZZZ_2026-07-12_10h50_NOME SOBRENOME_TAF.zip
+GE-MULTILIN-V8.71_SE-AAA_2026-07-12_11h00_NOME SOBRENOME_TAF.zip
+IED-PACK_SE-AAA_2026-07-12_10h35_NOME SOBRENOME_TAF.zip
 ```
 
 ## Configuração
@@ -142,7 +149,9 @@ Exemplo:
 
 ```json
 {
-  "colaborador": "COLABORADOR-EXEMPLO",
+  "nome": "NOME",
+  "sobrenome": "SOBRENOME",
+  "colaborador": "NOME SOBRENOME",
   "atu_path": "C:/Backups/Exemplo/ATU",
   "his_path": "C:/Backups/Exemplo/HIS",
   "language": "pt_BR",
@@ -160,7 +169,7 @@ Exemplo:
 ## Fluxo de Uso
 
 1. Coloque o executável na pasta dos arquivos de trabalho.
-2. Configure colaborador, `ATU`, `HIS`, idioma e tipos de IED.
+2. Configure nome, sobrenome, `ATU`, `HIS`, idioma e tipos de IED.
 3. Selecione a etapa.
 4. Confira a `Prévia do lote`.
 5. Clique em `Gerar backups`.
@@ -206,7 +215,7 @@ Executar a GUI com os exemplos:
 Nas configurações, use:
 
 ```text
-Colaborador: COLABORADOR-EXEMPLO
+Colaborador: NOME SOBRENOME
 Pasta ATU: docs\examples\sample-storage\ATU
 Pasta HIS: docs\examples\sample-storage\HIS
 ```
@@ -248,13 +257,13 @@ Executar a GUI em desenvolvimento:
 Executar via CLI:
 
 ```powershell
-.\.venv\Scripts\python.exe -m src.main --project-dir ".\docs\examples\sample-workspace" --process-all --collaborator "COLABORADOR-EXEMPLO" --atu-path ".\docs\examples\sample-storage\ATU" --his-path ".\docs\examples\sample-storage\HIS"
+.\.venv\Scripts\python.exe -m src.main --project-dir ".\docs\examples\sample-workspace" --process-all --collaborator "NOME SOBRENOME" --atu-path ".\docs\examples\sample-storage\ATU" --his-path ".\docs\examples\sample-storage\HIS"
 ```
 
 Simular sem criar ZIP nem mover arquivos:
 
 ```powershell
-.\.venv\Scripts\python.exe -m src.main --project-dir ".\docs\examples\sample-workspace" --project-type sel --process-all --dry-run --collaborator "COLABORADOR-EXEMPLO" --atu-path ".\docs\examples\sample-storage\ATU" --his-path ".\docs\examples\sample-storage\HIS"
+.\.venv\Scripts\python.exe -m src.main --project-dir ".\docs\examples\sample-workspace" --project-type sel --process-all --dry-run --collaborator "NOME SOBRENOME" --atu-path ".\docs\examples\sample-storage\ATU" --his-path ".\docs\examples\sample-storage\HIS"
 ```
 
 Validar qualidade e testes:
@@ -298,7 +307,7 @@ software/versão e arquivos relacionados. Depois registre o adaptador em
 
 Não publique arquivos reais de backup, `config.json` local, caminhos internos de
 empresa ou nomes reais de colaboradores. Para exemplos públicos, use nomes como
-`SE-AAA`, `ETD-BBB`, `VAO-ZZZ` e `COLABORADOR-EXEMPLO`.
+`SE-AAA`, `ETD-BBB`, `VAO-ZZZ` e `NOME SOBRENOME`.
 
 As pastas locais `IED-DES/`, `IED-ATU/`, `IED-HIS/`, `config.json`, `.venv/`,
 `build/`, `dist/`, `.spec` e `releases/` ficam protegidas pelo `.gitignore`.

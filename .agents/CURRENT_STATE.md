@@ -1,18 +1,20 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-08-21
+Last updated: 2026-08-26
 
 ## Current Version
 
-Current application version: `1.16.2`
+Current application version: `1.17.0`
 
 Latest generated executable:
 
 ```text
-releases/v1.16.2/IED_Backup_Manager.exe
+releases/v1.17.0/IED_Backup_Manager.exe
 ```
 
-The `v1.16.2` executable has been generated locally.
+The `v1.17.0` executable has been generated locally. The release script now
+sanitizes `PATH` during PyInstaller builds to prevent unrelated developer-tool
+DLLs from being collected into the executable.
 
 ## Recently Completed
 
@@ -55,6 +57,12 @@ The `v1.16.2` executable has been generated locally.
 - `v1.16.2`: GE ZIP software prefix now also accepts `GEVERNOVA` headers and
   compares `UR Setup` versions from `.cid/.icd`, using the highest detected
   compatible version.
+- `v1.16.3`: preserves source modified times inside ZIP entries, adds daily
+  diagnostics logs, captures unhandled exceptions, and moves preview planning to
+  a worker thread with a loading state for large folders.
+- `v1.17.0`: updates the final ZIP naming policy, adds first/last name fields,
+  detects and offers to rename legacy backup filenames, reviews translations,
+  and delays legacy-rename prompts until after startup instructions.
 
 ## Current v1.6.0 Released Scope
 
@@ -73,7 +81,7 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 116 passed
+pytest: 136 passed
 ```
 
 ## Local-Safety Notes
@@ -172,7 +180,7 @@ pytest: 116 passed
 
 - Public repository scan reviewed versionable files outside ignored local
   backup folders, `.venv`, `.git`, and generated binary assets.
-- Test fixtures were sanitized to use `COLABORADOR-EXEMPLO` instead of a real
+- Test fixtures were sanitized to use `NOME SOBRENOME` instead of a real
   first name.
 - `.gitignore` still protects `IED-DES/`, `IED-ATU/`, `IED-HIS/`, `.venv/`,
   `.vscode/`, `config.json`, build outputs, and `.spec` files.
@@ -340,23 +348,59 @@ pytest: 116 passed
 - Portuguese and English documentation now explain the updated GE extraction
   rule.
 
+## Current v1.16.3 Scope
+
+- ZIP creation now preserves each source file's modified time in the ZIP entry.
+- ZIP timestamps older than `1980-01-01` are clamped to the ZIP format minimum.
+- Application startup configures daily logs in
+  `%LOCALAPPDATA%\IED Backup Manager\logs\`.
+- Logs include startup stages, config loading, preview planning, update checks,
+  backup execution, failures, Qt messages, and unhandled exceptions.
+- Fatal startup errors attempt to show a user-visible dialog with the log path.
+- Batch preview planning now runs in `src/gui/preview_worker.py` on a `QThread`.
+- The preview area shows an indeterminate `Processando arquivos...` /
+  `Processing files...` state while scanning large folders.
+- Preview refreshes are debounced and queued when the user changes stage/type
+  while a previous scan is still running.
+
+## Current v1.17.0 Scope
+
+- Final ZIP names now use:
+  `SOFTWARE_PROJECT_YYYY-MM-DD_HHhMM_FIRST LAST_STAGE.zip`.
+- The GUI settings dialog uses separate first-name and last-name fields.
+- `config.json` stores `nome`, `sobrenome`, and the combined `colaborador`
+  value for compatibility/readability.
+- Legacy collaborator strings such as `JEAN-CARLOS-MACHADO` are compacted to
+  first/last format such as `JEAN MACHADO`; single names remain unchanged.
+- Existing ZIPs using the old `YYYYMMDD-HHMM` naming pattern are no longer used
+  silently by the current versioning rules.
+- The GUI detects old ZIP names in `ATU`/`HIS` and offers to rename them to the
+  current pattern before previewing the batch.
+- The legacy-rename prompt now waits until after startup instructions/settings
+  dialogs have finished. If startup instructions are disabled, it can appear
+  directly on startup.
+- Yes/No dialogs use app-controlled translations instead of Qt/system defaults.
+- Splash, startup fatal-error text, folder picker title, and cleanup messages
+  were reviewed for Portuguese/English consistency.
+- Public examples and documentation were updated to the new ZIP naming policy.
+
 ## Next Planned Work
 
-Planned next improvement after `v1.16.2`:
+Planned next improvement after `v1.17.0`:
 
 ```text
-real-usage improvements
+new IED types
 ```
 
 Likely scope:
 
-- validate GE behavior with more real environments;
-- refine user-facing labels, warnings, and documentation based on actual tests;
 - add new IED types only when clean/sanitized samples and reliable version rules
   are available.
+- continue minor UX/translation fixes as patch releases when real users report
+  concrete issues.
 
 Roadmap reference:
 
-- `docs/PLANO_MELHORIAS.md` now lists `v1.17.0` as the next estimated milestone
-  for improvements guided by real use; code signing, operational reports, and
-  external `.sha256` files remain outside the active roadmap.
+- `docs/PLANO_MELHORIAS.md` now lists `v1.18.0` as the next estimated milestone
+  for new IED types; code signing, operational reports, and external `.sha256`
+  files remain outside the active roadmap.

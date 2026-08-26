@@ -44,6 +44,10 @@ Run:
 The script should run lint/tests, build with PyInstaller, copy the executable to
 `releases/vX.Y.Z/`, and remove the generated `.spec`.
 
+The release script sanitizes `PATH` while PyInstaller runs. Keep this behavior:
+developer-tool runtimes can inject unrelated DLLs, which may increase the
+executable size and break Qt startup on other machines.
+
 `releases/` is a local ignored artifact folder. Do not force-add it to Git; use
 GitHub Releases for downloadable executables and release notes.
 
@@ -70,6 +74,10 @@ releases/vX.Y.Z/RELEASE_NOTES.md exists
 IED Backup Manager.spec does not exist
 build/ and dist/ do not exist
 ```
+
+For PySide6/Qt releases, also confirm the executable size stays near the
+previous release. A sudden large increase can indicate unrelated DLL collection
+from the local environment.
 
 Then report executable path, release notes path, validation result, final
 executable size, and confirm `releases/` remains ignored by Git.

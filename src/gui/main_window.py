@@ -30,6 +30,7 @@ from PySide6.QtWidgets import (
 )
 
 from src.config.config_manager import AppConfig, load_config, save_config
+from src.core.app_logging import get_logger
 from src.core.backup_service import (
     AtuDuplicatePlan,
     BackupPlan,
@@ -41,11 +42,15 @@ from src.core.i18n import DEFAULT_LANGUAGE, message_label, status_label, ui_text
 from src.core.naming import BackupStage, normalize_stage
 from src.core.project_types.base import ProjectType, ProjectVersionRequiredError
 from src.core.project_types.registry import PROJECT_TYPES, get_project_type
+from src.core.storage import (
+    StorageError,
+    find_legacy_backup_rename_plans,
+    rename_legacy_backups,
+)
 from src.gui.backup_application_service import (
     PreviewRequest,
     PreviewValidationCode,
     PreviewValidationError,
-    build_preview,
     manual_version_project_type,
     summarize_preview,
 )
@@ -58,7 +63,9 @@ from src.gui.backup_worker import BackupExecutionWorker, BackupProgressEvent
 from src.gui.execution_summary_dialog import show_execution_summary_dialog
 from src.gui.history_cleanup_window import HistoryCleanupWindow
 from src.gui.language_button import configure_language_button
+from src.gui.message_box import question_yes_no
 from src.gui.preview_table import populate_preview_table, source_files_text
+from src.gui.preview_worker import PreviewWorker
 from src.gui.resources import app_icon_path, help_document_url, language_flag_path, repository_url
 from src.gui.runtime import get_runtime_project_dir
 from src.gui.settings_window import SettingsWindow
@@ -69,6 +76,8 @@ from src.gui.update_worker import UpdateCheckWorker
 from src.version import APP_DISPLAY_NAME
 
 MANUAL_STAGE_DATA = "__manual_stage__"
+PREVIEW_REFRESH_DELAY_MS = 250
+
 
 class MainWindow(QMainWindow):
     """Main GUI controller for configuration, preview, execution, and logs."""
@@ -89,21 +98,34 @@ class MainWindow(QMainWindow):
         self.pending_show_startup_instructions: bool | None = None
         self.backup_thread: QThread | None = None
         self.backup_worker: BackupExecutionWorker | None = None
+        self.preview_thread: QThread | None = None
+        self.preview_worker: PreviewWorker | None = None
+        self.preview_refresh_pending = False
         self.update_thread: QThread | None = None
         self.update_worker: UpdateCheckWorker | None = None
         self.latest_release_url: str | None = None
         self.progress_dialog: QProgressDialog | None = None
         self.cancel_requested = False
+        self.legacy_rename_prompted = False
+        self.startup_sequence_active = (
+            auto_startup_dialogs and self._startup_sequence_needs_dialogs()
+        )
+        self.logger = get_logger("main_window")
+        self.logger.info("Initializing main window: project_dir=%s", self.project_dir)
 
         self.setWindowTitle(APP_DISPLAY_NAME)
         self.setWindowIcon(QIcon(str(app_icon_path())))
         self.setMinimumSize(920, 620)
         self._resize_to_available_screen()
         self._build_ui()
+        self.preview_refresh_timer = QTimer(self)
+        self.preview_refresh_timer.setSingleShot(True)
+        self.preview_refresh_timer.timeout.connect(self._start_preview_refresh)
         self._load_manual_software_version(self._manual_version_project_type())
         if auto_startup_dialogs:
             self.schedule_startup_dialogs()
-        self.refresh_preview()
+        if not self.startup_sequence_active:
+            self.refresh_preview()
         self.schedule_update_check()
 
     def schedule_startup_dialogs(self) -> None:
@@ -195,6 +217,14 @@ class MainWindow(QMainWindow):
 
         self.preview_group = QGroupBox()
         layout = QVBoxLayout(self.preview_group)
+        self.preview_loading_label = QLabel()
+        self.preview_loading_label.setVisible(False)
+        layout.addWidget(self.preview_loading_label)
+        self.preview_loading_bar = QProgressBar()
+        self.preview_loading_bar.setRange(0, 0)
+        self.preview_loading_bar.setTextVisible(False)
+        self.preview_loading_bar.setVisible(False)
+        layout.addWidget(self.preview_loading_bar)
         self.preview_table = QTableWidget(0, 6)
         self.preview_table.verticalHeader().setVisible(False)
         self.preview_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
@@ -323,19 +353,37 @@ class MainWindow(QMainWindow):
         """Load config.json from the runtime folder when it exists."""
 
         if not self.config_path.exists():
+            get_logger("config").info("config.json not found: %s", self.config_path)
             return None
         try:
-            return load_config(self.config_path)
+            config = load_config(self.config_path)
+            get_logger("config").info("config.json loaded: %s", self.config_path)
+            return config
         except Exception as exc:
+            get_logger("config").exception("Could not load config.json: %s", self.config_path)
             QMessageBox.warning(self, ui_text("settings_invalid", self.language), str(exc))
             return None
+
+    def _startup_sequence_needs_dialogs(self) -> bool:
+        """Return whether startup instructions/settings should run before preview."""
+
+        if not self.config:
+            return True
+        return self.config.show_startup_instructions
 
     def _run_startup_dialogs(self) -> None:
         """Show first-run guidance and then request settings when needed."""
 
-        self._show_startup_instructions_if_needed()
-        if not self.config:
-            self.open_settings()
+        self.logger.info("Running startup dialogs")
+        self.startup_sequence_active = True
+        try:
+            self._show_startup_instructions_if_needed()
+            if not self.config:
+                self.logger.info("Opening settings because config is missing")
+                self.open_settings()
+        finally:
+            self.startup_sequence_active = False
+        self.refresh_preview()
 
     def _show_startup_instructions_if_needed(self) -> None:
         """Show usage guidance unless the user opted out in config.json."""
@@ -389,6 +437,7 @@ class MainWindow(QMainWindow):
     def open_settings(self) -> None:
         """Open the settings dialog and refresh the preview after saving."""
 
+        self.logger.info("Opening settings dialog")
         dialog = SettingsWindow(
             config_path=self.config_path,
             config=self.config,
@@ -415,6 +464,7 @@ class MainWindow(QMainWindow):
         if self.update_thread is not None:
             return
 
+        self.logger.info("Starting update check")
         self.update_thread = QThread(self)
         self.update_worker = UpdateCheckWorker()
         self.update_worker.moveToThread(self.update_thread)
@@ -430,6 +480,12 @@ class MainWindow(QMainWindow):
     def _on_update_check_finished(self, result) -> None:
         """Show the update notice only when a newer release exists."""
 
+        self.logger.info(
+            "Update check finished: current=%s, latest=%s, available=%s",
+            result.current_version,
+            result.latest_version,
+            result.update_available,
+        )
         if not result.update_available:
             self.latest_release_url = None
             self.update_available_label.setVisible(False)
@@ -451,6 +507,7 @@ class MainWindow(QMainWindow):
     def _on_update_check_failed(self, _message: str) -> None:
         """Keep startup quiet when update checks fail."""
 
+        self.logger.info("Update check failed silently: %s", _message)
         self.latest_release_url = None
         self.update_available_label.setVisible(False)
 
@@ -492,6 +549,12 @@ class MainWindow(QMainWindow):
     def on_settings_saved(self, config: AppConfig) -> None:
         """Update in-memory configuration after the settings dialog saves."""
 
+        self.logger.info(
+            "Settings saved: atu=%s, his=%s, types=%s",
+            config.atu_path,
+            config.his_path,
+            config.project_types,
+        )
         self.config = config
         if self.pending_show_startup_instructions is not None:
             self.config = AppConfig(
@@ -532,30 +595,118 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def refresh_preview(self) -> None:
-        """Rebuild the batch preview using the current config and selected filters."""
+        """Schedule a preview refresh without blocking the GUI."""
 
         selected_project_types = self._selected_project_types()
         manual_project_type = self._manual_version_project_type(selected_project_types)
         self._set_software_version_visible(manual_project_type is not None)
+        self.logger.info("Preview refresh scheduled")
+        self.preview_refresh_timer.start(PREVIEW_REFRESH_DELAY_MS)
 
+    def _start_preview_refresh(self) -> None:
+        """Start preview planning in a worker thread."""
+
+        if self.preview_thread is not None:
+            self.preview_refresh_pending = True
+            self.logger.info("Preview refresh queued while another preview is running")
+            return
+        if self.startup_sequence_active:
+            self.logger.info("Preview refresh skipped until startup dialogs finish")
+            return
+        if self._prompt_legacy_backup_rename_if_needed():
+            return
+
+        request = PreviewRequest(
+            project_dir=self.project_dir,
+            config=self.config,
+            selected_project_types=self._selected_project_types(),
+            selected_stage=self._selected_stage(),
+            latest_only=self.latest_only_checkbox.isChecked(),
+            software_version_override=self._software_version_override(),
+            software_version_overrides=self._software_version_overrides(),
+        )
+        self._show_preview_loading()
+        self.preview_thread = QThread(self)
+        self.preview_worker = PreviewWorker(request)
+        self.preview_worker.moveToThread(self.preview_thread)
+        self.preview_thread.started.connect(self.preview_worker.run)
+        self.preview_worker.finished.connect(self._on_preview_finished)
+        self.preview_worker.failed.connect(self._on_preview_failed)
+        self.preview_worker.finished.connect(self.preview_thread.quit)
+        self.preview_worker.failed.connect(self.preview_thread.quit)
+        self.preview_thread.finished.connect(self.preview_worker.deleteLater)
+        self.preview_thread.finished.connect(self._clear_preview_worker)
+        self.preview_thread.start()
+
+    def _prompt_legacy_backup_rename_if_needed(self) -> bool:
+        """Offer an explicit migration when ATU/HIS contain legacy ZIP names."""
+
+        if not self.config or self.legacy_rename_prompted:
+            return False
+        plans = find_legacy_backup_rename_plans(
+            (self.config.atu_path, self.config.his_path),
+        )
+        if not plans:
+            return False
+
+        self.legacy_rename_prompted = True
+        details = "\n".join(
+            f"{plan.source_path.name} -> {plan.destination_path.name}"
+            for plan in plans[:8]
+        )
+        if len(plans) > 8:
+            details += f"\n... +{len(plans) - 8}"
+        answer = question_yes_no(
+            self,
+            title=ui_text("legacy_backup_rename_title", self.language),
+            text=ui_text("legacy_backup_rename_message", self.language).format(
+                count=len(plans),
+                details=details,
+            ),
+            language=self.language,
+            default_button=QMessageBox.StandardButton.Yes,
+        )
+        if answer != QMessageBox.StandardButton.Yes:
+            return False
         try:
-            preview = build_preview(
-                PreviewRequest(
-                    project_dir=self.project_dir,
-                    config=self.config,
-                    selected_project_types=selected_project_types,
-                    selected_stage=self._selected_stage(),
-                    latest_only=self.latest_only_checkbox.isChecked(),
-                    software_version_override=self._software_version_override(),
-                    software_version_overrides=self._software_version_overrides(),
-                )
+            renamed = rename_legacy_backups(plans)
+        except StorageError as exc:
+            QMessageBox.critical(
+                self,
+                ui_text("legacy_backup_rename_failed_title", self.language),
+                str(exc),
             )
-            self.current_plans = preview.plans
-            self.atu_duplicate_plans = preview.duplicate_plans
-            self._set_software_version_visible(preview.manual_project_type is not None)
-        except PreviewValidationError as exc:
-            self.current_plans = []
-            self.atu_duplicate_plans = []
+            return True
+        self.log_output.appendPlainText(
+            ui_text("legacy_backup_rename_done", self.language).format(
+                count=len(renamed),
+            )
+        )
+        self.refresh_preview()
+        return True
+
+    def _on_preview_finished(self, preview) -> None:
+        """Render preview plans after the worker finishes."""
+
+        if self.preview_refresh_pending:
+            self._show_preview_loading()
+            return
+        self._hide_preview_loading()
+        self.current_plans = preview.plans
+        self.atu_duplicate_plans = preview.duplicate_plans
+        self._set_software_version_visible(preview.manual_project_type is not None)
+        self._show_plans(self.current_plans, self.atu_duplicate_plans)
+
+    def _on_preview_failed(self, exc: Exception) -> None:
+        """Render validation or runtime preview errors."""
+
+        if self.preview_refresh_pending:
+            self._show_preview_loading()
+            return
+        self._hide_preview_loading()
+        self.current_plans = []
+        self.atu_duplicate_plans = []
+        if isinstance(exc, PreviewValidationError):
             self._set_software_version_visible(exc.project_type is not None)
             if exc.code == PreviewValidationCode.REQUIRED_MANUAL_SOFTWARE_VERSION:
                 self._clear_preview(
@@ -566,9 +717,7 @@ class MainWindow(QMainWindow):
             else:
                 self._clear_preview(ui_text(exc.code.value, self.language))
             return
-        except ProjectVersionRequiredError as exc:
-            self.current_plans = []
-            self.atu_duplicate_plans = []
+        if isinstance(exc, ProjectVersionRequiredError):
             self._set_software_version_visible(True)
             self._clear_preview(
                 ui_text("required_software_version", self.language).format(
@@ -576,17 +725,23 @@ class MainWindow(QMainWindow):
                 )
             )
             return
-        except Exception as exc:
-            self.current_plans = []
-            self.atu_duplicate_plans = []
-            self._clear_preview(str(exc))
-            return
+        self._clear_preview(str(exc))
 
-        self._show_plans(self.current_plans, self.atu_duplicate_plans)
+    def _clear_preview_worker(self) -> None:
+        """Release preview worker references and run any queued refresh."""
+
+        self.preview_thread = None
+        self.preview_worker = None
+        if self.preview_refresh_pending:
+            self.preview_refresh_pending = False
+            self.preview_refresh_timer.start(0)
 
     def generate_backup(self) -> None:
         """Confirm and execute the currently planned backup batch."""
 
+        if self.preview_thread is not None:
+            self.log_output.appendPlainText(ui_text("preview_loading_detail", self.language))
+            return
         if not self.config:
             QMessageBox.warning(
                 self,
@@ -628,27 +783,27 @@ class MainWindow(QMainWindow):
 
         fix_duplicates = False
         if summary.atu_duplicates:
-            answer = QMessageBox.question(
+            answer = question_yes_no(
                 self,
-                ui_text("duplicates_title", self.language),
-                f"{ui_text('duplicate_files_found', self.language)}\n\n"
+                title=ui_text("duplicates_title", self.language),
+                text=f"{ui_text('duplicate_files_found', self.language)}\n\n"
                 f"{duplicate_problem_files(self.atu_duplicate_plans)}\n\n"
                 f"{ui_text('duplicates_question', self.language)}",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No,
+                language=self.language,
+                default_button=QMessageBox.StandardButton.No,
             )
             fix_duplicates = answer == QMessageBox.StandardButton.Yes
 
-        answer = QMessageBox.question(
+        answer = question_yes_no(
             self,
-            ui_text("confirm_execution", self.language),
-            execution_confirmation_message(
+            title=ui_text("confirm_execution", self.language),
+            text=execution_confirmation_message(
                 summary,
                 fix_duplicates=fix_duplicates,
                 language=self.language,
             ),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
+            language=self.language,
+            default_button=QMessageBox.StandardButton.No,
         )
         if answer != QMessageBox.StandardButton.Yes:
             return
@@ -666,6 +821,7 @@ class MainWindow(QMainWindow):
 
         plans = self.current_plans
         self.cancel_requested = False
+        self.logger.info("Backup execution starting: plans=%s", len(plans))
         self.progress_dialog = QProgressDialog(
             ui_text("progress_starting", self.language),
             ui_text("cancel", self.language),
@@ -752,6 +908,12 @@ class MainWindow(QMainWindow):
     ) -> None:
         """Handle successful or canceled worker completion."""
 
+        self.logger.info(
+            "Backup execution finished: results=%s, duplicate_results=%s, canceled=%s",
+            len(results),
+            len(duplicate_results),
+            canceled,
+        )
         self._close_progress_dialog(ui_text("progress_finished", self.language))
         self.generate_button.setEnabled(True)
         self._write_execution_log(duplicate_results, results)
@@ -799,6 +961,7 @@ class MainWindow(QMainWindow):
     def _on_backup_failed(self, message: str) -> None:
         """Handle worker failure."""
 
+        self.logger.error("Backup execution failed: %s", message)
         self._close_progress_dialog("")
         self.generate_button.setEnabled(True)
         QMessageBox.critical(self, ui_text("backup_failed", self.language), message)
@@ -849,6 +1012,22 @@ class MainWindow(QMainWindow):
         self.backup_thread = None
         self.backup_worker = None
 
+    def _show_preview_loading(self) -> None:
+        """Show an indeterminate preview loading state."""
+
+        self.generate_button.setEnabled(False)
+        self.preview_loading_label.setText(ui_text("preview_loading", self.language))
+        self.preview_loading_label.setVisible(True)
+        self.preview_loading_bar.setVisible(True)
+        self.log_output.clear()
+        self.log_output.appendPlainText(ui_text("preview_loading_detail", self.language))
+
+    def _hide_preview_loading(self) -> None:
+        """Hide the preview loading state."""
+
+        self.preview_loading_label.setVisible(False)
+        self.preview_loading_bar.setVisible(False)
+
     def _show_plans(
         self,
         plans: list[BackupPlan],
@@ -890,6 +1069,7 @@ class MainWindow(QMainWindow):
     def _clear_preview(self, message: str) -> None:
         """Reset preview state and show a blocking message in the log area."""
 
+        self._hide_preview_loading()
         self.generate_button.setEnabled(False)
         self.log_output.clear()
         self.preview_table.setRowCount(0)
@@ -1100,6 +1280,7 @@ class MainWindow(QMainWindow):
             )
         self.summary_group.setTitle(ui_text("summary", self.language))
         self.preview_group.setTitle(ui_text("preview", self.language))
+        self.preview_loading_label.setText(ui_text("preview_loading", self.language))
         self.action_group.setTitle(ui_text("execution", self.language))
         self.log_output.setPlaceholderText(ui_text("preview", self.language))
         self.preview_table.setHorizontalHeaderLabels(
@@ -1158,15 +1339,15 @@ class MainWindow(QMainWindow):
             return
 
         if not target.exists():
-            answer = QMessageBox.question(
+            answer = question_yes_no(
                 self,
-                ui_text("storage_folder_missing_title", self.language),
-                ui_text("storage_folder_missing_message", self.language).format(
+                title=ui_text("storage_folder_missing_title", self.language),
+                text=ui_text("storage_folder_missing_message", self.language).format(
                     label=label,
                     path=target,
                 ),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No,
+                language=self.language,
+                default_button=QMessageBox.StandardButton.No,
             )
             if answer != QMessageBox.StandardButton.Yes:
                 return

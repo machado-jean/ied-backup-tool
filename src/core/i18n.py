@@ -70,6 +70,12 @@ UI_TEXT = {
         "files_to_process": "Serão processados {count} backups.",
         "file": "Arquivo",
         "fill_fields": "Preencha",
+        "fatal_startup_error": (
+            "O aplicativo encontrou um erro ao iniciar.\n\n"
+            "Erro: {error}\n\n"
+            "Log: {log_file}"
+        ),
+        "first_name": "Nome",
         "generate_backups": "Gerar backups",
         "help": "Ajuda",
         "help_open_failed": "Não foi possível abrir a ajuda online: {url}",
@@ -111,6 +117,7 @@ UI_TEXT = {
         "integrity_conflicts_title": "Conflitos de integridade",
         "his_folder": "Pasta HIS",
         "language_tooltip": "Idioma",
+        "last_name": "Sobrenome",
         "license": "Licença",
         "license_message": (
             "IED Backup Manager<br>"
@@ -120,6 +127,15 @@ UI_TEXT = {
             'Repositório: <a href="{url}">{url}</a>'
         ),
         "license_tooltip": "Licença e autoria",
+        "legacy_backup_rename_done": "{count} backup(s) antigo(s) renomeado(s).",
+        "legacy_backup_rename_failed_title": "Falha ao renomear backups antigos",
+        "legacy_backup_rename_message": (
+            "Foram encontrados {count} backup(s) com o padrão antigo de nome.\n\n"
+            "Eles não serão usados no versionamento atual até serem renomeados.\n\n"
+            "{details}\n\n"
+            "Deseja renomear agora?"
+        ),
+        "legacy_backup_rename_title": "Backups antigos encontrados",
         "mode": "Modo",
         "new": "Novos",
         "no_digsi_found": "Nenhum arquivo DIGSI 5 encontrado nesta pasta.",
@@ -128,7 +144,12 @@ UI_TEXT = {
         "nothing_to_execute": "Nada a executar",
         "open_atu": "Abrir ATU",
         "open_his": "Abrir HIS",
+        "no": "Não",
         "preview": "Prévia do lote",
+        "preview_loading": "Processando arquivos...",
+        "preview_loading_detail": (
+            "Varredura em andamento. Aguarde enquanto os arquivos da pasta são analisados."
+        ),
         "preview_note": "PRÉVIA: nenhum arquivo foi criado ou movido ainda.",
         "progress_finished": "Backups concluídos.",
         "progress_cancel_pending": (
@@ -152,7 +173,7 @@ UI_TEXT = {
         "project": "Projeto",
         "refresh": "Atualizar",
         "replaced_current": "Substituições em ATU",
-        "required_config": "Configure colaborador, ATU e HIS antes de gerar backup.",
+        "required_config": "Configure nome, sobrenome, ATU e HIS antes de gerar backup.",
         "required_fields": "Campos obrigatórios",
         "required_stage": "Selecione a etapa antes de gerar backup.",
         "required_type": "Selecione ao menos um tipo de arquivo suportado.",
@@ -166,6 +187,12 @@ UI_TEXT = {
         "settings_invalid": "Configuração inválida",
         "settings_pending": "Configuração pendente",
         "settings_required": "Salve as configurações antes de gerar backup.",
+        "select_folder_title": "Selecionar pasta",
+        "splash_loading": "Carregando...",
+        "splash_loading_modules": "Carregando módulos...",
+        "splash_opening_application": "Abrindo aplicação...",
+        "splash_preparing_interface": "Preparando interface",
+        "splash_reading_settings": "Lendo configurações...",
         "storage_folder_missing_message": (
             "{label} não existe:\n\n{path}\n\nDeseja criá-la agora?"
         ),
@@ -219,6 +246,7 @@ UI_TEXT = {
         "update_available": "Nova versão disponível! Clique para baixar.",
         "update_available_tooltip": "Clique para baixar a versão {version}.",
         "version": "Versão",
+        "yes": "Sim",
     },
     "en_US": {
         "action": "Action",
@@ -251,6 +279,12 @@ UI_TEXT = {
         "files_to_process": "{count} backups will be processed.",
         "file": "File",
         "fill_fields": "Fill in",
+        "fatal_startup_error": (
+            "The application found an error during startup.\n\n"
+            "Error: {error}\n\n"
+            "Log: {log_file}"
+        ),
+        "first_name": "First name",
         "generate_backups": "Generate backups",
         "help": "Help",
         "help_open_failed": "Could not open the online help: {url}",
@@ -267,10 +301,10 @@ UI_TEXT = {
         "history_cleanup_done_title": "Cleanup completed",
         "history_cleanup_failed_title": "HIS cleanup failed",
         "history_cleanup_notice": (
-            "HIS has {count} file(s) candidate for cleanup ({size})."
+            "HIS has {count} cleanup candidate(s) ({size})."
         ),
         "history_cleanup_manual_after_backup": (
-            "HIS cleanup: {count} file(s) are candidate for cleanup "
+            "HIS cleanup: {count} file(s) are candidates for cleanup "
             "({size}). Review the items before removing them."
         ),
         "history_cleanup_reason": "Reason",
@@ -292,6 +326,7 @@ UI_TEXT = {
         "integrity_conflicts_title": "Integrity conflicts",
         "his_folder": "HIS folder",
         "language_tooltip": "Language",
+        "last_name": "Last name",
         "license": "License",
         "license_message": (
             "IED Backup Manager<br>"
@@ -301,6 +336,15 @@ UI_TEXT = {
             'Repository: <a href="{url}">{url}</a>'
         ),
         "license_tooltip": "License and authorship",
+        "legacy_backup_rename_done": "{count} old backup(s) renamed.",
+        "legacy_backup_rename_failed_title": "Failed to rename old backups",
+        "legacy_backup_rename_message": (
+            "{count} backup(s) using the old filename pattern were found.\n\n"
+            "They will not be used by the current versioning rules until renamed.\n\n"
+            "{details}\n\n"
+            "Rename now?"
+        ),
+        "legacy_backup_rename_title": "Old backups found",
         "mode": "Mode",
         "new": "New",
         "no_digsi_found": "No DIGSI 5 file found in this folder.",
@@ -309,7 +353,12 @@ UI_TEXT = {
         "nothing_to_execute": "Nothing to execute",
         "open_atu": "Open ATU",
         "open_his": "Open HIS",
+        "no": "No",
         "preview": "Batch preview",
+        "preview_loading": "Processing files...",
+        "preview_loading_detail": (
+            "Scan in progress. Wait while the folder files are analyzed."
+        ),
         "preview_note": "PREVIEW: no file has been created or moved yet.",
         "progress_finished": "Backups completed.",
         "progress_cancel_pending": (
@@ -333,7 +382,7 @@ UI_TEXT = {
         "project": "Project",
         "refresh": "Refresh",
         "replaced_current": "ATU updates",
-        "required_config": "Configure collaborator, ATU and HIS before generating backup.",
+        "required_config": "Configure first name, last name, ATU and HIS before generating backup.",
         "required_fields": "Required fields",
         "required_stage": "Select the stage before generating backup.",
         "required_type": "Select at least one supported file type.",
@@ -347,6 +396,12 @@ UI_TEXT = {
         "settings_invalid": "Invalid settings",
         "settings_pending": "Pending settings",
         "settings_required": "Save settings before generating backup.",
+        "select_folder_title": "Select folder",
+        "splash_loading": "Loading...",
+        "splash_loading_modules": "Loading modules...",
+        "splash_opening_application": "Opening application...",
+        "splash_preparing_interface": "Preparing interface",
+        "splash_reading_settings": "Reading settings...",
         "storage_folder_missing_message": (
             "{label} does not exist:\n\n{path}\n\nDo you want to create it now?"
         ),
@@ -400,6 +455,7 @@ UI_TEXT = {
         "update_available": "New version available! Click to download.",
         "update_available_tooltip": "Click to download version {version}.",
         "version": "Version",
+        "yes": "Yes",
     },
 }
 

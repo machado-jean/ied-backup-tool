@@ -1,3 +1,5 @@
+import os
+from datetime import datetime
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -28,6 +30,32 @@ def test_create_backup_zip_reports_byte_progress(tmp_path: Path) -> None:
     assert events
     assert events[0] == ("zip", 0, 2048)
     assert events[-1] == ("zip", 2048, 2048)
+
+
+def test_create_backup_zip_preserves_source_modified_time(tmp_path: Path) -> None:
+    source = tmp_path / "project.dz5"
+    source.write_bytes(b"backup")
+    modified_at = datetime(2026, 8, 24, 10, 30, 0)
+    os.utime(source, (modified_at.timestamp(), modified_at.timestamp()))
+
+    zip_path = create_backup_zip(source, "backup.zip", output_dir=tmp_path / "out")
+
+    with ZipFile(zip_path) as archive:
+        info = archive.getinfo("project.dz5")
+        assert info.date_time == (2026, 8, 24, 10, 30, 0)
+
+
+def test_create_backup_zip_clamps_unsupported_old_modified_time(tmp_path: Path) -> None:
+    source = tmp_path / "project.dz5"
+    source.write_bytes(b"backup")
+    old_time = datetime(1979, 12, 31, 23, 59, 58)
+    os.utime(source, (old_time.timestamp(), old_time.timestamp()))
+
+    zip_path = create_backup_zip(source, "backup.zip", output_dir=tmp_path / "out")
+
+    with ZipFile(zip_path) as archive:
+        info = archive.getinfo("project.dz5")
+        assert info.date_time == (1980, 1, 1, 0, 0, 0)
 
 
 def test_create_backup_zip_preserves_relative_folders_for_nested_sources(

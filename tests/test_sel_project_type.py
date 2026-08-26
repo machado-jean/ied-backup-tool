@@ -44,7 +44,7 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.TAF,
         project_type=SEL_PROJECT_TYPE,
     )
@@ -52,8 +52,8 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
     assert [result.status for result in results] == ["stored"]
     [zip_path] = list(atu.glob("*.zip"))
     assert zip_path.name == (
-        "QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_SE-FFF_20260619-0013_"
-        "COLABORADOR-EXEMPLO_TAF.zip"
+        "QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_SE-FFF_2026-06-19_00h13_"
+        "COLABORADOR EXEMPLO_TAF.zip"
     )
     with zipfile.ZipFile(zip_path) as archive:
         assert archive.namelist() == [
@@ -79,14 +79,14 @@ def test_sel_version_fallback_is_used_when_quickset_is_missing(tmp_path: Path) -
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
         project_type=SEL_PROJECT_TYPE,
         software_version_override="7.5.2.3",
     )
 
     assert [path.name for path in atu.glob("*.zip")] == [
-        "QUICKSET-V7.5.2.3_SE-FFF_20260619-0013_COLABORADOR-EXEMPLO_DEV.zip"
+        "QUICKSET-V7.5.2.3_SE-FFF_2026-06-19_00h13_COLABORADOR EXEMPLO_DEV.zip"
     ]
 
 

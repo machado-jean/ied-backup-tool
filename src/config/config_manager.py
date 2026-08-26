@@ -8,6 +8,11 @@ from pathlib import Path
 from typing import Any
 
 from src.core.i18n import DEFAULT_LANGUAGE
+from src.core.naming import (
+    compact_collaborator_name,
+    format_collaborator_name,
+    normalize_person_name_part,
+)
 
 
 class ConfigError(RuntimeError):
@@ -28,11 +33,25 @@ class AppConfig:
     collaborator: str
     atu_path: Path
     his_path: Path
+    collaborator_first_name: str = ""
+    collaborator_last_name: str = ""
     language: str = DEFAULT_LANGUAGE
     project_types: tuple[str, ...] = ()
     software_versions: dict[str, str] | None = None
     show_startup_instructions: bool = True
     history_cleanup: HistoryCleanupConfig = HistoryCleanupConfig()
+
+    def __post_init__(self) -> None:
+        """Keep legacy collaborator input and split name fields synchronized."""
+
+        first_name = normalize_person_name_part(self.collaborator_first_name)
+        last_name = normalize_person_name_part(self.collaborator_last_name)
+        if not first_name and not last_name:
+            first_name, last_name = split_collaborator_name(self.collaborator)
+        collaborator = format_collaborator_name(first_name, last_name)
+        object.__setattr__(self, "collaborator_first_name", first_name)
+        object.__setattr__(self, "collaborator_last_name", last_name)
+        object.__setattr__(self, "collaborator", collaborator)
 
 
 def load_config(path: Path) -> AppConfig:
@@ -57,6 +76,8 @@ def save_config(path: Path, config: AppConfig) -> None:
 
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
+        "nome": config.collaborator_first_name,
+        "sobrenome": config.collaborator_last_name,
         "colaborador": config.collaborator,
         "atu_path": str(config.atu_path),
         "his_path": str(config.his_path),
@@ -74,7 +95,7 @@ def save_config(path: Path, config: AppConfig) -> None:
 def parse_config(raw: dict[str, Any]) -> AppConfig:
     """Convert raw JSON data into a normalized application configuration."""
 
-    collaborator = _required_str(raw, "colaborador")
+    first_name, last_name = _read_collaborator_fields(raw)
     atu_path = Path(_required_str(raw, "atu_path"))
     his_path = Path(_required_str(raw, "his_path"))
     language = raw.get("language", DEFAULT_LANGUAGE)
@@ -92,7 +113,9 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
     history_cleanup = _parse_history_cleanup(raw.get("history_cleanup", {}))
 
     return AppConfig(
-        collaborator=collaborator.strip().upper().replace(" ", "-"),
+        collaborator=format_collaborator_name(first_name, last_name),
+        collaborator_first_name=first_name,
+        collaborator_last_name=last_name,
         atu_path=atu_path,
         his_path=his_path,
         language=language,
@@ -105,6 +128,33 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
         show_startup_instructions=show_startup_instructions,
         history_cleanup=history_cleanup,
     )
+
+
+def split_collaborator_name(collaborator: str) -> tuple[str, str]:
+    """Split legacy collaborator text into first and last name fields."""
+
+    compacted = compact_collaborator_name(collaborator)
+    parts = compacted.split()
+    if not parts:
+        return "", ""
+    if len(parts) == 1:
+        return parts[0], ""
+    return parts[0], parts[-1]
+
+
+def _read_collaborator_fields(raw: dict[str, Any]) -> tuple[str, str]:
+    """Read current name fields or migrate the legacy collaborator field."""
+
+    first_name = raw.get("nome")
+    last_name = raw.get("sobrenome")
+    if isinstance(first_name, str) and first_name.strip():
+        return (
+            normalize_person_name_part(first_name),
+            normalize_person_name_part(last_name if isinstance(last_name, str) else ""),
+        )
+
+    collaborator = _required_str(raw, "colaborador")
+    return split_collaborator_name(collaborator)
 
 
 def _required_str(raw: dict[str, Any], key: str) -> str:

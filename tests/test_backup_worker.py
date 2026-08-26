@@ -21,7 +21,7 @@ def test_backup_worker_cancels_before_first_file(tmp_path: Path) -> None:
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
     finished = []
@@ -53,7 +53,7 @@ def test_backup_worker_cancel_during_zip_does_not_publish_backup(tmp_path: Path)
         project_dir=project_dir,
         atu_path=atu,
         his_path=his,
-        collaborator="COLABORADOR-EXEMPLO",
+        collaborator="COLABORADOR EXEMPLO",
         stage=BackupStage.DEV,
     )
     finished = []

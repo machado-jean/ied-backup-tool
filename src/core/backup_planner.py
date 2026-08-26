@@ -16,7 +16,12 @@ from src.core.backup_models import (
     BackupStatusValue,
 )
 from src.core.integrity import has_sha256_conflict
-from src.core.naming import BackupStage, build_backup_name, get_file_timestamp
+from src.core.naming import (
+    BackupStage,
+    build_backup_name,
+    format_backup_timestamp,
+    get_file_timestamp,
+)
 from src.core.project_types.base import ProjectDetectionError, ProjectType
 from src.core.project_types.registry import DEFAULT_PROJECT_TYPE
 from src.core.storage import (
@@ -363,7 +368,7 @@ def _plan_backup_name(
                 status=STATUS_ARCHIVED_HISTORY,
                 software=software,
                 project=planned_info.project,
-                timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+                timestamp_text=format_backup_timestamp(planned_info.timestamp),
                 collaborator=planned_info.collaborator,
                 stage=planned_info.stage,
                 project_type_key=project_type_key,
@@ -381,7 +386,7 @@ def _plan_backup_name(
             status=STATUS_SKIPPED_OLDER,
             software=software,
             project=planned_info.project,
-            timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+            timestamp_text=format_backup_timestamp(planned_info.timestamp),
             collaborator=planned_info.collaborator,
             stage=planned_info.stage,
             project_type_key=project_type_key,
@@ -414,7 +419,7 @@ def _plan_backup_name(
             status=STATUS_ALREADY_CURRENT,
             software=software,
             project=planned_info.project,
-            timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+            timestamp_text=format_backup_timestamp(planned_info.timestamp),
             collaborator=planned_info.collaborator,
             stage=planned_info.stage,
             project_type_key=project_type_key,
@@ -433,7 +438,7 @@ def _plan_backup_name(
             status=STATUS_REPLACED_CURRENT,
             software=software,
             project=planned_info.project,
-            timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+            timestamp_text=format_backup_timestamp(planned_info.timestamp),
             collaborator=planned_info.collaborator,
             stage=planned_info.stage,
             project_type_key=project_type_key,
@@ -451,7 +456,7 @@ def _plan_backup_name(
         status=STATUS_STORED,
         software=software,
         project=planned_info.project,
-        timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+        timestamp_text=format_backup_timestamp(planned_info.timestamp),
         collaborator=planned_info.collaborator,
         stage=planned_info.stage,
         project_type_key=project_type_key,
@@ -485,7 +490,7 @@ def _build_plan(
         status=status,
         software=software,
         project=planned_info.project,
-        timestamp_text=planned_info.timestamp.strftime("%Y%m%d-%H%M"),
+        timestamp_text=format_backup_timestamp(planned_info.timestamp),
         collaborator=planned_info.collaborator,
         stage=planned_info.stage,
         project_type_key=project_type_key,
