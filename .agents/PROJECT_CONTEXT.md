@@ -162,16 +162,24 @@ Generate release executable:
 .\scripts\release.ps1
 ```
 
+Verify generated release assets without publishing:
+
+```powershell
+.\releases\vX.Y.Z\PUBLISH_RELEASE.ps1 -VerifyOnly
+```
+
 ## Working Style
 
 - Prefer small, versioned changes.
-- Before generating an executable, update `src/version.py`, `README.md`,
-  `.agents/CURRENT_STATE.md`, and `releases/vX.Y.Z/RELEASE_NOTES.md`.
+- Before generating an executable, update `src/version.py`, both README files,
+  `.agents/CURRENT_STATE.md`, relevant bilingual docs/roadmaps, and
+  `releases/vX.Y.Z/RELEASE_NOTES.md`.
 - Distributed executable filename is fixed: `IED_Backup_Manager.exe`.
 - Keep versioning in the release folder, release notes, Git tag, window title,
   and splash screen, not in the executable filename.
 - `releases/` is a local ignored artifact folder and must not be committed.
-  Publish executables and release notes through GitHub Releases instead.
+  `scripts/release.ps1` generates the executable, notes, `SHA256SUMS.txt`, and
+  `PUBLISH_RELEASE.ps1`; publish those assets through GitHub Releases.
 - When the user asks to generate the `.exe`, generate it directly using
   `scripts/release.ps1` unless there is a clear blocker.
 - Every release should update `.agents/CURRENT_STATE.md`,
@@ -187,7 +195,10 @@ Generate release executable:
 - Local diagnostics log directory:
   `%LOCALAPPDATA%\IED Backup Manager\logs\`
 - Logs are daily files named `ied-backup-manager-YYYY-MM-DD.log`.
-- The active next roadmap milestone after `v1.17.0` is new IED types when
+- Unexpected-session markers and heartbeats also remain under the per-user log
+  directory. Windows events are queried only after explicit consent, within a
+  narrow time window, and are never uploaded automatically.
+- The active next roadmap milestone after `v1.17.1` is new IED types when
   clean/sanitized samples and reliable version rules are available.
   Operational reports and external `.sha256` files are intentionally outside
   the active roadmap for now.
@@ -233,5 +244,18 @@ Generate release executable:
 - Check GitHub Releases in a worker thread after startup.
 - Show update status only when a newer version exists.
 - Use a red clickable notice in the bottom-left corner of the main window.
+- Keep the primary link as the stable direct executable download and provide a
+  separate `O que há de novo?` / `What's new?` link to the specific release.
 - Keep network errors silent; update checks must never block backup workflows.
 - Do not auto-download or replace the executable.
+
+## Release Publishing Rules
+
+- GitHub Actions workflow `CI` runs on `master`, pull requests, and `v*` tags.
+- Build locally with `scripts/release.ps1`; it must validate the generated
+  publisher and remove temporary PyInstaller output after success.
+- Before publishing, commit tracked changes and push `master`.
+- Do not manually create the release tag. Run the generated
+  `PUBLISH_RELEASE.ps1` only after explicit publication authorization.
+- Publishing requires a clean worktree, `HEAD == origin/master`, green CI,
+  authenticated GitHub CLI, correct hashes, and all expected assets.

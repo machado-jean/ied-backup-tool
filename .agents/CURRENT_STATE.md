@@ -1,79 +1,44 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-08-26
+Last updated: 2026-09-14
 
 ## Current Version
 
-Current application version: `1.17.0`
+Current application version: `1.17.1`
 
 Latest generated executable:
 
 ```text
-releases/v1.17.0/IED_Backup_Manager.exe
+releases/v1.17.1/IED_Backup_Manager.exe
 ```
 
-The `v1.17.0` executable has been generated locally. The release script now
-sanitizes `PATH` during PyInstaller builds to prevent unrelated developer-tool
-DLLs from being collected into the executable.
+The local release folder also contains `RELEASE_NOTES.md`, `SHA256SUMS.txt`, and
+the generated `PUBLISH_RELEASE.ps1`. Generated release folders remain ignored by
+Git and are published through GitHub Releases.
 
-## Recently Completed
+## Current v1.17.1 Scope
 
-- `v1.5.3`: warning for `ATU`/`HIS` in common cloud-synced folders.
-- `v1.5.4`: ABB PCM600 support expanded from `.pcmp` to `.pcmp` and `.apcmp`.
-- `v1.5.5`: splash screen and startup ordering fix.
-- `v1.6.0`: advanced SHA256 integrity check.
-- `v1.7.0`: more transactional ATU/HIS movement and real per-file byte progress
-  during ZIP creation and final copy.
-- `v1.8.0`: worker-thread execution and controlled cancellation.
-- `v1.9.0`: public/professional user documentation and in-app help access.
-- `v1.9.1`: in-app help points to the public GitHub `HELP.md`.
-- `v1.10.0`: automatic GitHub release check with clickable update notice.
-- `v1.10.1`: fixed distributed executable name for simpler updates and latest
-  download URLs.
-- `v1.10.2`: non-commercial license file, public license documentation, and
-  clickable copyright notice in the GUI.
-- `v1.10.3`: update notice opens direct latest executable download and the
-  release asset uses underscore naming.
-- `v1.10.4`: update notice text clarifies that clicking downloads the new
-  version.
-- `v1.10.5`: public repository sensitivity review and copyright indicator
-  contrast fix.
-- `v1.11.0`: structural refactor of GUI and core modules without intended
-  behavior changes.
-- `v1.12.0`: operational quarantine for suspicious/partial files after rare
-  copy, publication, or archive failures.
-- `v1.13.0`: controlled HIS cleanup with configurable retention days and
-  protected latest backup per technical key and stage.
-- `v1.14.0`: public visual documentation, sanitized example files,
-  contribution guidance, issue/PR templates, and roadmap cleanup with new IED
-  types as the next milestone.
-- `v1.15.0`: GE Multilin / EnerVista UR support for SE-level environments,
-  preserving GE IED subfolders and adding GE-specific metadata.
-- `v1.15.1`: public documentation of IED identification/version rules,
-  including special cases for INGETEAM and GE Multilin.
-- `v1.16.0`: bilingual public documentation and language-aware in-app help URL.
-- `v1.16.1`: GE ZIP software prefix now uses the highest IED/application
-  `GEMULTILIN` version from `.urs/.urk` headers.
-- `v1.16.2`: GE ZIP software prefix now also accepts `GEVERNOVA` headers and
-  compares `UR Setup` versions from `.cid/.icd`, using the highest detected
-  compatible version.
-- `v1.16.3`: preserves source modified times inside ZIP entries, adds daily
-  diagnostics logs, captures unhandled exceptions, and moves preview planning to
-  a worker thread with a loading state for large folders.
-- `v1.17.0`: updates the final ZIP naming policy, adds first/last name fields,
-  detects and offers to rename legacy backup filenames, reviews translations,
-  and delays legacy-rename prompts until after startup instructions.
-
-## Current v1.6.0 Released Scope
-
-- Reads SHA256 values from `IEDS-BACKUP-INFO.txt` in existing ZIPs.
-- Detects same technical identity with different source-file SHA256 values.
-- Shows `Conflito SHA` / `SHA conflict` in the batch preview.
-- Blocks execution while an integrity conflict exists.
-- Checks conflicts in both `ATU` and `HIS`.
-- Keeps legacy ZIPs without SHA metadata compatible.
-- Recreates final ZIP files inside destination folders to inherit `ATU`/`HIS`
-  permissions instead of preserving temporary-file ACLs.
+- Keeps the `v1.17.0` readable ZIP naming policy:
+  `SOFTWARE_PROJECT_YYYY-MM-DD_HHhMM_FIRST LAST_STAGE.zip`.
+- Fixes Qt worker lifecycle for update checks, preview planning, and backup
+  execution; workers and threads use controlled deferred deletion.
+- Logs thread shutdown, `QApplication about to quit`, and the Qt event-loop exit
+  code so a normal close is distinguishable from abrupt termination.
+- Stores a per-user session marker and 10-second heartbeat under
+  `%LOCALAPPDATA%\IED Backup Manager\logs\`.
+- On the next startup after an unclean session, asks for consent before reading
+  Windows Application events. Declining performs no event query.
+- With consent, queries only event IDs 1000/1001 within ±2 minutes of the last
+  heartbeat and filters by executable name/path. It stores only sanitized event
+  fields in the local log; it does not access dumps, upload data, or request UAC.
+- Keeps the update notice's direct executable download and adds a separate
+  `O que há de novo?` / `What's new?` link to the specific GitHub release page.
+- Adds a Windows GitHub Actions workflow named `CI` for `master`, pull requests,
+  and `v*` tags.
+- `scripts/release.ps1` builds the executable and generates notes, SHA256, and a
+  per-release publisher, then runs local `-VerifyOnly` validation.
+- The publisher requires a clean, synchronized `master` with green CI, creates
+  the GitHub Release/tag, verifies uploaded assets, and waits for tag CI.
 
 ## Validation Baseline
 
@@ -81,326 +46,36 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 136 passed
+pytest: 142 passed
+PowerShell syntax validation: passed
+PUBLISH_RELEASE.ps1 -VerifyOnly: passed
+packaged executable smoke test: exit code 0
 ```
 
-## Local-Safety Notes
+Latest generated executable before the final documentation-only rebuild was
+approximately 47.5 MB. Always report the exact final size and SHA256 after the
+last build.
 
-- Local source/current/history folders may contain real or sensitive files and
-  must remain ignored by Git.
-- Local `config.json` files are user-specific and should not be committed.
-- Previously generated ZIPs created before the storage-permission fix may need
-  manual deletion/recreation or ACL repair if Windows denies access to them.
+## Active Roadmap
 
-## Current v1.7.0 Scope
-
-- Validates staged ZIPs before touching `ATU`/`HIS`.
-- Copies new ZIPs into a temporary file inside the destination folder and
-  validates them before publishing the final name.
-- Publishes the new ATU backup before archiving the previous current backup, and
-  removes the new ATU backup if archiving the previous current backup fails.
-- Creates missing history backups in a temporary staging folder before placing
-  them in `HIS`.
-- Rejects silent overwrite when a destination ZIP already exists unexpectedly.
-- Shows `file X/N` while generating backups.
-- Updates the progress bar by bytes during ZIP creation.
-- Updates the progress bar by bytes while copying the final ZIP into `ATU`/`HIS`.
-- Keeps duplicate correction progress tied to actual copy bytes when duplicate
-  files are moved to `HIS`.
-
-## Current v1.8.0 Scope
-
-- Runs backup execution in a `QThread` worker instead of the GUI thread.
-- Updates the progress dialog through Qt signals.
-- Keeps the GUI event loop responsive while large files are being processed.
-- Allows cancellation before the next backup file starts.
-- If cancellation is requested while ZIP staging is running, the staged ZIP is
-  discarded and the backup is not published to `ATU`/`HIS`.
-- Does not interrupt a final destination copy midway, preserving transactional
-  storage behavior.
-
-## Current v1.9.0 Scope
-
-- Adds `docs/HELP.md` with operational usage, folder structure, naming policy,
-  supported IED types, output examples, ZIP metadata example, known limitations,
-  troubleshooting, and privacy guidance.
-- Adds an `Ajuda` / `Help` button to the main window.
-- Bundles `docs/HELP.md` into the PyInstaller executable.
-- Updates README, executable-use documentation, improvement roadmap, release
-  notes, and agent context.
-
-## Current v1.9.1 Scope
-
-- Changes the main-window `Ajuda` / `Help` button to open the public GitHub
-  document:
-  `https://github.com/machado-jean/ied-backup-tool/blob/master/docs/HELP.md`.
-- Removes `docs/HELP.md` from PyInstaller bundled data because the online
-  document is now the single help target.
-- Keeps the local `docs/HELP.md` in the repository as the public source
-  document.
-
-## Current v1.10.0 Scope
-
-- On startup, a background Qt worker checks the latest public GitHub release.
-- If a newer version exists, the main window shows a red clickable notice in
-  the bottom-left corner.
-- Clicking the notice opens the GitHub `/releases/latest` URL in the default
-  browser.
-- No message is shown when the installed version is current.
-- Internet, proxy, corporate block, or GitHub errors are silent and do not block
-  application startup or backup use.
-- Automatic download/replacement remains out of scope.
-
-## Current v1.10.1 Scope
-
-- Release script generates and copies `IED_Backup_Manager.exe` instead of a
-  versioned executable filename.
-- Version remains visible in the window title and splash screen through
-  `APP_VERSION`.
-- Release folders remain versioned as `releases/vX.Y.Z/`.
-- GitHub can expose a stable latest-download URL:
-  `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe`.
-
-## Current v1.10.2 Scope
-
-- Adds `LICENSE` with the `IED Backup Manager Non-Commercial License`.
-- Adds license notes to README, executable-use documentation, and public help.
-- Adds a clickable `©` indicator in the bottom-right corner of the GUI.
-- Clicking `©` shows a compact authorship/license note and repository link.
-
-## Current v1.10.3 Scope
-
-- The release script generates `IED_Backup_Manager.exe`.
-- The update notice opens the direct latest download URL:
-  `https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe`.
-- The tooltip explains that clicking the update notice downloads the new
-  version.
-
-## Current v1.10.5 Scope
-
-- Public repository scan reviewed versionable files outside ignored local
-  backup folders, `.venv`, `.git`, and generated binary assets.
-- Test fixtures were sanitized to use `NOME SOBRENOME` instead of a real
-  first name.
-- `.gitignore` still protects `IED-DES/`, `IED-ATU/`, `IED-HIS/`, `.venv/`,
-  `.vscode/`, `config.json`, build outputs, and `.spec` files.
-- The bottom-right copyright indicator now uses a flat `QPushButton` with the
-  active theme text color instead of rich-text link coloring.
-
-## Current v1.11.0 Scope
-
-- Extracted startup instructions into `src/gui/startup_instructions.py`.
-- Extracted GUI language/runtime helpers into `src/gui/language_button.py` and
-  `src/gui/runtime.py`.
-- Extracted preview-table rendering and source-file display formatting into
-  `src/gui/preview_table.py`.
-- Extracted execution-summary text formatting into `src/gui/summary_text.py`.
-- Extracted confirmation/conflict message builders into
-  `src/gui/backup_confirmation.py`.
-- Added `src/gui/backup_application_service.py` as a Qt-independent layer
-  between `MainWindow` and core planning.
-- Extracted backup status constants and data models into
-  `src/core/backup_models.py`.
-- Added `BackupStatus` as a string enum while preserving legacy status constants.
-- Extracted backup planning into `src/core/backup_planner.py`.
-- Extracted backup plan execution and history archiving into
-  `src/core/backup_executor.py`.
-- Extracted ATU duplicate planning/execution into
-  `src/core/backup_duplicates.py`.
-- Extracted backup metadata text generation into `src/core/backup_metadata.py`.
-- Added focused tests for backup metadata, application service, and GUI
-  presentation helpers.
-- Progress dialog hides the progress bar's built-in percentage text and keeps
-  only the explicit progress text above the bar.
-
-## Current v1.12.0 Scope
-
-- Adds `IED-QUARENTENA` beside the storage folders for suspicious or partial
-  files left by rare copy/publication/archive failures.
-- Moves partial temporary files to quarantine instead of silently deleting them
-  when destination copy fails.
-- Writes a `.txt` note beside each quarantined file with original path, reason,
-  original error, timestamp, and manual-analysis guidance.
-- Cleans matching quarantine entries automatically after a successful backup for
-  the same technical key with equal or newer timestamp; removes the quarantine
-  folder when it becomes empty.
-- Keeps normal ATU/HIS transactional behavior unchanged.
-- Updates README, executable usage docs, public help, and roadmap.
-
-## Current v1.13.0 Scope
-
-- Adds `src/core/history_cleanup.py` with a testable HIS cleanup policy.
-- Adds `Limpeza HIS` / `HIS cleanup` dialog in the main GUI.
-- Saves cleanup preferences in `config.json` under `history_cleanup`.
-- Default retention is `30` days.
-- Retention `0` disables post-backup cleanup checks and suppresses cleanup
-  notices in the final summary.
-- Cleanup candidates are ZIPs in `HIS` older than the retention period.
-- The newest backup for each `SOFTWARE + PROJETO + ETAPA` is always preserved,
-  even when it is older than the retention period.
-- The cleanup preview shows candidate count, total HIS size, candidate size,
-  age, stage, project, timestamp, and reason.
-- Manual cleanup requires row selection and explicit confirmation.
-- The `Limpeza HIS` table uses a checkbox in the first column; deletion uses
-  checked rows, not visual table selection.
-- The app reports cleanup candidates in the final backup summary after a
-  successful backup; it does not show a permanent main-window notice.
-- No post-backup path deletes HIS automatically. Deletion is restricted to the
-  `Limpeza HIS` dialog with explicit row selection and confirmation.
-- `history_cleanup` now stores only `retention_days`; the removed automatic
-  cleanup flag is no longer parsed or written.
-- The final backup summary uses a custom compact dialog that hides zero-value
-  counters and shows cleanup guidance as a separate highlighted note.
-- Files outside the standard ZIP naming pattern are ignored by cleanup.
-- Fixed grouped preview behavior: when multiple IED types are selected but only
-  one real type exists for a project, the app now processes all files of that
-  type unless `Processar apenas a partir do backup atual` is checked. `IED-PACK`
-  still uses only the newest file per type when multiple real types exist.
-- Tests now include config parsing and core cleanup rules.
-
-## Current v1.14.0 Scope
-
-- Updates the public README with current screenshots, download guidance,
-  supported IED types, examples, development commands, architecture notes,
-  privacy guidance, contribution links, roadmap, and license summary.
-- Adds visual documentation to `docs/HELP.md`.
-- Adds public sanitized images under `docs/images/`.
-- Adds artificial public examples under `docs/examples/`.
-- Adds `CONTRIBUTING.md` with install, reproduction, pull request, and safe
-  sample-file contribution guidance.
-- Adds GitHub issue and pull request templates for bugs, feature requests, new
-  IED types, and pull requests.
-- Reorganizes `docs/PLANO_MELHORIAS.md` with implemented history since
-  `v1.0.0` and active roadmap focused on new IED types.
-- Keeps release artifacts local under ignored `releases/`.
-
-## Current v1.15.0 Scope
-
-- Adds `src/core/project_types/ge_multilin.py`.
-- Registers `ge_multilin` in the project type registry, CLI, and GUI checkbox
-  list.
-- Detects GE backups from direct child folders containing `.urs` or `.urk`.
-- Includes the top-level `.ENV` file when present, but does not require it.
-- Includes only `.urs`, `.urk`, `.cid`, and `.icd` inside selected GE IED
-  folders.
-- Excludes non-IED folders/files such as RDP, switches, GPS, `.cfg`, `.xml`,
-  `.msf`, and extensionless switch configs unless future rules explicitly add
-  them.
-- Uses the highest `GE Digital Energy UR Setup` version found in `.cid/.icd`
-  for the backup name, e.g. `GE-URSETUP-V8.61`.
-- Falls back to the highest `GEMULTILIN` header version from `.urs/.urk` when
-  no SCL setup version exists, e.g. `GE-MULTILIN-V8.40`.
-- Preserves nested folder paths inside ZIPs when source files span subfolders.
-- Adds a GE-specific section to `IEDS-BACKUP-INFO.txt` with environment,
-  optional `.ENV` versions, included IED folders, development version, and
-  IED/application version.
-- Adds artificial GE examples under `docs/examples/ge-workspace/SE-AAA`.
-- Updates README, HELP, executable-use docs, roadmap, and tests for GE support.
-
-## Current v1.15.1 Scope
-
-- Promotes `docs/LOGICA_IDENTIFICACAO_IEDS.md` as the public reference for IED
-  identification logic.
-- Documents which project types use automatic version detection and which can
-  require manual input.
-- Explains why INGETEAM uses a manually informed version due to ambiguous
-  internal markers across imported/newer components.
-- Explains the GE Multilin special case: SE/application folder as the project,
-  `.ENV` optional, IED folders detected by `.urs`/`.urk`, allowed extensions,
-  excluded non-IED equipment files, and version selection order.
-- Links the logic document from README, HELP, executable-use docs, and agent
-  context.
-
-## Current v1.16.0 Scope
-
-- Adds separate English public documentation files:
-  `README.en.md`, `CONTRIBUTING.en.md`, `docs/HELP.en.md`,
-  `docs/EXECUTABLE_USAGE.en.md`, `docs/IED_IDENTIFICATION_LOGIC.en.md`, and
-  `docs/ROADMAP.en.md`.
-- Adds language switch links at the top of the Portuguese and English public
-  documents.
-- Changes the GUI `Ajuda` / `Help` button to open the public help document that
-  matches the active UI language: `docs/HELP.md` for `pt_BR` and
-  `docs/HELP.en.md` for `en_US`.
-
-## Current v1.16.1 Scope
-
-- GE Multilin ZIP names now use the highest IED/application `GEMULTILIN`
-  version found in `.urs/.urk` headers.
-- `GE UR Setup` from `.cid/.icd` remains recorded in `IEDS-BACKUP-INFO.txt` as
-  development metadata, but no longer drives the ZIP software prefix.
-- The extraction method is documented in Portuguese and English: read first
-  `.urs/.urk` line, parse `HEADER,GEMULTILIN,...`, normalize values such as
-  `840 -> 8.40`, and use the highest detected IED/application version.
-
-## Current v1.16.2 Scope
-
-- GE Multilin ZIP names now accept both `GEMULTILIN` and `GEVERNOVA` headers in
-  `.urs/.urk`.
-- `GEVERNOVA` header values such as `870` are normalized to `8.70`.
-- `.cid/.icd` headers created by `GE Digital Energy UR Setup` or
-  `Multilin UR Setup` are also considered when selecting the ZIP software
-  prefix.
-- The final GE ZIP prefix uses the highest version found across IED/application
-  headers and UR Setup software headers, for example `GE-MULTILIN-V8.71`.
-- `IEDS-BACKUP-INFO.txt` continues to include per-IED details with files,
-  development software version, and IED/application version.
-- Portuguese and English documentation now explain the updated GE extraction
-  rule.
-
-## Current v1.16.3 Scope
-
-- ZIP creation now preserves each source file's modified time in the ZIP entry.
-- ZIP timestamps older than `1980-01-01` are clamped to the ZIP format minimum.
-- Application startup configures daily logs in
-  `%LOCALAPPDATA%\IED Backup Manager\logs\`.
-- Logs include startup stages, config loading, preview planning, update checks,
-  backup execution, failures, Qt messages, and unhandled exceptions.
-- Fatal startup errors attempt to show a user-visible dialog with the log path.
-- Batch preview planning now runs in `src/gui/preview_worker.py` on a `QThread`.
-- The preview area shows an indeterminate `Processando arquivos...` /
-  `Processing files...` state while scanning large folders.
-- Preview refreshes are debounced and queued when the user changes stage/type
-  while a previous scan is still running.
-
-## Current v1.17.0 Scope
-
-- Final ZIP names now use:
-  `SOFTWARE_PROJECT_YYYY-MM-DD_HHhMM_FIRST LAST_STAGE.zip`.
-- The GUI settings dialog uses separate first-name and last-name fields.
-- `config.json` stores `nome`, `sobrenome`, and the combined `colaborador`
-  value for compatibility/readability.
-- Legacy collaborator strings such as `JEAN-CARLOS-MACHADO` are compacted to
-  first/last format such as `JEAN MACHADO`; single names remain unchanged.
-- Existing ZIPs using the old `YYYYMMDD-HHMM` naming pattern are no longer used
-  silently by the current versioning rules.
-- The GUI detects old ZIP names in `ATU`/`HIS` and offers to rename them to the
-  current pattern before previewing the batch.
-- The legacy-rename prompt now waits until after startup instructions/settings
-  dialogs have finished. If startup instructions are disabled, it can appear
-  directly on startup.
-- Yes/No dialogs use app-controlled translations instead of Qt/system defaults.
-- Splash, startup fatal-error text, folder picker title, and cleanup messages
-  were reviewed for Portuguese/English consistency.
-- Public examples and documentation were updated to the new ZIP naming policy.
-
-## Next Planned Work
-
-Planned next improvement after `v1.17.0`:
+Planned next minor milestone after `v1.17.1`:
 
 ```text
-new IED types
+v1.18.0 - new IED types
 ```
 
-Likely scope:
+Add new types only with clean/sanitized samples and reliable identification,
+version, and included-file rules. Continue focused patch releases for concrete
+stability, diagnostics, usability, and documentation issues.
 
-- add new IED types only when clean/sanitized samples and reliable version rules
-  are available.
-- continue minor UX/translation fixes as patch releases when real users report
-  concrete issues.
+Paused/out-of-scope items remain code signing, operational reports, external
+per-backup `.sha256` files, and automatic executable replacement.
 
-Roadmap reference:
+## Local Safety
 
-- `docs/PLANO_MELHORIAS.md` now lists `v1.18.0` as the next estimated milestone
-  for new IED types; code signing, operational reports, and external `.sha256`
-  files remain outside the active roadmap.
+- Never commit real backups, local `config.json`, `.venv`, `build`, `dist`, or
+  generated `releases/` contents.
+- Never send diagnostic logs automatically. Users decide whether to authorize
+  the narrow Windows event query and whether to share the resulting local log.
+- Keep HIS deletion manual and confirmed through the cleanup dialog.
+- Follow `.agents/RELEASE_CHECKLIST.md` for every executable/release task.

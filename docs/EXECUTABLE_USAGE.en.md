@@ -43,7 +43,9 @@ unsafe nested paths.
 ## 3. Update Notice
 
 At startup, the application checks the latest public GitHub release. If a newer
-version exists, a clickable notice is shown in the lower-left corner.
+version exists, a clickable notice is shown in the lower-left corner. The main
+link downloads the executable, while `What's new?` opens the specific release
+page.
 
 The app does not replace itself automatically.
 
@@ -113,3 +115,8 @@ If the app closes by itself or freezes during startup, check the daily log under
 
 Send the log from the day of the failure after removing sensitive information if
 needed.
+
+If the previous execution ended unexpectedly, the next startup may request
+permission to query only Windows events 1000/1001 near that time and related to
+`IED_Backup_Manager.exe`. This does not require UAC, and no information is sent
+automatically.

@@ -32,6 +32,7 @@ def test_check_latest_release_uses_github_payload() -> None:
     assert result.latest_version == "1.10.0"
     assert result.update_available is True
     assert result.release_url == LATEST_EXECUTABLE_DOWNLOAD_URL
+    assert result.release_page_url.endswith("/releases/tag/v1.10.0")
 
 
 def test_check_latest_release_uses_latest_download_url_when_current() -> None:
@@ -39,6 +40,7 @@ def test_check_latest_release_uses_latest_download_url_when_current() -> None:
 
     assert result.update_available is False
     assert result.release_url == LATEST_EXECUTABLE_DOWNLOAD_URL
+    assert result.release_page_url == LATEST_RELEASE_PAGE_URL
     assert LATEST_RELEASE_PAGE_URL.endswith("/releases/latest")
 
 

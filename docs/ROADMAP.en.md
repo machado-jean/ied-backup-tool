@@ -32,6 +32,7 @@ discarded decisions.
 | `v1.16.2` | GE Vernova / UR Setup compatibility | GE prefixes now accept `GEVERNOVA` headers in `.urs/.urk` and also compare `GE Digital Energy UR Setup` / `Multilin UR Setup` versions in `.cid/.icd`, using the highest detected version. |
 | `v1.16.3` | Diagnostics and background preview | Preserves source modified time inside ZIPs, adds daily logs under `%LOCALAPPDATA%`, captures unhandled exceptions, and runs batch preview in a worker to reduce freezes in large folders. |
 | `v1.17.0` | Naming policy and real-usage polish | New ZIP filename format with readable date/time and `FIRST LAST`, separate first/last name fields, assisted detection and renaming of old backups, translation review, and startup ordering fixed so instructions appear before legacy-rename prompts. |
+| `v1.17.1` | Stability, diagnostics, and publishing | Fixes Qt worker lifecycle, records normal exits, detects interrupted sessions, offers consent-based filtered Windows event collection, adds `What's new?` to update notices, and integrates hashes, CI, and validated GitHub release publishing. |
 
 ## Paused or Discarded Items
 

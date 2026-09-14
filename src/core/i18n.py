@@ -60,6 +60,25 @@ UI_TEXT = {
         "continue_question": "Continuar?",
         "close": "Fechar",
         "current_folder": "Pasta atual",
+        "crash_diagnostics_consent_message": (
+            "A execução anterior terminou inesperadamente por volta de {time}.\n\n"
+            "Você permite consultar os eventos do Windows em uma janela de ±2 minutos "
+            "e anexar ao log local somente os registros relacionados ao "
+            "IED Backup Manager?\n\n"
+            "Nenhum dado será enviado automaticamente e não é necessário acesso de administrador."
+        ),
+        "crash_diagnostics_consent_title": "Diagnóstico de encerramento inesperado",
+        "crash_diagnostics_failed": (
+            "Não foi possível consultar os eventos do Windows. O motivo foi registrado "
+            "no log da aplicação."
+        ),
+        "crash_diagnostics_found": (
+            "Foram anexados {count} evento(s) do Windows ao log local da aplicação."
+        ),
+        "crash_diagnostics_none": (
+            "Nenhum evento do Windows relacionado ao aplicativo foi encontrado nesse horário."
+        ),
+        "crash_diagnostics_result_title": "Diagnóstico concluído",
         "destination": "Destino",
         "duplicate_files_found": "Foram encontrados arquivos antigos duplicados em ATU:",
         "duplicates_question": "Deseja mover esses arquivos problemáticos para HIS?",
@@ -245,6 +264,7 @@ UI_TEXT = {
         "type": "Tipos",
         "update_available": "Nova versão disponível! Clique para baixar.",
         "update_available_tooltip": "Clique para baixar a versão {version}.",
+        "update_whats_new": "O que há de novo?",
         "version": "Versão",
         "yes": "Sim",
     },
@@ -269,6 +289,23 @@ UI_TEXT = {
         "continue_question": "Continue?",
         "close": "Close",
         "current_folder": "Current folder",
+        "crash_diagnostics_consent_message": (
+            "The previous execution ended unexpectedly around {time}.\n\n"
+            "Do you allow the application to query Windows events in a ±2-minute window "
+            "and append only records related to IED Backup Manager to the local log?\n\n"
+            "No data will be sent automatically, and administrator access is not required."
+        ),
+        "crash_diagnostics_consent_title": "Unexpected exit diagnostics",
+        "crash_diagnostics_failed": (
+            "Windows events could not be queried. The reason was recorded in the application log."
+        ),
+        "crash_diagnostics_found": (
+            "{count} Windows event(s) were appended to the local application log."
+        ),
+        "crash_diagnostics_none": (
+            "No Windows events related to the application were found at that time."
+        ),
+        "crash_diagnostics_result_title": "Diagnostics complete",
         "destination": "Destination",
         "duplicate_files_found": "Older duplicate files were found in ATU:",
         "duplicates_question": "Do you want to move these problematic files to HIS?",
@@ -454,6 +491,7 @@ UI_TEXT = {
         "type": "Types",
         "update_available": "New version available! Click to download.",
         "update_available_tooltip": "Click to download version {version}.",
+        "update_whats_new": "What's new?",
         "version": "Version",
         "yes": "Yes",
     },

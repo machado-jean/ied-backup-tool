@@ -30,7 +30,13 @@ from PySide6.QtWidgets import (
 )
 
 from src.config.config_manager import AppConfig, load_config, save_config
-from src.core.app_logging import get_logger
+from src.core.app_logging import (
+    append_windows_crash_diagnostics,
+    collect_windows_crash_diagnostics,
+    get_logger,
+    pending_previous_session,
+    resolve_pending_incident,
+)
 from src.core.backup_service import (
     AtuDuplicatePlan,
     BackupPlan,
@@ -104,6 +110,7 @@ class MainWindow(QMainWindow):
         self.update_thread: QThread | None = None
         self.update_worker: UpdateCheckWorker | None = None
         self.latest_release_url: str | None = None
+        self.latest_release_page_url: str | None = None
         self.progress_dialog: QProgressDialog | None = None
         self.cancel_requested = False
         self.legacy_rename_prompted = False
@@ -377,6 +384,7 @@ class MainWindow(QMainWindow):
         self.logger.info("Running startup dialogs")
         self.startup_sequence_active = True
         try:
+            self._offer_previous_crash_diagnostics()
             self._show_startup_instructions_if_needed()
             if not self.config:
                 self.logger.info("Opening settings because config is missing")
@@ -384,6 +392,50 @@ class MainWindow(QMainWindow):
         finally:
             self.startup_sequence_active = False
         self.refresh_preview()
+
+    def _offer_previous_crash_diagnostics(self) -> None:
+        """Request consent before reading narrowly scoped Windows crash events."""
+
+        incident = pending_previous_session()
+        if incident is None:
+            return
+        try:
+            approximate_time = datetime.fromisoformat(
+                incident.last_seen_at.replace("Z", "+00:00")
+            ).astimezone().strftime("%d/%m/%Y %H:%M:%S")
+        except ValueError:
+            approximate_time = incident.last_seen_at
+        answer = question_yes_no(
+            self,
+            title=ui_text("crash_diagnostics_consent_title", self.language),
+            text=ui_text("crash_diagnostics_consent_message", self.language).format(
+                time=approximate_time
+            ),
+            language=self.language,
+        )
+        if answer != QMessageBox.StandardButton.Yes:
+            self.logger.info("User declined Windows crash diagnostic collection")
+            resolve_pending_incident()
+            return
+
+        try:
+            events = collect_windows_crash_diagnostics(incident)
+            append_windows_crash_diagnostics(incident, events)
+            message_key = "crash_diagnostics_found" if events else "crash_diagnostics_none"
+            QMessageBox.information(
+                self,
+                ui_text("crash_diagnostics_result_title", self.language),
+                ui_text(message_key, self.language).format(count=len(events)),
+            )
+        except Exception:
+            self.logger.exception("Could not collect approved Windows crash diagnostics")
+            QMessageBox.warning(
+                self,
+                ui_text("crash_diagnostics_result_title", self.language),
+                ui_text("crash_diagnostics_failed", self.language),
+            )
+        finally:
+            resolve_pending_incident()
 
     def _show_startup_instructions_if_needed(self) -> None:
         """Show usage guidance unless the user opted out in config.json."""
@@ -471,9 +523,11 @@ class MainWindow(QMainWindow):
         self.update_thread.started.connect(self.update_worker.run)
         self.update_worker.finished.connect(self._on_update_check_finished)
         self.update_worker.failed.connect(self._on_update_check_failed)
+        self.update_worker.finished.connect(self.update_worker.deleteLater)
+        self.update_worker.failed.connect(self.update_worker.deleteLater)
         self.update_worker.finished.connect(self.update_thread.quit)
         self.update_worker.failed.connect(self.update_thread.quit)
-        self.update_thread.finished.connect(self.update_worker.deleteLater)
+        self.update_thread.finished.connect(self.update_thread.deleteLater)
         self.update_thread.finished.connect(self._clear_update_worker)
         self.update_thread.start()
 
@@ -488,15 +542,13 @@ class MainWindow(QMainWindow):
         )
         if not result.update_available:
             self.latest_release_url = None
+            self.latest_release_page_url = None
             self.update_available_label.setVisible(False)
             return
 
         self.latest_release_url = result.release_url
-        self.update_available_label.setText(
-            f'<a href="{result.release_url}" style="color:#d92d20; '
-            f'text-decoration:none; font-weight:600;">'
-            f'{ui_text("update_available", self.language)}</a>'
-        )
+        self.latest_release_page_url = result.release_page_url
+        self._set_update_available_text()
         self.update_available_label.setToolTip(
             ui_text("update_available_tooltip", self.language).format(
                 version=result.latest_version
@@ -509,11 +561,27 @@ class MainWindow(QMainWindow):
 
         self.logger.info("Update check failed silently: %s", _message)
         self.latest_release_url = None
+        self.latest_release_page_url = None
         self.update_available_label.setVisible(False)
+
+    def _set_update_available_text(self) -> None:
+        """Render download and release-notes links in the update notice."""
+
+        if not self.latest_release_url or not self.latest_release_page_url:
+            return
+        self.update_available_label.setText(
+            f'<a href="{self.latest_release_url}" style="color:#d92d20; '
+            f'text-decoration:none; font-weight:600;">'
+            f'{ui_text("update_available", self.language)}</a>'
+            f'&nbsp;&nbsp;<a href="{self.latest_release_page_url}" '
+            f'style="text-decoration:underline;">'
+            f'{ui_text("update_whats_new", self.language)}</a>'
+        )
 
     def _clear_update_worker(self) -> None:
         """Release update worker/thread references after completion."""
 
+        self.logger.info("Update worker thread stopped")
         self.update_thread = None
         self.update_worker = None
 
@@ -632,9 +700,11 @@ class MainWindow(QMainWindow):
         self.preview_thread.started.connect(self.preview_worker.run)
         self.preview_worker.finished.connect(self._on_preview_finished)
         self.preview_worker.failed.connect(self._on_preview_failed)
+        self.preview_worker.finished.connect(self.preview_worker.deleteLater)
+        self.preview_worker.failed.connect(self.preview_worker.deleteLater)
         self.preview_worker.finished.connect(self.preview_thread.quit)
         self.preview_worker.failed.connect(self.preview_thread.quit)
-        self.preview_thread.finished.connect(self.preview_worker.deleteLater)
+        self.preview_thread.finished.connect(self.preview_thread.deleteLater)
         self.preview_thread.finished.connect(self._clear_preview_worker)
         self.preview_thread.start()
 
@@ -730,6 +800,7 @@ class MainWindow(QMainWindow):
     def _clear_preview_worker(self) -> None:
         """Release preview worker references and run any queued refresh."""
 
+        self.logger.info("Preview worker thread stopped")
         self.preview_thread = None
         self.preview_worker = None
         if self.preview_refresh_pending:
@@ -854,9 +925,11 @@ class MainWindow(QMainWindow):
         self.backup_worker.progress.connect(self._on_backup_progress)
         self.backup_worker.finished.connect(self._on_backup_finished)
         self.backup_worker.failed.connect(self._on_backup_failed)
+        self.backup_worker.finished.connect(self.backup_worker.deleteLater)
+        self.backup_worker.failed.connect(self.backup_worker.deleteLater)
         self.backup_worker.finished.connect(self.backup_thread.quit)
         self.backup_worker.failed.connect(self.backup_thread.quit)
-        self.backup_thread.finished.connect(self.backup_worker.deleteLater)
+        self.backup_thread.finished.connect(self.backup_thread.deleteLater)
         self.backup_thread.finished.connect(self._clear_backup_worker)
         self.backup_thread.start()
 
@@ -1009,6 +1082,7 @@ class MainWindow(QMainWindow):
     def _clear_backup_worker(self) -> None:
         """Release worker/thread references after the thread stops."""
 
+        self.logger.info("Backup worker thread stopped")
         self.backup_thread = None
         self.backup_worker = None
 
@@ -1272,12 +1346,8 @@ class MainWindow(QMainWindow):
             "QPushButton { border: none; padding: 0; font-weight: 600; }"
             "QPushButton:hover { text-decoration: underline; }"
         )
-        if self.update_available_label.isVisible() and self.latest_release_url:
-            self.update_available_label.setText(
-                f'<a href="{self.latest_release_url}" style="color:#d92d20; '
-                f'text-decoration:none; font-weight:600;">'
-                f'{ui_text("update_available", self.language)}</a>'
-            )
+        if self.update_available_label.isVisible():
+            self._set_update_available_text()
         self.summary_group.setTitle(ui_text("summary", self.language))
         self.preview_group.setTitle(ui_text("preview", self.language))
         self.preview_loading_label.setText(ui_text("preview_loading", self.language))

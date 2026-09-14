@@ -120,7 +120,9 @@ Ao abrir o aplicativo, ele consulta o último release público no GitHub.
 
 Se existir uma versão mais recente, será exibido o aviso `Nova versão
 disponível` no canto inferior esquerdo da tela principal. Clique no aviso para
-iniciar o download direto do executável mais recente no navegador.
+iniciar o download direto do executável mais recente no navegador. O link
+`O que há de novo?` abre a página específica do release para consultar as
+alterações antes de baixar.
 
 Se o computador estiver sem internet, com GitHub bloqueado ou se você já estiver
 na versão mais recente, o aplicativo continua funcionando normalmente.
@@ -539,6 +541,10 @@ sem confirmação.
 - Se o programa fechar sozinho ou travar ao abrir, envie o log do dia em
   `%LOCALAPPDATA%\IED Backup Manager\logs\`, removendo informações sensíveis se
   necessário.
+- Se a execução anterior tiver terminado inesperadamente, a próxima abertura
+  poderá pedir autorização para consultar somente os eventos 1000/1001 do
+  Windows próximos daquele horário e relacionados ao `IED_Backup_Manager.exe`.
+  A consulta não exige UAC e nenhuma informação é enviada automaticamente.
 
 ## 17. Atualização de versão
 

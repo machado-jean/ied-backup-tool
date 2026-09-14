@@ -56,7 +56,9 @@ Nao altere nada ainda. Apenas investigue e me diga a causa provavel.
   `.agents` files whenever rules, workflow, roadmap, or release procedure
   changes.
 - Run `ruff` and `pytest` after code changes.
-- Clean caches after validation.
+- For release work, validate changed PowerShell scripts, run the generated
+  `PUBLISH_RELEASE.ps1 -VerifyOnly`, smoke-test the packaged executable, and
+  clean temporary build/smoke directories.
 
 ## What To Avoid
 
@@ -68,6 +70,8 @@ Nao altere nada ainda. Apenas investigue e me diga a causa provavel.
 - Do not rewrite release notes from old versions unless explicitly requested;
   old release notes are historical records.
 - Do not remove `.venv/` or `config.json` unless explicitly requested.
+- Do not publish a release, create a tag, push, or upload assets unless the user
+  explicitly requests publication.
 
 ## Expected Final Answer After Implementation
 
@@ -76,6 +80,6 @@ whether `.exe` was generated, how to test locally, and any known caveat.
 
 ## Expected Final Answer After Release
 
-Codex should report executable path, release notes path, test result, final
-executable size, temporary build folders cleaned, and next recommended Git
-steps.
+Codex should report executable, notes, hash, and publisher paths; test count;
+PowerShell/VerifyOnly and smoke-test results; final executable size/SHA256;
+temporary build cleanup; whether publication occurred; and the next Git step.

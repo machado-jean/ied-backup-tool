@@ -6,7 +6,7 @@ Windows application for standardizing IED project backups, keeping the current
 backup in `ATU`, historical backups in `HIS`, and consistent ZIP names for
 technical traceability.
 
-Current version: `1.17.0`
+Current version: `1.17.1`
 
 - Executable usage guide: [docs/EXECUTABLE_USAGE.en.md](docs/EXECUTABLE_USAGE.en.md)
 - Operational help: [docs/HELP.en.md](docs/HELP.en.md)
@@ -36,6 +36,7 @@ rename them to the current pattern.
 - Portuguese and English interface, saved in `config.json`.
 - Public online help opened according to the selected UI language.
 - GitHub update check with clickable update notice.
+- Direct download plus a `What's new?` link to the specific release page.
 - Fixed executable name: `IED_Backup_Manager.exe`.
 - Standard stages: `DEV`, `PRE-TAF`, `TAF`, `POS-TAF`, `PRE-TAC`, `TAC`,
   `POS-TAC`, and free description.
@@ -48,6 +49,8 @@ rename them to the current pattern.
 - Controlled `HIS` cleanup with retention, preview, and manual confirmation.
 - Batch preview runs in the background to reduce freezes in large folders.
 - Daily local log for startup, preview, backup, and failure diagnostics.
+- Unexpected-exit detection with consent-based, time-scoped Windows event
+  collection, without automatic uploads or UAC prompts.
 - Responsive execution with per-file progress and controlled cancellation.
 
 ## Supported Types
@@ -106,6 +109,21 @@ Generate a local release executable only after validation:
 ```powershell
 .\scripts\release.ps1
 ```
+
+The command also generates `SHA256SUMS.txt` and `PUBLISH_RELEASE.ps1` inside
+`releases\vX.Y.Z`. Verify the local artifacts before publishing:
+
+```powershell
+.\releases\vX.Y.Z\PUBLISH_RELEASE.ps1 -VerifyOnly
+```
+
+After committing, pushing `master`, and waiting for CI, publish with:
+
+```powershell
+.\releases\vX.Y.Z\PUBLISH_RELEASE.ps1
+```
+
+GitHub CLI must be installed and authenticated with `gh auth login`.
 
 ## Privacy
 

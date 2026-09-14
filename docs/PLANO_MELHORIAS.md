@@ -53,6 +53,7 @@ notes detalhadas, mas ajuda a entender a evolução técnica do projeto.
 | `v1.16.2` | Compatibilidade GE Vernova / UR Setup | O prefixo GE passa a aceitar headers `GEVERNOVA` em `.urs/.urk` e a comparar também versões `GE Digital Energy UR Setup` / `Multilin UR Setup` em `.cid/.icd`, usando a maior versão encontrada. |
 | `v1.16.3` | Diagnóstico e prévia em segundo plano | Correção da data de modificação dentro do ZIP, log diário em `%LOCALAPPDATA%`, captura de exceções não tratadas e prévia do lote em worker para reduzir travamentos em pastas grandes. |
 | `v1.17.0` | Padrão de nomes e polimento de uso real | Novo formato de nome do ZIP com data/hora legível e `NOME SOBRENOME`, campos separados de nome/sobrenome, detecção e renomeação assistida de backups antigos, revisão de traduções e ordem de inicialização corrigida para mostrar instruções antes da sugestão de renomeio. |
+| `v1.17.1` | Estabilidade, diagnóstico e publicação | Corrige o ciclo de vida das threads Qt, registra encerramento normal, detecta sessões interrompidas, oferece coleta consentida e filtrada de eventos do Windows, adiciona `O que há de novo?` ao aviso de atualização e integra hash, CI e publicação validada de releases no GitHub. |
 
 ## Itens Pausados ou Descartados
 

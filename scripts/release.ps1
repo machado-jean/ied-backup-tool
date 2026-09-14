@@ -3,6 +3,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
 
 $Root = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $Root
@@ -17,9 +18,14 @@ $Version = $Matches[1]
 $Tag = "v$Version"
 $ExeName = "IED_Backup_Manager"
 $ExePath = Join-Path $Root "dist\$ExeName.exe"
+$BuildDir = Join-Path $Root "build"
+$DistDir = Join-Path $Root "dist"
 $ReleaseDir = Join-Path $Root "releases\$Tag"
 $ReleaseExe = Join-Path $ReleaseDir "$ExeName.exe"
 $ReleaseNotes = Join-Path $ReleaseDir "RELEASE_NOTES.md"
+$ReleaseHashes = Join-Path $ReleaseDir "SHA256SUMS.txt"
+$PublishTemplate = Join-Path $Root "scripts\PUBLISH_RELEASE.Template.ps1"
+$PublishScript = Join-Path $ReleaseDir "PUBLISH_RELEASE.ps1"
 $VenvScripts = Join-Path $Root ".venv\Scripts"
 $SystemPath = @(
     $VenvScripts,
@@ -85,5 +91,23 @@ Descreva aqui o objetivo desta versao.
 "@ | Set-Content -LiteralPath $ReleaseNotes -Encoding utf8
 }
 
+if (-not (Test-Path -LiteralPath $PublishTemplate -PathType Leaf)) {
+    throw "Publish template not found: $PublishTemplate"
+}
+$ReleaseHash = (Get-FileHash -LiteralPath $ReleaseExe -Algorithm SHA256).Hash
+"$ReleaseHash  $ExeName.exe" | Set-Content -LiteralPath $ReleaseHashes -Encoding ascii
+Copy-Item -LiteralPath $PublishTemplate -Destination $PublishScript -Force
+
+& $PublishScript -VerifyOnly
+
+foreach ($TemporaryBuildPath in @($BuildDir, $DistDir)) {
+    if (Test-Path -LiteralPath $TemporaryBuildPath) {
+        Remove-Item -LiteralPath $TemporaryBuildPath -Recurse -Force
+    }
+}
+
 Write-Host "Release generated: $ReleaseExe"
 Write-Host "Release notes: $ReleaseNotes"
+Write-Host "Release hashes: $ReleaseHashes"
+Write-Host "Publish script: $PublishScript"
+Write-Host "Temporary PyInstaller folders removed."

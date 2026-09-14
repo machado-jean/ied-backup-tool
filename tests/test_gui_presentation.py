@@ -9,7 +9,10 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QMessageBox, QTableWidget
 
 from src.config.config_manager import AppConfig, HistoryCleanupConfig, save_config
+from src.core.app_logging import PreviousSessionIncident
 from src.core.backup_models import BackupPlan, BackupSummary
+from src.core.update_checker import UpdateCheckResult
+from src.gui import main_window as main_window_module
 from src.gui.backup_confirmation import execution_confirmation_message, integrity_conflict_details
 from src.gui.execution_summary_dialog import _summary_rows
 from src.gui.history_cleanup_window import HistoryCleanupWindow
@@ -44,6 +47,68 @@ def test_yes_no_message_buttons_use_app_language() -> None:
 
     assert message.button(QMessageBox.StandardButton.Yes).text() == "Sim"
     assert message.button(QMessageBox.StandardButton.No).text() == "Não"
+
+
+def test_declining_crash_diagnostics_does_not_query_windows(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    app = QApplication.instance() or QApplication([])
+    _ = app
+    incident = PreviousSessionIncident(
+        session_id="session",
+        started_at="2026-09-11T20:21:30+00:00",
+        last_seen_at="2026-09-11T20:21:40+00:00",
+        executable=r"C:\Projects\IED_Backup_Manager.exe",
+        pid=123,
+    )
+    resolved = []
+    monkeypatch.setattr(MainWindow, "refresh_preview", lambda self: None)
+    monkeypatch.setattr(MainWindow, "schedule_update_check", lambda self: None)
+    monkeypatch.setattr(main_window_module, "pending_previous_session", lambda: incident)
+    monkeypatch.setattr(
+        main_window_module,
+        "question_yes_no",
+        lambda *args, **kwargs: QMessageBox.StandardButton.No,
+    )
+    monkeypatch.setattr(
+        main_window_module,
+        "collect_windows_crash_diagnostics",
+        lambda _incident: (_ for _ in ()).throw(AssertionError("unexpected query")),
+    )
+    monkeypatch.setattr(
+        main_window_module,
+        "resolve_pending_incident",
+        lambda: resolved.append(True),
+    )
+    window = MainWindow(project_dir=tmp_path, auto_startup_dialogs=False)
+
+    window._offer_previous_crash_diagnostics()
+
+    assert resolved == [True]
+
+
+def test_update_notice_links_download_and_release_notes(monkeypatch, tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    _ = app
+    monkeypatch.setattr(MainWindow, "refresh_preview", lambda self: None)
+    monkeypatch.setattr(MainWindow, "schedule_update_check", lambda self: None)
+    window = MainWindow(project_dir=tmp_path, auto_startup_dialogs=False)
+
+    window._on_update_check_finished(
+        UpdateCheckResult(
+            current_version="1.17.1",
+            latest_version="1.18.0",
+            release_url="https://example.invalid/download.exe",
+            release_page_url="https://example.invalid/releases/v1.18.0",
+            update_available=True,
+        )
+    )
+
+    notice = window.update_available_label.text()
+    assert "https://example.invalid/download.exe" in notice
+    assert "https://example.invalid/releases/v1.18.0" in notice
+    assert "O que há de novo?" in notice
 
 
 def test_format_summary_text_uses_translated_labels() -> None:

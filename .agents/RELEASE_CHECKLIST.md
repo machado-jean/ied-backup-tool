@@ -1,96 +1,97 @@
 # Release Checklist
 
-Use this checklist whenever the user asks to generate a new `.exe`.
+Use this checklist whenever the user asks to generate a new `.exe` or publish a
+GitHub Release.
 
 ## 1. Decide Version
 
-- Patch `vX.Y.Z+1`: bug fix, small compatibility extension, UI polish, docs
-  update that affects release output.
+- Patch `vX.Y.Z+1`: bug fix, compatibility adjustment, UI polish, diagnostics,
+  or documentation/release-process improvement.
 - Minor `vX.Y+1.0`: new functional behavior or meaningful workflow capability.
 - Major `vX+1.0.0`: breaking workflow or compatibility change.
 
-## 2. Update Files
+## 2. Update Sources of Truth
 
-Update:
+Always update:
 
-- `src/version.py`
-- `README.md` current version line
-- `.agents/CURRENT_STATE.md`
-- release notes for the GitHub Release
+- `src/version.py`;
+- current-version lines in `README.md` and `README.en.md`;
+- `.agents/CURRENT_STATE.md`;
+- `releases/vX.Y.Z/RELEASE_NOTES.md`.
 
-For user-visible behavior, also update when relevant:
+When behavior or workflow changes, also review both languages of:
 
-- `docs/USO_EXECUTAVEL.md`
-- `docs/PLANO_MELHORIAS.md`
-- `.agents/PROJECT_CONTEXT.md`
+- `docs/USO_EXECUTAVEL.md` / `docs/EXECUTABLE_USAGE.en.md`;
+- `docs/HELP.md` / `docs/HELP.en.md`;
+- `docs/PLANO_MELHORIAS.md` / `docs/ROADMAP.en.md`;
+- `CONTRIBUTING.md` / `CONTRIBUTING.en.md`;
+- `.agents/PROJECT_CONTEXT.md`, `.agents/DECISIONS.md`, and this checklist.
+
+Do not rewrite historical release notes from older versions.
 
 ## 3. Validate Before Build
-
-Run:
 
 ```powershell
 .\.venv\Scripts\python.exe -m ruff check .
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-## 4. Generate Executable
+Parse changed PowerShell scripts with
+`System.Management.Automation.Language.Parser` before executing them.
 
-Run:
+## 4. Generate and Verify the Release
 
 ```powershell
 .\scripts\release.ps1
 ```
 
-The script should run lint/tests, build with PyInstaller, copy the executable to
-`releases/vX.Y.Z/`, and remove the generated `.spec`.
+The script must:
 
-The release script sanitizes `PATH` while PyInstaller runs. Keep this behavior:
-developer-tool runtimes can inject unrelated DLLs, which may increase the
-executable size and break Qt startup on other machines.
+- run lint/tests unless `-SkipTests` follows equivalent validation in the same
+  release task;
+- sanitize `PATH` while PyInstaller runs;
+- build the fixed filename `IED_Backup_Manager.exe` with `--onefile`;
+- create/preserve `RELEASE_NOTES.md`;
+- generate `SHA256SUMS.txt` and `PUBLISH_RELEASE.ps1`;
+- execute `PUBLISH_RELEASE.ps1 -VerifyOnly`;
+- remove `.spec`, `build/`, and `dist/` after successful packaging.
 
-`releases/` is a local ignored artifact folder. Do not force-add it to Git; use
-GitHub Releases for downloadable executables and release notes.
-
-## 5. Clean Temporary Files
-
-After build, remove temporary artifacts if they exist:
-
-- `build/`
-- `dist/`
-- `.pytest_cache/`
-- `.ruff_cache/`
-- `__pycache__/`
-
-Do not remove `.venv/`, `.vscode/`, local source/current/history backup
-folders, `config.json`, or `releases/vX.Y.Z/`.
-
-## 6. Final Checks
-
-Confirm:
+Expected local artifacts:
 
 ```text
-releases/vX.Y.Z/IED_Backup_Manager.exe exists
-releases/vX.Y.Z/RELEASE_NOTES.md exists
-IED Backup Manager.spec does not exist
-build/ and dist/ do not exist
+releases/vX.Y.Z/IED_Backup_Manager.exe
+releases/vX.Y.Z/RELEASE_NOTES.md
+releases/vX.Y.Z/SHA256SUMS.txt
+releases/vX.Y.Z/PUBLISH_RELEASE.ps1
 ```
 
-For PySide6/Qt releases, also confirm the executable size stays near the
-previous release. A sudden large increase can indicate unrelated DLL collection
-from the local environment.
+`releases/` remains ignored by Git. Never force-add it.
 
-Then report executable path, release notes path, validation result, final
-executable size, and confirm `releases/` remains ignored by Git.
+## 5. Smoke Test
 
-## 7. Git Closeout
+Open the packaged executable with isolated project/config and `LOCALAPPDATA`.
+Confirm the main window opens, workers stop, closing returns code `0`, the log
+records a normal event-loop exit, and Windows records no new application crash.
+Remove only the explicitly created smoke-test directory afterward.
 
-Recommended after user validation:
+## 6. Final Local Checks
+
+Confirm that all release assets exist, `-VerifyOnly` passes, `.spec`/`build`/
+`dist` are absent, executable size is near the previous release, SHA256 matches,
+and `releases/` remains ignored. Report paths, test count, size, hash, smoke-test
+result, and whether publication occurred.
+
+## 7. Commit, Push, and Publish
+
+After user validation, commit tracked changes and push `master`. Do not create
+or push the release tag manually; the generated publisher owns that step.
 
 ```powershell
-git status
-git add .
-git commit -m "Release vX.Y.Z"
-git tag vX.Y.Z
-git push
-git push origin vX.Y.Z
+.\releases\vX.Y.Z\PUBLISH_RELEASE.ps1 -VerifyOnly
+.\releases\vX.Y.Z\PUBLISH_RELEASE.ps1
 ```
+
+Publish only when explicitly requested. The publisher requires a clean
+worktree, `HEAD == origin/master`, authenticated GitHub CLI, and successful
+`CI`. It creates the release/tag, uploads the executable and SHA256 file,
+verifies assets, and waits for tag CI through `scripts/Check-ReleaseCi.ps1`.

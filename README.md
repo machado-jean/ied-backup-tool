@@ -6,7 +6,7 @@ Aplicação Windows para padronizar backups de projetos de IED, mantendo um back
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade técnica.
 
-Versão atual: `1.17.0`
+Versão atual: `1.17.1`
 
 - Manual do executável: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
@@ -55,6 +55,7 @@ Exemplo da interface em inglês:
 - Interface em português e inglês, com preferência salva em `config.json`.
 - Verificação automática de nova versão publicada no GitHub.
 - Download direto do executável mais recente pelo aviso de atualização.
+- Link `O que há de novo?` para consultar as notas da versão disponível.
 - Executável distribuído com nome fixo `IED_Backup_Manager.exe`.
 - Etapas padrão: `DEV`, `PRE-TAF`, `TAF`, `POS-TAF`, `PRE-TAC`, `TAC`,
   `POS-TAC` e descrição livre.
@@ -81,6 +82,8 @@ Exemplo da interface em inglês:
 - Prévia do lote calculada em segundo plano para reduzir travamentos em pastas
   grandes.
 - Log diário local para diagnóstico de inicialização, prévia, backup e falhas.
+- Detecção de encerramento inesperado e coleta consentida de eventos do Windows,
+  limitada ao horário e ao executável, sem envio automático ou solicitação de UAC.
 - Cancelamento controlado antes de iniciar o próximo arquivo.
 - Botão `Ajuda` / `Help` apontando para a documentação operacional pública.
 - Indicador `©` com autoria, licença e link do repositório.
@@ -278,6 +281,21 @@ Gerar executável:
 ```powershell
 .\scripts\release.ps1
 ```
+
+O comando também gera `SHA256SUMS.txt` e `PUBLISH_RELEASE.ps1` dentro da pasta
+`releases\vX.Y.Z`. Antes de publicar, valide os artefatos:
+
+```powershell
+.\releases\vX.Y.Z\PUBLISH_RELEASE.ps1 -VerifyOnly
+```
+
+Depois de fazer commit, enviar `master` e aguardar o CI, publique com:
+
+```powershell
+.\releases\vX.Y.Z\PUBLISH_RELEASE.ps1
+```
+
+É necessário ter o GitHub CLI instalado e autenticado com `gh auth login`.
 
 ## Arquitetura
 

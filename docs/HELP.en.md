@@ -152,6 +152,14 @@ execution, failures, and unhandled exceptions. When reporting a problem, send
 the log from the day of the failure after removing sensitive information if
 needed.
 
+The application keeps a local session marker. If the previous execution did not
+record a normal exit, the next startup reports an unexpected exit and asks for
+consent before querying the Windows Application log. When authorized, it copies
+only events 1000/1001 near that time and filtered by `IED_Backup_Manager.exe`
+into the local log. The query does not require UAC, does not access dumps, and
+does not upload data. Answering `No` prevents the query and dismisses that
+incident.
+
 ### The app does not open in a synced folder
 
 Try copying the executable to a local, non-synced folder. If it opens normally,

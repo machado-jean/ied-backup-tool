@@ -279,6 +279,14 @@ prévia, execução de backup, falhas e exceções não tratadas. Ao reportar um
 problema, envie o log do dia em que ocorreu a falha, removendo antes qualquer
 informação sensível se necessário.
 
+O aplicativo mantém um marcador local de sessão. Se a execução anterior não
+registrou uma saída normal, a próxima abertura informa que houve um encerramento
+inesperado e pede consentimento antes de consultar o log Application do Windows.
+Se autorizado, copia para o log local somente eventos 1000/1001 próximos do
+horário e filtrados por `IED_Backup_Manager.exe`. A consulta não exige UAC,
+não acessa dumps e não envia dados automaticamente. Responder `Não` impede a
+consulta e encerra o aviso daquele incidente.
+
 ### O programa não abre em pasta sincronizada
 
 Teste copiar o executável para uma pasta local não sincronizada. Se abrir

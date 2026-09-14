@@ -25,6 +25,7 @@ class UpdateCheckResult:
     current_version: str
     latest_version: str
     release_url: str
+    release_page_url: str
     update_available: bool
 
 
@@ -52,6 +53,7 @@ def check_latest_release(
         current_version=current_version,
         latest_version=latest_version,
         release_url=LATEST_EXECUTABLE_DOWNLOAD_URL,
+        release_page_url=payload.get("html_url") or LATEST_RELEASE_PAGE_URL,
         update_available=is_version_newer(latest_version, current_version),
     )
 

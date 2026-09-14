@@ -62,7 +62,7 @@ or backup files with operational data.
 
 Recommended flow:
 
-1. Create a branch from the main branch.
+1. Create a branch from the `master` branch.
 2. Keep the change focused on one objective.
 3. Update tests when behavior changes.
 4. Update documentation when the change is visible to users.

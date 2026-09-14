@@ -116,6 +116,25 @@ Tradeoff:
 The splash screen improves perceived startup but cannot remove the initial
 PyInstaller unpacking delay.
 
+## Crash Diagnostics Consent
+
+An absent clean-exit marker means only that the previous session ended
+unexpectedly; it is not sufficient by itself to classify a native crash.
+
+On the next startup, ask before reading Windows Application events. If consent
+is granted, query only event IDs 1000/1001 within ±2 minutes of the last
+heartbeat and filter by executable name/path. Copy only sanitized diagnostic
+fields into the local log. Do not access WER dumps, request UAC, or upload data.
+Declining must perform no Windows event query and must dismiss that incident.
+
+## Release Publication
+
+Local release artifacts remain ignored by Git. `scripts/release.ps1` owns the
+build plus generation of SHA256 and the per-release publisher. The generated
+publisher owns tag/release creation after it verifies a clean synchronized
+`master`, green CI, hashes, notes, and assets. Do not create tags manually in the
+normal release flow.
+
 ## Storage Movement
 
 Do not use direct `shutil.move` for final backup placement into `ATU`/`HIS`.

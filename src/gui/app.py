@@ -8,11 +8,16 @@ import logging
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import Qt, qInstallMessageHandler
+from PySide6.QtCore import Qt, QTimer, qInstallMessageHandler
 from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import QApplication, QMessageBox, QSplashScreen
 
-from src.core.app_logging import get_logger, setup_application_logging
+from src.core.app_logging import (
+    get_logger,
+    mark_application_session_clean,
+    setup_application_logging,
+    touch_application_session,
+)
 from src.core.i18n import DEFAULT_LANGUAGE, ui_text
 from src.gui.resources import app_icon_path
 from src.version import APP_NAME, APP_VERSION
@@ -122,6 +127,11 @@ def _run_app() -> int:
     app.setApplicationName(APP_NAME)
     app.setApplicationVersion(APP_VERSION)
     app.setWindowIcon(QIcon(str(app_icon_path())))
+    app.aboutToQuit.connect(lambda: logger.info("QApplication about to quit"))
+    session_heartbeat = QTimer(app)
+    session_heartbeat.setInterval(10_000)
+    session_heartbeat.timeout.connect(touch_application_session)
+    session_heartbeat.start()
 
     logger.info("Showing splash screen")
     splash = create_splash_screen(app, language=language)
@@ -158,7 +168,10 @@ def _run_app() -> int:
     logger.info("Scheduling startup dialogs")
     window.schedule_startup_dialogs()
     logger.info("Entering Qt event loop")
-    return app.exec()
+    exit_code = app.exec()
+    logger.info("Qt event loop exited: code=%s", exit_code)
+    mark_application_session_clean(exit_code)
+    return exit_code
 
 
 def _qt_message_handler(mode, _context, message: str) -> None:
