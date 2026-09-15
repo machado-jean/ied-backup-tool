@@ -6,7 +6,7 @@ Windows application for standardizing IED project backups, keeping the current
 backup in `ATU`, historical backups in `HIS`, and consistent ZIP names for
 technical traceability.
 
-Current version: `1.17.1`
+Current version: `1.17.2`
 
 - Executable usage guide: [docs/EXECUTABLE_USAGE.en.md](docs/EXECUTABLE_USAGE.en.md)
 - Operational help: [docs/HELP.en.md](docs/HELP.en.md)
@@ -34,6 +34,8 @@ rename them to the current pattern.
 
 - Windows GUI with batch preview before execution.
 - Portuguese and English interface, saved in `config.json`.
+- Quick light/dark theme toggle; the first run follows the system and a manual
+  choice is then saved in `config.json`.
 - Public online help opened according to the selected UI language.
 - GitHub update check with clickable update notice.
 - Direct download plus a `What's new?` link to the specific release page.
@@ -117,13 +119,19 @@ The command also generates `SHA256SUMS.txt` and `PUBLISH_RELEASE.ps1` inside
 .\releases\vX.Y.Z\PUBLISH_RELEASE.ps1 -VerifyOnly
 ```
 
-After committing, pushing `master`, and waiting for CI, publish with:
+After committing and pushing `master`, publish manually with:
 
 ```powershell
 .\releases\vX.Y.Z\PUBLISH_RELEASE.ps1
 ```
 
 GitHub CLI must be installed and authenticated with `gh auth login`.
+Before creating the GitHub Release, the publisher reruns lint and tests, requires
+green CI on `master`, pushes the tag, waits for that tag's CI on the same commit,
+and shows a report with every check marked `CORRETO` or `INCORRETO`. When all
+checks pass, it asks `Publicar release com o release note e .exe?`; only an
+affirmative answer creates the GitHub Release and uploads its assets. If any
+gate fails, no GitHub Release is created.
 
 ## Privacy
 

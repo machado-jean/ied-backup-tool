@@ -112,6 +112,13 @@ Nesses casos, o projeto pode ser identificado incorretamente.
 8. Quando necessário, use `Limpeza HIS` para revisar backups antigos antes de
    remover qualquer arquivo.
 
+## Tema da Interface
+
+Na primeira abertura, o aplicativo acompanha o tema claro ou escuro do Windows.
+O botão com lua ou sol, ao lado do seletor de idioma, alterna o tema sem mudar
+as proporções da interface. Depois da primeira troca manual, a opção `light` ou
+`dark` é salva em `config.json` e reaplicada nas próximas aberturas.
+
 ## Prévia do Lote
 
 A prévia mostra:

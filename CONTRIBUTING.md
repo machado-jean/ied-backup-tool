@@ -94,6 +94,11 @@ Fluxo recomendado:
 5. Rode `ruff` e `pytest`.
 6. Abra o pull request usando o template do repositório.
 
+Para preparar um release local, use `scripts\release.ps1`. O publicador gerado
+em `releases\vX.Y.Z` deve ser executado manualmente depois do commit e push de
+`master`; ele exige os testes locais e os CIs de `master` e da tag aprovados,
+mostra um relatório e pede confirmação antes de criar o GitHub Release.
+
 Evite incluir:
 
 - executáveis `.exe`;

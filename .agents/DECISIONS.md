@@ -135,6 +135,18 @@ publisher owns tag/release creation after it verifies a clean synchronized
 `master`, green CI, hashes, notes, and assets. Do not create tags manually in the
 normal release flow.
 
+The publisher must never create the GitHub Release before tag CI completes. Its
+required order is: validate assets, rerun local lint/tests, require green
+`master` CI for the exact commit, push the tag, require green tag CI for that
+same commit, and only then run `gh release create --verify-tag`. A failed tag CI
+may leave the diagnostic tag in place, but must not expose a release or assets.
+
+After all pre-publication gates pass, the publisher must print a detailed report
+with each completed check marked `CORRETO` or `INCORRETO` and ask
+`Publicar release com o release note e .exe?`. Only an affirmative answer may
+run `gh release create`; a refusal keeps the validated tag but creates no GitHub
+Release and uploads no assets.
+
 ## Storage Movement
 
 Do not use direct `shutil.move` for final backup placement into `ATU`/`HIS`.

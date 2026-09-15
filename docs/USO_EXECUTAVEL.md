@@ -79,6 +79,7 @@ Exemplo de `config.json`:
   "atu_path": "C:/Backups/Exemplo/ATU",
   "his_path": "C:/Backups/Exemplo/HIS",
   "language": "pt_BR",
+  "theme": "dark",
   "project_types": ["digsi5", "sel"],
   "software_versions": {
     "ingeteam": "5.5.4"
@@ -101,7 +102,14 @@ tela de instruções e também na tela principal, ao lado de `Configurações`.
 
 A preferência fica salva no `config.json`.
 
-## 4. Abrir ajuda
+## 4. Selecionar tema
+
+Na primeira utilização, o programa acompanha o tema claro ou escuro configurado
+no Windows. Use o botão de lua/sol ao lado do botão de idioma para alternar o
+tema imediatamente. Depois da primeira alteração manual, a preferência `light`
+ou `dark` fica salva no `config.json`.
+
+## 5. Abrir ajuda
 
 Use o botão `Ajuda` na tela principal para abrir o documento operacional no
 GitHub:
@@ -114,7 +122,7 @@ Esse documento resume estrutura de pastas, regras de nomes, exemplos de saída,
 metadados internos dos ZIPs, limitações conhecidas, solução de problemas e
 cuidados de privacidade.
 
-## 5. Verificar atualizações
+## 6. Verificar atualizações
 
 Ao abrir o aplicativo, ele consulta o último release público no GitHub.
 
@@ -129,7 +137,7 @@ na versão mais recente, o aplicativo continua funcionando normalmente.
 
 O programa não baixa nem substitui o executável automaticamente.
 
-## 6. Selecionar tipos de IED
+## 7. Selecionar tipos de IED
 
 Marque os tipos de IED que deseja processar.
 
@@ -139,7 +147,7 @@ a seleção anterior será restaurada.
 Se nenhuma preferência estiver salva, o programa inicia sem tipo selecionado.
 Selecione ao menos um tipo para liberar a prévia do lote.
 
-## 7. Selecionar etapa
+## 8. Selecionar etapa
 
 Antes de gerar backups, selecione a etapa da entrega.
 
@@ -163,7 +171,7 @@ pode ser preenchido manualmente, por exemplo para indicar um backup antes de uma
 grande alteração, ou pode ficar vazio quando o caso não se enquadrar nas etapas
 anteriores.
 
-## 8. Tipos de arquivo suportados
+## 9. Tipos de arquivo suportados
 
 ### DIGSI 5
 
@@ -330,7 +338,7 @@ lista:
 - data de modificação dos arquivos incluídos;
 - SHA256 dos arquivos incluídos.
 
-## 9. Padrão de nome dos arquivos de origem
+## 10. Padrão de nome dos arquivos de origem
 
 Para os tipos suportados, o programa identifica o projeto/subestação pelo nome
 do arquivo. Pela política atual, o projeto é sempre o primeiro bloco antes do
@@ -376,7 +384,7 @@ Cuidados:
   `DEV_SE-BBB_20260619_0013.dz5` será identificado como projeto `DEV`.
 - Confira sempre a coluna `Projeto` na prévia antes de gerar backups.
 
-## 10. Conferir a prévia do lote
+## 11. Conferir a prévia do lote
 
 Depois de selecionar a etapa, a tela mostra uma prévia dos arquivos suportados
 encontrados na pasta.
@@ -409,7 +417,7 @@ Status possiveis:
 - `Ignorado`: o arquivo é antigo e já existe no histórico.
 - `Ja atual`: o arquivo já corresponde ao backup atual em `ATU`.
 
-## 11. Modo de processamento
+## 12. Modo de processamento
 
 A opção `Processar apenas a partir do backup atual` evita reprocessar arquivos
 antigos que vieram antes do backup atual já existente em `ATU`.
@@ -417,7 +425,7 @@ antigos que vieram antes do backup atual já existente em `ATU`.
 Use essa opção quando a pasta tiver muitos arquivos antigos e você quiser
 processar somente o backup atual e os arquivos mais novos.
 
-## 12. Gerar backups
+## 13. Gerar backups
 
 Clique em `Gerar backups`.
 
@@ -455,7 +463,7 @@ Quando a falha for resolvida e um backup da mesma chave técnica for concluído
 com timestamp igual ou mais recente, os itens correspondentes da quarentena são
 removidos automaticamente. Se a pasta ficar vazia, ela também é apagada.
 
-## 13. Limpeza HIS
+## 14. Limpeza HIS
 
 Use o botão `Limpeza HIS` para revisar backups antigos da pasta `HIS`.
 
@@ -486,7 +494,7 @@ são detectados como legado em `ATU`/`HIS`. Quando encontrados, o aplicativo
 pergunta se o usuário deseja renomeá-los para o padrão atual antes de continuar
 o versionamento.
 
-## 14. Resultado dos arquivos
+## 15. Resultado dos arquivos
 
 O nome final do backup segue o padrão:
 
@@ -511,7 +519,7 @@ Regras principais:
 - A comparação técnica considera `SOFTWARE_PROJETO_YYYYMMDD-HHMM`.
 - Mudanças apenas de colaborador ou etapa não criam duplicidade técnica.
 
-## 15. Abrir pastas ATU e HIS
+## 16. Abrir pastas ATU e HIS
 
 Use os botoes:
 
@@ -524,7 +532,7 @@ Se a pasta tiver sido apagada depois da configuração, o programa perguntara se
 você deseja recriá-la antes de abrir. A pasta não é recriada automaticamente
 sem confirmação.
 
-## 16. Cuidados recomendados
+## 17. Cuidados recomendados
 
 - Feche o DIGSI antes de gerar backups, para evitar arquivo bloqueado.
 - Feche QuickSet/Architect antes de gerar backups SEL, para evitar arquivo
@@ -546,7 +554,7 @@ sem confirmação.
   Windows próximos daquele horário e relacionados ao `IED_Backup_Manager.exe`.
   A consulta não exige UAC e nenhuma informação é enviada automaticamente.
 
-## 17. Atualização de versão
+## 18. Atualização de versão
 
 Quando receber uma nova versão do executável:
 
@@ -563,7 +571,7 @@ O download direto da versão mais recente pode usar sempre o mesmo link:
 https://github.com/machado-jean/ied-backup-tool/releases/latest/download/IED_Backup_Manager.exe
 ```
 
-## 18. Licença e autoria
+## 19. Licença e autoria
 
 Na tela principal, clique no simbolo `©` no canto inferior direito para ver a
 nota curta de autoria e licença.

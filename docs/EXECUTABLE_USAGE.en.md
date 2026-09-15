@@ -54,6 +54,10 @@ The app does not replace itself automatically.
 Select at least one IED type before generating backups. The selected types are
 saved in `config.json`.
 
+On first use, the interface follows the Windows light/dark theme. Use the
+moon/sun button next to the language button to switch immediately. After the
+first manual change, `light` or `dark` is saved as `theme` in `config.json`.
+
 Select the delivery stage. The stage is part of the generated ZIP name. Returning
 to an earlier stage is allowed for long projects that need rework.
 

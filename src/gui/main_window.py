@@ -10,7 +10,6 @@ from PySide6.QtGui import QDesktopServices, QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
-    QComboBox,
     QDialog,
     QDialogButtonBox,
     QFormLayout,
@@ -78,6 +77,13 @@ from src.gui.settings_window import SettingsWindow
 from src.gui.startup_instructions import StartupInstructionsDialog
 from src.gui.storage_paths import confirm_storage_paths_ready
 from src.gui.summary_text import format_summary_text
+from src.gui.theme import (
+    ThemedComboBox,
+    alert_color,
+    apply_theme,
+    configure_theme_button,
+    set_theme_button_state,
+)
 from src.gui.update_worker import UpdateCheckWorker
 from src.version import APP_DISPLAY_NAME
 
@@ -101,6 +107,11 @@ class MainWindow(QMainWindow):
         self.current_plans: list[BackupPlan] = []
         self.atu_duplicate_plans: list[AtuDuplicatePlan] = []
         self.language = self.config.language if self.config else DEFAULT_LANGUAGE
+        self.theme_preference = self.config.theme if self.config else None
+        app = QApplication.instance()
+        if app is None:
+            raise RuntimeError("QApplication must exist before MainWindow")
+        self.current_theme = apply_theme(app, self.theme_preference)
         self.pending_show_startup_instructions: bool | None = None
         self.backup_thread: QThread | None = None
         self.backup_worker: BackupExecutionWorker | None = None
@@ -171,6 +182,10 @@ class MainWindow(QMainWindow):
         configure_language_button(self.language_button)
         self.language_button.setToolTip(ui_text("language_tooltip", self.language))
         self.language_button.clicked.connect(self.toggle_language)
+        self.theme_button = QPushButton()
+        configure_theme_button(self.theme_button)
+        set_theme_button_state(self.theme_button, self.current_theme)
+        self.theme_button.clicked.connect(self.toggle_theme)
         self.refresh_button = QPushButton()
         self.refresh_button.clicked.connect(self.refresh_preview)
         self.settings_button = QPushButton()
@@ -183,6 +198,7 @@ class MainWindow(QMainWindow):
         top.addWidget(self.refresh_button)
         top.addWidget(self.settings_button)
         top.addWidget(self.help_button)
+        top.addWidget(self.theme_button)
         top.addWidget(self.language_button)
         layout.addLayout(top)
 
@@ -262,7 +278,10 @@ class MainWindow(QMainWindow):
             value = QLabel("0")
             value.setAlignment(Qt.AlignmentFlag.AlignCenter)
             value.setMinimumWidth(80)
-            value.setStyleSheet("font-size: 20px; font-weight: 600;")
+            value_font = value.font()
+            value_font.setPixelSize(20)
+            value_font.setWeight(value_font.Weight.DemiBold)
+            value.setFont(value_font)
             title = QLabel()
             title.setAlignment(Qt.AlignmentFlag.AlignCenter)
             box = QVBoxLayout()
@@ -281,7 +300,7 @@ class MainWindow(QMainWindow):
 
         form = QFormLayout()
         self.action_form = form
-        self.stage_input = QComboBox()
+        self.stage_input = ThemedComboBox()
         self.stage_input.addItem("", None)
         for stage in BackupStage:
             self.stage_input.addItem(stage.value, stage.value)
@@ -455,6 +474,7 @@ class MainWindow(QMainWindow):
                 atu_path=self.config.atu_path,
                 his_path=self.config.his_path,
                 language=self.config.language,
+                theme=self.config.theme,
                 project_types=self.config.project_types,
                 software_versions=self.config.software_versions,
                 show_startup_instructions=False,
@@ -478,6 +498,7 @@ class MainWindow(QMainWindow):
                 atu_path=self.config.atu_path,
                 his_path=self.config.his_path,
                 language=self.language,
+                theme=self.config.theme,
                 project_types=self.config.project_types,
                 software_versions=self.config.software_versions,
                 show_startup_instructions=self.config.show_startup_instructions,
@@ -494,6 +515,7 @@ class MainWindow(QMainWindow):
             config_path=self.config_path,
             config=self.config,
             language=self.language,
+            theme=self.theme_preference,
             parent=self,
         )
         dialog.saved.connect(self.on_settings_saved)
@@ -570,7 +592,8 @@ class MainWindow(QMainWindow):
         if not self.latest_release_url or not self.latest_release_page_url:
             return
         self.update_available_label.setText(
-            f'<a href="{self.latest_release_url}" style="color:#d92d20; '
+            f'<a href="{self.latest_release_url}" '
+            f'style="color:{alert_color(self.current_theme)}; '
             f'text-decoration:none; font-weight:600;">'
             f'{ui_text("update_available", self.language)}</a>'
             f'&nbsp;&nbsp;<a href="{self.latest_release_page_url}" '
@@ -630,6 +653,7 @@ class MainWindow(QMainWindow):
                 atu_path=config.atu_path,
                 his_path=config.his_path,
                 language=config.language,
+                theme=config.theme,
                 project_types=config.project_types,
                 software_versions=config.software_versions,
                 show_startup_instructions=self.pending_show_startup_instructions,
@@ -638,6 +662,7 @@ class MainWindow(QMainWindow):
             save_config(self.config_path, self.config)
             self.pending_show_startup_instructions = None
         self.language = config.language
+        self.theme_preference = config.theme
         self._set_language_button_icon(self.language_button)
         self._load_manual_software_version(self._manual_version_project_type())
         self.retranslate_ui()
@@ -1007,6 +1032,7 @@ class MainWindow(QMainWindow):
             title=title,
             summary=summary,
             language=self.language,
+            theme=self.current_theme,
             canceled_message=canceled_message,
             cleanup_message=cleanup_message,
             cleanup_action=self.open_history_cleanup if cleanup_message else None,
@@ -1123,6 +1149,7 @@ class MainWindow(QMainWindow):
             plans=plans,
             duplicate_plans=duplicate_plans,
             language=self.language,
+            theme=self.current_theme,
         )
         self.log_output.clear()
         self.log_output.appendPlainText(ui_text("preview_note", self.language))
@@ -1176,6 +1203,7 @@ class MainWindow(QMainWindow):
             atu_path=self.config.atu_path,
             his_path=self.config.his_path,
             language=self.config.language,
+            theme=self.config.theme,
             project_types=tuple(
                 key for key, checkbox in self.type_checkboxes.items() if checkbox.isChecked()
             ),
@@ -1257,6 +1285,7 @@ class MainWindow(QMainWindow):
                 atu_path=self.config.atu_path,
                 his_path=self.config.his_path,
                 language=self.config.language,
+                theme=self.config.theme,
                 project_types=self.config.project_types,
                 software_versions=software_versions,
                 show_startup_instructions=self.config.show_startup_instructions,
@@ -1299,6 +1328,33 @@ class MainWindow(QMainWindow):
                 atu_path=self.config.atu_path,
                 his_path=self.config.his_path,
                 language=self.language,
+                theme=self.config.theme,
+                project_types=self.config.project_types,
+                software_versions=self.config.software_versions,
+                show_startup_instructions=self.config.show_startup_instructions,
+                history_cleanup=self.config.history_cleanup,
+            )
+            save_config(self.config_path, self.config)
+        self.retranslate_ui()
+        if self.current_plans or self.atu_duplicate_plans:
+            self._show_plans(self.current_plans, self.atu_duplicate_plans)
+
+    def toggle_theme(self) -> None:
+        """Switch between explicit light/dark themes and persist the choice."""
+
+        self.theme_preference = "dark" if self.current_theme == "light" else "light"
+        app = QApplication.instance()
+        if app is None:
+            return
+        self.current_theme = apply_theme(app, self.theme_preference)
+        set_theme_button_state(self.theme_button, self.current_theme)
+        if self.config:
+            self.config = AppConfig(
+                collaborator=self.config.collaborator,
+                atu_path=self.config.atu_path,
+                his_path=self.config.his_path,
+                language=self.config.language,
+                theme=self.theme_preference,
                 project_types=self.config.project_types,
                 software_versions=self.config.software_versions,
                 show_startup_instructions=self.config.show_startup_instructions,
@@ -1337,6 +1393,11 @@ class MainWindow(QMainWindow):
 
         self.current_folder_title.setText(ui_text("current_folder", self.language))
         self.language_button.setToolTip(ui_text("language_tooltip", self.language))
+        theme_key = (
+            "theme_dark_tooltip" if self.current_theme == "light" else "theme_light_tooltip"
+        )
+        self.theme_button.setToolTip(ui_text(theme_key, self.language))
+        set_theme_button_state(self.theme_button, self.current_theme)
         self._set_language_button_icon(self.language_button)
         self.refresh_button.setText(ui_text("refresh", self.language))
         self.settings_button.setText(ui_text("settings", self.language))
@@ -1379,6 +1440,7 @@ class MainWindow(QMainWindow):
             manual_index,
             ui_text("stage_description_option", self.language),
         )
+        self.stage_input.setItemText(0, ui_text("select_stage_placeholder", self.language))
         self.type_label.setText(ui_text("type", self.language))
         self.mode_label.setText(ui_text("mode", self.language))
         for project_type in PROJECT_TYPES:

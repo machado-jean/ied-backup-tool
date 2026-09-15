@@ -38,8 +38,14 @@ def test_update_worker_process_exits_cleanly() -> None:
         project_dir = Path(tempfile.mkdtemp(prefix="ied-worker-lifecycle-"))
         window = MainWindow(project_dir=project_dir, auto_startup_dialogs=False)
         window._start_update_check()
-        thread = window.update_thread
-        thread.finished.connect(app.quit)
+
+        def quit_when_worker_stops():
+            if window.update_thread is None:
+                app.quit()
+                return
+            QTimer.singleShot(10, quit_when_worker_stops)
+
+        QTimer.singleShot(0, quit_when_worker_stops)
         QTimer.singleShot(2_000, lambda: app.exit(2))
 
         exit_code = app.exec()

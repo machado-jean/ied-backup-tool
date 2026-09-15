@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 
 from src.core.backup_models import BackupSummary
 from src.core.i18n import ui_text
+from src.gui.theme import ThemeName, alert_color
 
 
 def show_execution_summary_dialog(
@@ -23,6 +24,7 @@ def show_execution_summary_dialog(
     title: str,
     summary: BackupSummary,
     language: str,
+    theme: ThemeName = "light",
     canceled_message: str | None = None,
     cleanup_message: str | None = None,
     cleanup_action=None,
@@ -52,7 +54,7 @@ def show_execution_summary_dialog(
         layout.addWidget(_separator())
         cleanup = QLabel(cleanup_message)
         cleanup.setWordWrap(True)
-        cleanup.setStyleSheet("font-weight: 600; color: #d92d20;")
+        cleanup.setStyleSheet(f"font-weight: 600; color: {alert_color(theme)};")
         layout.addWidget(cleanup)
 
     buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)

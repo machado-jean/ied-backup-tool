@@ -36,6 +36,7 @@ class AppConfig:
     collaborator_first_name: str = ""
     collaborator_last_name: str = ""
     language: str = DEFAULT_LANGUAGE
+    theme: str | None = None
     project_types: tuple[str, ...] = ()
     software_versions: dict[str, str] | None = None
     show_startup_instructions: bool = True
@@ -89,6 +90,8 @@ def save_config(path: Path, config: AppConfig) -> None:
             "retention_days": config.history_cleanup.retention_days,
         },
     }
+    if config.theme is not None:
+        payload["theme"] = config.theme
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
@@ -101,6 +104,9 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
     language = raw.get("language", DEFAULT_LANGUAGE)
     if not isinstance(language, str) or language not in {"pt_BR", "en_US"}:
         language = DEFAULT_LANGUAGE
+    theme = raw.get("theme")
+    if theme not in {"light", "dark"}:
+        theme = None
     project_types = raw.get("project_types", [])
     if not isinstance(project_types, list):
         project_types = []
@@ -119,6 +125,7 @@ def parse_config(raw: dict[str, Any]) -> AppConfig:
         atu_path=atu_path,
         his_path=his_path,
         language=language,
+        theme=theme,
         project_types=tuple(item for item in project_types if isinstance(item, str)),
         software_versions={
             key: value.strip()

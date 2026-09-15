@@ -198,7 +198,7 @@ Verify generated release assets without publishing:
 - Unexpected-session markers and heartbeats also remain under the per-user log
   directory. Windows events are queried only after explicit consent, within a
   narrow time window, and are never uploaded automatically.
-- The active next roadmap milestone after `v1.17.1` is new IED types when
+- The active next roadmap milestone after `v1.17.2` is new IED types when
   clean/sanitized samples and reliable version rules are available.
   Operational reports and external `.sha256` files are intentionally outside
   the active roadmap for now.
@@ -259,3 +259,7 @@ Verify generated release assets without publishing:
   `PUBLISH_RELEASE.ps1` only after explicit publication authorization.
 - Publishing requires a clean worktree, `HEAD == origin/master`, green CI,
   authenticated GitHub CLI, correct hashes, and all expected assets.
+- The publisher pushes or reuses the release tag only after local checks and
+  `master` CI pass, waits for the tag CI on the exact commit, prints a detailed
+  `CORRETO`/`INCORRETO` report, and asks the user for final confirmation before
+  creating the GitHub Release or uploading assets.

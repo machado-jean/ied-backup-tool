@@ -69,6 +69,11 @@ Recommended flow:
 5. Run `ruff` and `pytest`.
 6. Open the pull request using the repository template.
 
+To prepare a local release, run `scripts\release.ps1`. Run the publisher created
+under `releases\vX.Y.Z` manually after committing and pushing `master`; it
+requires passing local tests plus `master` and tag CI, shows a verification
+report, and asks for confirmation before creating the GitHub Release.
+
 Avoid including `.venv/`, `releases/`, generated `.exe` files, real backups,
 or unrelated formatting-only changes.
 

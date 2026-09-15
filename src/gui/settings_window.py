@@ -32,12 +32,14 @@ class SettingsWindow(QDialog):
         config_path: Path,
         config: AppConfig | None,
         language: str = DEFAULT_LANGUAGE,
+        theme: str | None = None,
         parent=None,
     ) -> None:
         super().__init__(parent)
         self.config_path = config_path
         self.config = config
         self.language = language
+        self.theme = theme
         self.setWindowTitle(ui_text("settings", self.language))
         self.setMinimumWidth(560)
 
@@ -127,6 +129,7 @@ class SettingsWindow(QDialog):
             atu_path=atu,
             his_path=his,
             language=self.config.language if self.config else self.language,
+            theme=self.config.theme if self.config else self.theme,
             project_types=self.config.project_types if self.config else (),
             software_versions=self.config.software_versions if self.config else {},
             show_startup_instructions=(

@@ -75,6 +75,13 @@ DEV_SE-AAA_20260622_1350.dz5
 7. Wait for completion or cancel before the next file starts.
 8. Use `HIS cleanup` when old historical backups should be reviewed.
 
+## Interface Theme
+
+On first launch, the application follows the Windows light or dark theme. The
+moon/sun button beside the language selector switches themes without changing
+the interface proportions. After the first manual change, `light` or `dark` is
+saved in `config.json` and restored on future launches.
+
 ## Batch Preview
 
 The preview shows:

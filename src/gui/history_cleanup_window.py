@@ -226,6 +226,7 @@ class HistoryCleanupWindow(QDialog):
             atu_path=self.config.atu_path,
             his_path=self.config.his_path,
             language=self.config.language,
+            theme=self.config.theme,
             project_types=self.config.project_types,
             software_versions=self.config.software_versions,
             show_startup_instructions=self.config.show_startup_instructions,

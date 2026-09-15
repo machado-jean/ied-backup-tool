@@ -6,7 +6,7 @@ Aplicação Windows para padronizar backups de projetos de IED, mantendo um back
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade técnica.
 
-Versão atual: `1.17.1`
+Versão atual: `1.17.2`
 
 - Manual do executável: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
@@ -53,6 +53,8 @@ Exemplo da interface em inglês:
 - Interface gráfica para Windows com pré-visualização antes da execução.
 - Tela inicial de instruções com opção `Não exibir novamente`.
 - Interface em português e inglês, com preferência salva em `config.json`.
+- Tema claro/escuro com botão rápido; na primeira utilização acompanha o sistema
+  e, após a troca manual, salva a preferência em `config.json`.
 - Verificação automática de nova versão publicada no GitHub.
 - Download direto do executável mais recente pelo aviso de atualização.
 - Link `O que há de novo?` para consultar as notas da versão disponível.
@@ -158,6 +160,7 @@ Exemplo:
   "atu_path": "C:/Backups/Exemplo/ATU",
   "his_path": "C:/Backups/Exemplo/HIS",
   "language": "pt_BR",
+  "theme": "dark",
   "project_types": ["digsi5", "sel", "pcm600", "ingeteam", "ge_multilin"],
   "software_versions": {
     "ingeteam": "5.5.4"
@@ -289,13 +292,20 @@ O comando também gera `SHA256SUMS.txt` e `PUBLISH_RELEASE.ps1` dentro da pasta
 .\releases\vX.Y.Z\PUBLISH_RELEASE.ps1 -VerifyOnly
 ```
 
-Depois de fazer commit, enviar `master` e aguardar o CI, publique com:
+Depois de fazer commit e enviar `master`, publique manualmente com:
 
 ```powershell
 .\releases\vX.Y.Z\PUBLISH_RELEASE.ps1
 ```
 
 É necessário ter o GitHub CLI instalado e autenticado com `gh auth login`.
+Antes de criar o GitHub Release, o publicador executa novamente lint e testes,
+exige o CI verde de `master`, envia a tag, aguarda o CI dessa tag para o mesmo
+commit e apresenta um relatório com cada verificação marcada como `CORRETO` ou
+`INCORRETO`. Quando tudo estiver correto, pergunta
+`Publicar release com o release note e .exe?`; somente uma resposta afirmativa
+cria o GitHub Release e envia os assets. Se qualquer validação falhar, nenhum
+GitHub Release é criado.
 
 ## Arquitetura
 

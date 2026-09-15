@@ -92,6 +92,11 @@ or push the release tag manually; the generated publisher owns that step.
 ```
 
 Publish only when explicitly requested. The publisher requires a clean
-worktree, `HEAD == origin/master`, authenticated GitHub CLI, and successful
-`CI`. It creates the release/tag, uploads the executable and SHA256 file,
-verifies assets, and waits for tag CI through `scripts/Check-ReleaseCi.ps1`.
+worktree, `HEAD == origin/master`, authenticated GitHub CLI, local lint/tests,
+and successful `master` CI. It then pushes only the tag and waits for the tag CI
+on the exact commit through `scripts/Check-ReleaseCi.ps1`. The GitHub Release
+and its assets may be created only after that tag CI concludes successfully.
+After all gates pass, the publisher must show a `CORRETO`/`INCORRETO` report and
+ask `Publicar release com o release note e .exe?`. Only an affirmative response
+may create the GitHub Release. When any gate fails or the user declines, leave
+the release unpublished; the validated tag may remain for diagnosis or retry.

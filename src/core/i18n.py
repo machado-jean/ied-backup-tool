@@ -136,6 +136,9 @@ UI_TEXT = {
         "integrity_conflicts_title": "Conflitos de integridade",
         "his_folder": "Pasta HIS",
         "language_tooltip": "Idioma",
+        "select_stage_placeholder": "Selecione uma etapa",
+        "theme_dark_tooltip": "Usar tema escuro",
+        "theme_light_tooltip": "Usar tema claro",
         "last_name": "Sobrenome",
         "license": "Licença",
         "license_message": (
@@ -363,6 +366,9 @@ UI_TEXT = {
         "integrity_conflicts_title": "Integrity conflicts",
         "his_folder": "HIS folder",
         "language_tooltip": "Language",
+        "select_stage_placeholder": "Select a stage",
+        "theme_dark_tooltip": "Use dark theme",
+        "theme_light_tooltip": "Use light theme",
         "last_name": "Last name",
         "license": "License",
         "license_message": (

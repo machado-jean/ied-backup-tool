@@ -1,6 +1,8 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$Tag,
+    [Parameter(Mandatory = $true)]
+    [string]$Commit,
     [int]$TimeoutMinutes = 10
 )
 
@@ -16,6 +18,7 @@ do {
         --repo $Repository `
         --workflow CI `
         --branch $Tag `
+        --commit $Commit `
         --event push `
         --limit 1 `
         --json databaseId,status,conclusion
@@ -29,7 +32,7 @@ do {
 } while (-not $Run -and (Get-Date) -lt $Deadline)
 
 if (-not $Run) {
-    throw "O workflow CI da tag $Tag não foi encontrado em $TimeoutMinutes minuto(s)."
+    throw "O workflow CI da tag $Tag para o commit $Commit não foi encontrado em $TimeoutMinutes minuto(s)."
 }
 
 if ($Run.status -ne "completed") {

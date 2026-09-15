@@ -79,6 +79,30 @@ def test_parse_config_accepts_language() -> None:
     assert config.language == "en_US"
 
 
+def test_parse_config_accepts_explicit_theme() -> None:
+    config = parse_config(
+        {
+            "colaborador": "Colaborador Exemplo",
+            "atu_path": "C:/BKP/ATU",
+            "his_path": "C:/BKP/HIS",
+            "theme": "dark",
+        }
+    )
+
+    assert config.theme == "dark"
+
+
+def test_parse_config_uses_system_theme_when_preference_is_missing_or_invalid() -> None:
+    base = {
+        "colaborador": "Colaborador Exemplo",
+        "atu_path": "C:/BKP/ATU",
+        "his_path": "C:/BKP/HIS",
+    }
+
+    assert parse_config(base).theme is None
+    assert parse_config({**base, "theme": "automatic"}).theme is None
+
+
 def test_parse_config_accepts_project_types() -> None:
     config = parse_config(
         {
@@ -180,6 +204,22 @@ def test_save_config_writes_history_cleanup_retention_only(tmp_path: Path) -> No
     assert '"history_cleanup"' in text
     assert '"retention_days": 30' in text
     assert '"nome": "COLABORADOR"' in text
+    assert '"theme"' not in text
+
+
+def test_save_config_writes_theme_only_after_explicit_selection(tmp_path: Path) -> None:
+    path = tmp_path / "config.json"
+    save_config(
+        path,
+        AppConfig(
+            collaborator="COLABORADOR",
+            atu_path=tmp_path / "ATU",
+            his_path=tmp_path / "HIS",
+            theme="dark",
+        ),
+    )
+
+    assert '"theme": "dark"' in path.read_text(encoding="utf-8")
 
 
 def test_parse_config_requires_paths() -> None:

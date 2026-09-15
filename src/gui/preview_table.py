@@ -10,15 +10,27 @@ from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 
 from src.core.backup_service import AtuDuplicatePlan, BackupPlan
 from src.core.i18n import status_label
+from src.gui.theme import ThemeName
 
 STATUS_COLORS = {
-    "stored": QColor("#1f7a3f"),
-    "replaced_current": QColor("#1c5d99"),
-    "archived_history": QColor("#7a4f00"),
-    "atu_duplicate": QColor("#9a5b00"),
-    "sha_conflict": QColor("#b42318"),
-    "skipped_older": QColor("#666666"),
-    "already_current": QColor("#2f6f73"),
+    "light": {
+        "stored": "#1f7a3f",
+        "replaced_current": "#1c5d99",
+        "archived_history": "#7a4f00",
+        "atu_duplicate": "#9a5b00",
+        "sha_conflict": "#b42318",
+        "skipped_older": "#666666",
+        "already_current": "#2f6f73",
+    },
+    "dark": {
+        "stored": "#56d364",
+        "replaced_current": "#79c0ff",
+        "archived_history": "#e3b341",
+        "atu_duplicate": "#ffa657",
+        "sha_conflict": "#ff7b72",
+        "skipped_older": "#aab2bd",
+        "already_current": "#76e3ea",
+    },
 }
 
 
@@ -36,6 +48,7 @@ def populate_preview_table(
     plans: list[BackupPlan],
     duplicate_plans: list[AtuDuplicatePlan],
     language: str,
+    theme: ThemeName = "light",
 ) -> None:
     """Write backup and duplicate-fix plans to the preview table."""
 
@@ -49,8 +62,9 @@ def populate_preview_table(
                 item.setToolTip(str(plan.destination_path))
             if column in {0, 2, 3, 4}:
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-            if column == 0 and plan.status in STATUS_COLORS:
-                item.setForeground(STATUS_COLORS[plan.status])
+            status_color = STATUS_COLORS[theme].get(plan.status)
+            if column == 0 and status_color:
+                item.setForeground(QColor(status_color))
             table.setItem(row, column, item)
     table.resizeColumnsToContents()
 

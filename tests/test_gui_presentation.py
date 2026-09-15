@@ -13,6 +13,7 @@ from src.core.app_logging import PreviousSessionIncident
 from src.core.backup_models import BackupPlan, BackupSummary
 from src.core.update_checker import UpdateCheckResult
 from src.gui import main_window as main_window_module
+from src.gui.app import parse_args
 from src.gui.backup_confirmation import execution_confirmation_message, integrity_conflict_details
 from src.gui.execution_summary_dialog import _summary_rows
 from src.gui.history_cleanup_window import HistoryCleanupWindow
@@ -24,6 +25,16 @@ from src.gui.preview_table import (
     source_files_text,
 )
 from src.gui.summary_text import format_summary_text
+from src.gui.theme import ThemedComboBox, apply_theme
+
+
+def test_smoke_test_exit_argument_is_available_only_for_automated_validation(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        ["ied-backup-manager", "--smoke-test-exit-ms", "1500"],
+    )
+
+    assert parse_args().smoke_test_exit_ms == 1500
 
 
 def test_source_files_text_shows_first_file_and_extra_count(tmp_path: Path) -> None:
@@ -180,6 +191,16 @@ def test_populate_preview_table_writes_plan_columns(tmp_path: Path) -> None:
     assert table.item(0, 2).text() == "SE-AAA"
     assert table.item(0, 5).text() == "ATU\\backup.zip"
     assert table.item(0, 5).toolTip() == str(tmp_path / "IED-ATU" / "backup.zip")
+
+    light_status_color = table.item(0, 0).foreground().color().name()
+    populate_preview_table(
+        table,
+        plans=[plan],
+        duplicate_plans=[],
+        language="pt_BR",
+        theme="dark",
+    )
+    assert table.item(0, 0).foreground().color().name() != light_status_color
 
 
 def test_destination_display_text_uses_storage_folder_alias(tmp_path: Path) -> None:
@@ -353,3 +374,77 @@ def test_startup_sequence_allows_direct_preview_when_instructions_are_disabled(
 
     assert window.startup_sequence_active is False
     assert window.preview_refresh_timer.isActive()
+
+
+def test_theme_toggle_applies_and_persists_explicit_preference(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    _ = app
+    save_config(
+        tmp_path / "config.json",
+        AppConfig(
+            collaborator="COLABORADOR",
+            atu_path=tmp_path / "ATU",
+            his_path=tmp_path / "HIS",
+            theme="light",
+            show_startup_instructions=False,
+        ),
+    )
+    window = MainWindow(project_dir=tmp_path, auto_startup_dialogs=False)
+    window.resize(1200, 720)
+    window.centralWidget().layout().activate()
+
+    assert window.current_theme == "light"
+    assert window.theme_button.text() == "☾"
+    assert window.stage_input.itemText(0) == "Selecione uma etapa"
+    assert "QGroupBox" in app.styleSheet()
+    assert "QComboBox QAbstractItemView" in app.styleSheet()
+    light_geometry = (
+        window.summary_group.geometry(),
+        window.preview_group.geometry(),
+        window.action_group.geometry(),
+    )
+
+    window.toggle_theme()
+    window.centralWidget().layout().activate()
+
+    assert window.current_theme == "dark"
+    assert window.theme_button.text() == "☀"
+    assert "QGroupBox" in app.styleSheet()
+    assert (
+        window.summary_group.geometry(),
+        window.preview_group.geometry(),
+        window.action_group.geometry(),
+    ) == light_geometry
+    assert parse_config_json(tmp_path / "config.json")["theme"] == "dark"
+    window.close()
+
+
+def test_theme_combo_popup_uses_uniform_frame() -> None:
+    app = QApplication.instance() or QApplication([])
+    apply_theme(app, "light")
+    combo = ThemedComboBox()
+    combo.addItems(["Selecione uma etapa", "DEV"])
+    combo.showPopup()
+
+    popup = combo.view().window()
+    margins = popup.layout().contentsMargins()
+    assert popup.frameShape() == popup.Shape.Box
+    assert (margins.left(), margins.top(), margins.right(), margins.bottom()) == (1, 1, 1, 1)
+    assert popup.palette().windowText().color().name() == "#7f8c99"
+    image = popup.grab().toImage()
+    border_colors = {
+        image.pixelColor(image.width() // 2, 0).name(),
+        image.pixelColor(0, image.height() // 2).name(),
+        image.pixelColor(image.width() - 1, image.height() // 2).name(),
+        image.pixelColor(image.width() // 2, image.height() - 1).name(),
+    }
+    assert border_colors == {"#7f8c99"}
+
+    combo.hidePopup()
+    combo.close()
+
+
+def parse_config_json(path: Path) -> dict:
+    import json
+
+    return json.loads(path.read_text(encoding="utf-8"))

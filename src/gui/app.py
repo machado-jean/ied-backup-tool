@@ -20,6 +20,7 @@ from src.core.app_logging import (
 )
 from src.core.i18n import DEFAULT_LANGUAGE, ui_text
 from src.gui.resources import app_icon_path
+from src.gui.theme import apply_theme, normalize_theme
 from src.version import APP_NAME, APP_VERSION
 
 
@@ -31,6 +32,11 @@ def parse_args() -> argparse.Namespace:
         "--project-dir",
         type=Path,
         help="Pasta processada pela GUI. Uso principal: testes em desenvolvimento.",
+    )
+    parser.add_argument(
+        "--smoke-test-exit-ms",
+        type=int,
+        help=argparse.SUPPRESS,
     )
     return parser.parse_args()
 
@@ -121,12 +127,13 @@ def _run_app() -> int:
     logger = get_logger("startup")
     logger.info("Parsing arguments")
     args = parse_args()
-    language = _startup_language(args.project_dir or Path.cwd())
+    language, theme = _startup_preferences(args.project_dir or Path.cwd())
     logger.info("Creating QApplication")
     app = QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setApplicationVersion(APP_VERSION)
     app.setWindowIcon(QIcon(str(app_icon_path())))
+    apply_theme(app, theme)
     app.aboutToQuit.connect(lambda: logger.info("QApplication about to quit"))
     session_heartbeat = QTimer(app)
     session_heartbeat.setInterval(10_000)
@@ -167,6 +174,8 @@ def _run_app() -> int:
     app.processEvents()
     logger.info("Scheduling startup dialogs")
     window.schedule_startup_dialogs()
+    if args.smoke_test_exit_ms is not None:
+        QTimer.singleShot(max(args.smoke_test_exit_ms, 0), app.quit)
     logger.info("Entering Qt event loop")
     exit_code = app.exec()
     logger.info("Qt event loop exited: code=%s", exit_code)
@@ -202,18 +211,24 @@ def _show_fatal_error(exc: Exception, log_file: Path) -> None:
         get_logger("startup").exception("Could not show fatal error dialog")
 
 
-def _startup_language(project_dir: Path) -> str:
-    """Read the saved language before the main window/config loader is available."""
+def _startup_preferences(project_dir: Path) -> tuple[str, str | None]:
+    """Read display preferences before the main window/config loader is available."""
 
     config_path = project_dir / "config.json"
     try:
         raw = json.loads(config_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
-        return DEFAULT_LANGUAGE
+        return DEFAULT_LANGUAGE, None
     language = raw.get("language")
     if language in {"pt_BR", "en_US"}:
-        return language
-    return DEFAULT_LANGUAGE
+        return language, normalize_theme(raw.get("theme"))
+    return DEFAULT_LANGUAGE, normalize_theme(raw.get("theme"))
+
+
+def _startup_language(project_dir: Path) -> str:
+    """Return the saved startup language for fatal-error compatibility."""
+
+    return _startup_preferences(project_dir)[0]
 
 
 if __name__ == "__main__":
