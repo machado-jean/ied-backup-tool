@@ -343,6 +343,7 @@ lista:
 Para os tipos suportados, o programa identifica o projeto/subestação pelo nome
 do arquivo. Pela política atual, o projeto é sempre o primeiro bloco antes do
 primeiro sublinhado `"_"`.
+Espaços nesse primeiro bloco são convertidos em hífens: `SE CTR` vira `SE-CTR`.
 
 Para DIGSI 5, o padrão recomendado e:
 
@@ -358,6 +359,7 @@ Exemplos:
 
 ```text
 SE-AAA_20260529_1624.dz5           -> Projeto: SE-AAA
+SE CTR_20260916_0800.dz5           -> Projeto: SE-CTR
 SE-BBB_DEV_01_20260619_0013.dz5    -> Projeto: SE-BBB
 SE-ABC_REVISAO_FINAL_20260619_1015.dz5 -> Projeto: SE-ABC
 ESD-AAA.rdb                        -> Projeto: ESD-AAA
@@ -549,10 +551,14 @@ sem confirmação.
 - Se o programa fechar sozinho ou travar ao abrir, envie o log do dia em
   `%LOCALAPPDATA%\IED Backup Manager\logs\`, removendo informações sensíveis se
   necessário.
-- Se a execução anterior tiver terminado inesperadamente, a próxima abertura
-  poderá pedir autorização para consultar somente os eventos 1000/1001 do
-  Windows próximos daquele horário e relacionados ao `IED_Backup_Manager.exe`.
+- Cada execução usa um marcador próprio com UUID, PID, horário de início e
+  caminho. Instâncias simultâneas ou abertas em pastas diferentes não se
+  sobrescrevem. Se uma sessão do mesmo caminho desaparecer sem registrar saída
+  normal, a próxima abertura mostra o local e pode pedir autorização para
+  consultar somente os eventos 1000/1001 do Windows próximos daquele horário.
   A consulta não exige UAC e nenhuma informação é enviada automaticamente.
+- Marcadores limpos ou já tratados são removidos imediatamente. Os demais
+  expiram após 30 dias e são limitados a 20 por caminho do executável.
 
 ## 18. Atualização de versão
 

@@ -65,8 +65,8 @@ e `HIS` podem ficar em outro local, desde que estejam configuradas.
 
 - O nome da SE, ETD, vão ou equipamento deve vir antes do primeiro sublinhado
   `"_"`.
-- Use hífen `"-"` para separar textos dentro do nome da SE, ETD, vão ou
-  equipamento.
+- Espaços dentro desse trecho são convertidos automaticamente em hífen `"-"`;
+  por exemplo, `SE CTR` será identificado como `SE-CTR`.
 - Todo texto depois do primeiro sublinhado `"_"` é tratado como comentário do
   usuário e não entra na chave técnica do backup.
 - Confira sempre a coluna `Projeto` na prévia do lote antes de gerar backups.
@@ -286,13 +286,20 @@ prévia, execução de backup, falhas e exceções não tratadas. Ao reportar um
 problema, envie o log do dia em que ocorreu a falha, removendo antes qualquer
 informação sensível se necessário.
 
-O aplicativo mantém um marcador local de sessão. Se a execução anterior não
-registrou uma saída normal, a próxima abertura informa que houve um encerramento
-inesperado e pede consentimento antes de consultar o log Application do Windows.
-Se autorizado, copia para o log local somente eventos 1000/1001 próximos do
-horário e filtrados por `IED_Backup_Manager.exe`. A consulta não exige UAC,
-não acessa dumps e não envia dados automaticamente. Responder `Não` impede a
-consulta e encerra o aviso daquele incidente.
+O aplicativo mantém um marcador separado para cada sessão. UUID, PID, horário de
+início e caminho do executável distinguem cópias abertas simultaneamente. Uma
+instância ainda ativa ou aberta em outro caminho não gera alerta na cópia atual.
+Se uma sessão do mesmo caminho deixar de existir sem registrar saída normal, a
+próxima abertura mostra também o local daquela execução e pede consentimento
+antes de consultar o log Application do Windows. Se autorizado, copia para o log
+local somente eventos 1000/1001 próximos do horário e filtrados pelo executável.
+A consulta não exige UAC, não acessa dumps e não envia dados automaticamente.
+Responder `Não` impede a consulta e encerra o aviso daquele incidente.
+
+Sessões encerradas normalmente são removidas imediatamente. Pendências já
+tratadas também são removidas; as demais expiram após 30 dias e são limitadas a
+20 registros por caminho. O log diário continua sendo um único arquivo e passa
+a identificar cada linha com o UUID da sessão e o PID.
 
 ### O programa não abre em pasta sincronizada
 

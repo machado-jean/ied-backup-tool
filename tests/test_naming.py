@@ -35,6 +35,18 @@ def test_get_project_id_uses_first_block_even_without_timestamp_suffix() -> None
     assert get_project_id("SE-BBB_REVISAO_FINAL.dz5") == "SE-BBB"
 
 
+def test_get_project_id_replaces_spaces_with_hyphens() -> None:
+    assert get_project_id("SE CTR_20260916_0800.dz5") == "SE-CTR"
+
+
+def test_get_project_id_collapses_multiple_spaces_into_one_hyphen() -> None:
+    assert get_project_id("SE   CTR_20260916_0800.dz5") == "SE-CTR"
+
+
+def test_get_project_id_keeps_underscore_as_the_identifier_delimiter() -> None:
+    assert get_project_id("SE_CTR_20260916_0800.dz5") == "SE"
+
+
 def test_build_backup_name_uses_required_pattern() -> None:
     result = build_backup_name(
         software_version="DIGSI5-V10.00",

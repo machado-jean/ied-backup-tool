@@ -13,6 +13,7 @@ entrada manual do usuário e quais casos exigem cuidado especial.
 
 Para a maioria dos tipos de IED, o projeto, SE, ETD, vao ou equipamento e
 identificado pelo texto antes do primeiro sublinhado `"_"` no nome do arquivo.
+Espaços dentro desse trecho são convertidos em hífens: `SE CTR` vira `SE-CTR`.
 
 Exemplo:
 

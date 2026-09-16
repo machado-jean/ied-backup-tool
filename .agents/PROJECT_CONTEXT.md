@@ -15,6 +15,8 @@ generates consistent ZIP names for technical traceability.
   files.
 - The application/project identifier is the text before the first underscore
   `"_"`.
+- Whitespace inside that identifier is collapsed and converted to a hyphen, so
+  `SE CTR` becomes `SE-CTR`; an underscore still ends the identifier.
 - Text after the first underscore is treated as user comment and is not part of
   the backup technical key.
 - `ATU` contains the current backup for each technical key.
@@ -195,10 +197,13 @@ Verify generated release assets without publishing:
 - Local diagnostics log directory:
   `%LOCALAPPDATA%\IED Backup Manager\logs\`
 - Logs are daily files named `ied-backup-manager-YYYY-MM-DD.log`.
-- Unexpected-session markers and heartbeats also remain under the per-user log
-  directory. Windows events are queried only after explicit consent, within a
-  narrow time window, and are never uploaded automatically.
-- The active next roadmap milestone after `v1.17.2` is new IED types when
+- Unexpected-session markers are stored individually under `logs\sessions\`
+  with UUID, PID, process start time, and executable path. Active sessions and
+  sessions from other executable paths never trigger the current copy's alert.
+  Clean/handled markers are removed immediately; unresolved markers expire
+  after 30 days and are limited to 20 per path. Windows events are queried only
+  after explicit consent, within a narrow time window, and are never uploaded.
+- The active next roadmap milestone after `v1.17.3` is new IED types when
   clean/sanitized samples and reliable version rules are available.
   Operational reports and external `.sha256` files are intentionally outside
   the active roadmap for now.

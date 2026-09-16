@@ -62,6 +62,7 @@ UI_TEXT = {
         "current_folder": "Pasta atual",
         "crash_diagnostics_consent_message": (
             "A execução anterior terminou inesperadamente por volta de {time}.\n\n"
+            "Local da execução:\n{path}\n\n"
             "Você permite consultar os eventos do Windows em uma janela de ±2 minutos "
             "e anexar ao log local somente os registros relacionados ao "
             "IED Backup Manager?\n\n"
@@ -294,6 +295,7 @@ UI_TEXT = {
         "current_folder": "Current folder",
         "crash_diagnostics_consent_message": (
             "The previous execution ended unexpectedly around {time}.\n\n"
+            "Execution location:\n{path}\n\n"
             "Do you allow the application to query Windows events in a ±2-minute window "
             "and append only records related to IED Backup Manager to the local log?\n\n"
             "No data will be sent automatically, and administrator access is not required."

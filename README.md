@@ -6,7 +6,7 @@ Aplicação Windows para padronizar backups de projetos de IED, mantendo um back
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
 rastreabilidade técnica.
 
-Versão atual: `1.17.2`
+Versão atual: `1.17.3`
 
 - Manual do executável: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
@@ -19,6 +19,7 @@ Versão atual: `1.17.2`
 
 O IED Backup Manager processa os arquivos de trabalho que estão na pasta do
 executável, identifica o projeto pelo trecho antes do primeiro sublinhado `"_"`,
+convertendo espaços desse trecho em hífens,
 gera um ZIP padronizado e aplica as regras de versionamento entre `ATU` e `HIS`.
 
 O objetivo é reduzir backups manuais inconsistentes, evitar duplicidades
@@ -84,8 +85,9 @@ Exemplo da interface em inglês:
 - Prévia do lote calculada em segundo plano para reduzir travamentos em pastas
   grandes.
 - Log diário local para diagnóstico de inicialização, prévia, backup e falhas.
-- Detecção de encerramento inesperado e coleta consentida de eventos do Windows,
-  limitada ao horário e ao executável, sem envio automático ou solicitação de UAC.
+- Detecção de encerramento inesperado com marcador separado por sessão, validação
+  de UUID, PID, horário e caminho do executável e coleta consentida de eventos do
+  Windows, sem envio automático ou solicitação de UAC.
 - Cancelamento controlado antes de iniciar o próximo arquivo.
 - Botão `Ajuda` / `Help` apontando para a documentação operacional pública.
 - Indicador `©` com autoria, licença e link do repositório.
@@ -115,6 +117,7 @@ VAO-ZZZ_COMENTARIO-GENERICO_20260712_1050.efsPro -> Projeto: VAO-ZZZ
 
 Todo texto depois do primeiro sublinhado `"_"` é tratado como comentário do
 usuário e não entra na chave técnica do backup.
+Se o identificador vier como `SE CTR`, ele será normalizado para `SE-CTR`.
 
 Evite:
 

@@ -104,8 +104,8 @@ class StartupInstructionsDialog(QDialog):
                 <ul>
                   <li>The SE, ETD, bay, or equipment name must come before the
                   first underscore <code>"_"</code>.</li>
-                  <li>Use hyphen <code>"-"</code> to separate text inside the SE,
-                  ETD, bay, or equipment name.</li>
+                  <li>Spaces in that text are automatically converted to hyphens;
+                  for example, <code>SE CTR</code> becomes <code>SE-CTR</code>.</li>
                   <li>All text after the first underscore <code>"_"</code> is treated
                   as a user comment and will not be used to identify the backup.</li>
                   <li>The backup will be grouped by the text before the first
@@ -158,8 +158,8 @@ ETD-YYY_OTHER-COMMENT.rdb</pre>
             <ul>
               <li>O nome da SE, ETD, vão ou equipamento deve vir antes do primeiro
               sublinhado <code>"_"</code>.</li>
-              <li>Use hífen <code>"-"</code> para separar textos dentro do nome da SE,
-              ETD, vão ou equipamento.</li>
+              <li>Espaços nesse trecho são convertidos automaticamente em hífens;
+              por exemplo, <code>SE CTR</code> se torna <code>SE-CTR</code>.</li>
               <li>Todo texto depois do primeiro sublinhado <code>"_"</code> é tratado
               como comentário do usuário e não será usado para identificar o backup.</li>
               <li>O backup será agrupado pelo trecho antes do primeiro sublinhado

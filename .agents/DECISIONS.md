@@ -23,12 +23,16 @@ Collaborator and stage do not change technical identity.
 
 The project/substation/equipment identifier is always the text before the first
 underscore `"_"`.
+Whitespace within that text is collapsed into a hyphen. The underscore remains
+the identifier delimiter and is not normalized as part of the project name.
 
 Examples:
 
 ```text
 SE-AAA_COMMENT_20260622_1350.dz5 -> SE-AAA
 ETD-BBB_OTHER-COMMENT.rdb -> ETD-BBB
+SE CTR_20260916_0800.dz5 -> SE-CTR
+SE_CTR_20260916_0800.dz5 -> SE
 ```
 
 Avoid underscores inside the project identifier.
@@ -126,6 +130,16 @@ is granted, query only event IDs 1000/1001 within ±2 minutes of the last
 heartbeat and filter by executable name/path. Copy only sanitized diagnostic
 fields into the local log. Do not access WER dumps, request UAC, or upload data.
 Declining must perform no Windows event query and must dismiss that incident.
+
+Use one transient `logs/sessions/<UUID>.json` marker per process instead of a
+shared session file. Each marker records the application executable path, PID,
+process-image path, process creation time, start time, and heartbeat. A marker
+is active only when PID, process-image path, and creation time still match; this
+prevents PID reuse and concurrent instances from producing false incidents.
+Offer diagnostics only for a dead session whose application executable path
+matches the current copy. Delete clean and handled markers immediately, expire
+unresolved markers after 30 days, and retain at most 20 per executable path.
+Keep one shared daily log, with session UUID and PID included in every line.
 
 ## Release Publication
 

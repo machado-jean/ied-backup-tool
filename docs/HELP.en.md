@@ -41,7 +41,8 @@ can be configured in another location.
 
 - The SE, ETD, bay, or equipment name must come before the first underscore
   `"_"`.
-- Use hyphen `"-"` inside the project name.
+- Spaces in that text are automatically converted to hyphens; for example,
+  `SE CTR` is identified as `SE-CTR`.
 - Everything after the first underscore is treated as a user comment.
 - Always check the `Project` column in the batch preview before generating
   backups.
@@ -159,13 +160,19 @@ execution, failures, and unhandled exceptions. When reporting a problem, send
 the log from the day of the failure after removing sensitive information if
 needed.
 
-The application keeps a local session marker. If the previous execution did not
-record a normal exit, the next startup reports an unexpected exit and asks for
-consent before querying the Windows Application log. When authorized, it copies
-only events 1000/1001 near that time and filtered by `IED_Backup_Manager.exe`
-into the local log. The query does not require UAC, does not access dumps, and
-does not upload data. Answering `No` prevents the query and dismisses that
-incident.
+The application keeps a separate marker for each session. UUID, PID, process
+start time, and executable path distinguish copies running at the same time. An
+active instance or a copy running from another path does not trigger an alert in
+the current copy. If a same-path session disappears without recording a normal
+exit, the next startup also shows its location and asks for consent before
+querying the Windows Application log. When authorized, only events 1000/1001
+near that time and matching the executable are copied into the local log. The
+query does not require UAC, does not access dumps, and does not upload data.
+Answering `No` prevents the query and dismisses that incident.
+
+Clean and handled markers are removed immediately. Other pending markers expire
+after 30 days and are limited to 20 per executable path. The daily log remains a
+single file, with each line identifying its session UUID and PID.
 
 ### The app does not open in a synced folder
 

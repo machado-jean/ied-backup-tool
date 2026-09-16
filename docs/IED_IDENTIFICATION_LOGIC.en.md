@@ -10,6 +10,7 @@ backup name.
 
 For most IED types, the project, SE, ETD, bay, or equipment is identified by the
 text before the first underscore `"_"`.
+Spaces in that text are converted to hyphens: `SE CTR` becomes `SE-CTR`.
 
 ```text
 SE-AAA_GENERIC-COMMENT_20260622_1350.dz5 -> Project: SE-AAA

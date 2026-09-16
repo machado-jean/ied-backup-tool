@@ -87,6 +87,23 @@ remains disabled.
 If cancellation is requested during ZIP staging, the staged ZIP is discarded and
 is not copied to `ATU`/`HIS`.
 
+### Project identification in source filenames
+
+For file-based project types, the project identifier is the text before the
+first underscore `"_"`. Spaces inside that text are collapsed and converted to
+hyphens:
+
+```text
+SE CTR_20260916_0800.dz5        -> Project: SE-CTR
+SE   CTR_REVISION_FINAL.dz5     -> Project: SE-CTR
+SE-CTR_20260916_0800.dz5        -> Project: SE-CTR
+SE_CTR_20260916_0800.dz5        -> Project: SE
+```
+
+The underscore remains the identifier delimiter. Everything after the first
+underscore is treated as a user comment and does not become part of the project
+identifier.
+
 ## 6. Storage Behavior
 
 - `ATU` keeps the newest current backup for each technical key.
@@ -120,7 +137,11 @@ If the app closes by itself or freezes during startup, check the daily log under
 Send the log from the day of the failure after removing sensitive information if
 needed.
 
-If the previous execution ended unexpectedly, the next startup may request
-permission to query only Windows events 1000/1001 near that time and related to
-`IED_Backup_Manager.exe`. This does not require UAC, and no information is sent
-automatically.
+Each execution uses its own marker with UUID, PID, process start time, and path,
+so simultaneous copies or copies opened from different folders do not overwrite
+one another. If a same-path session disappears without recording a normal exit,
+the next startup shows its location and may request permission to query only
+Windows events 1000/1001 near that time. This does not require UAC, and no
+information is sent automatically. Clean or handled markers are removed
+immediately; other markers expire after 30 days and are limited to 20 per
+executable path.

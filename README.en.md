@@ -6,7 +6,7 @@ Windows application for standardizing IED project backups, keeping the current
 backup in `ATU`, historical backups in `HIS`, and consistent ZIP names for
 technical traceability.
 
-Current version: `1.17.2`
+Current version: `1.17.3`
 
 - Executable usage guide: [docs/EXECUTABLE_USAGE.en.md](docs/EXECUTABLE_USAGE.en.md)
 - Operational help: [docs/HELP.en.md](docs/HELP.en.md)
@@ -18,7 +18,8 @@ Current version: `1.17.2`
 ## Overview
 
 IED Backup Manager processes the working files in the executable folder,
-identifies the project from the text before the first underscore `"_"`, creates a
+identifies the project from the text before the first underscore `"_"`, converts
+spaces in that text to hyphens, creates a
 standard ZIP, and applies the current/history storage rules between `ATU` and
 `HIS`.
 
@@ -51,8 +52,9 @@ rename them to the current pattern.
 - Controlled `HIS` cleanup with retention, preview, and manual confirmation.
 - Batch preview runs in the background to reduce freezes in large folders.
 - Daily local log for startup, preview, backup, and failure diagnostics.
-- Unexpected-exit detection with consent-based, time-scoped Windows event
-  collection, without automatic uploads or UAC prompts.
+- Unexpected-exit detection with one marker per session, UUID/PID/start-time/
+  executable-path validation, and consent-based Windows event collection without
+  automatic uploads or UAC prompts.
 - Responsive execution with per-file progress and controlled cancellation.
 
 ## Supported Types
@@ -78,6 +80,7 @@ VAO-ZZZ_GENERIC-COMMENT_20260712_1050.efsPro -> Project: VAO-ZZZ
 
 Everything after the first underscore is treated as a user comment and is not
 part of the technical backup key.
+For example, `SE CTR` is normalized to `SE-CTR`.
 
 ## Public Sample Files
 

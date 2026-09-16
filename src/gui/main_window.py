@@ -424,11 +424,13 @@ class MainWindow(QMainWindow):
             ).astimezone().strftime("%d/%m/%Y %H:%M:%S")
         except ValueError:
             approximate_time = incident.last_seen_at
+        display_path = incident.executable.replace("\\", "\\\u200b").replace("/", "/\u200b")
         answer = question_yes_no(
             self,
             title=ui_text("crash_diagnostics_consent_title", self.language),
             text=ui_text("crash_diagnostics_consent_message", self.language).format(
-                time=approximate_time
+                time=approximate_time,
+                path=display_path,
             ),
             language=self.language,
         )

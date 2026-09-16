@@ -1,32 +1,43 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-09-15
+Last updated: 2026-09-16
 
 ## Current Version
 
-Current application version: `1.17.2`
+Current application version: `1.17.3` (release artifacts generated locally;
+publication pending user commit and publisher execution)
 
 Latest generated executable:
 
 ```text
-releases/v1.17.2/IED_Backup_Manager.exe
+releases/v1.17.3/IED_Backup_Manager.exe
 ```
 
 The local release folder also contains `RELEASE_NOTES.md`, `SHA256SUMS.txt`, and
 the generated `PUBLISH_RELEASE.ps1`. Generated release folders remain ignored by
 Git and are published through GitHub Releases.
 
-## Current v1.17.2 Scope
+The `v1.17.3` executable, release notes, SHA256 file, and manual publisher were
+generated and passed local verification. No tag or GitHub Release was created.
 
+## Current v1.17.3 Scope
+
+- Normalizes whitespace in the project identifier to hyphens, so `SE CTR`
+  becomes `SE-CTR`, while `_` remains the identifier delimiter.
 - Keeps the `v1.17.0` readable ZIP naming policy:
   `SOFTWARE_PROJECT_YYYY-MM-DD_HHhMM_FIRST LAST_STAGE.zip`.
 - Fixes Qt worker lifecycle for update checks, preview planning, and backup
   execution; workers and threads use controlled deferred deletion.
 - Logs thread shutdown, `QApplication about to quit`, and the Qt event-loop exit
   code so a normal close is distinguishable from abrupt termination.
-- Stores a per-user session marker and 10-second heartbeat under
-  `%LOCALAPPDATA%\IED Backup Manager\logs\`.
-- On the next startup after an unclean session, asks for consent before reading
+- Stores one UUID marker per running instance under
+  `%LOCALAPPDATA%\IED Backup Manager\logs\sessions\`, with PID, process start
+  time, executable path, and a 10-second heartbeat. Concurrent copies cannot
+  overwrite one another.
+- Removes clean/handled markers immediately, expires unresolved markers after
+  30 days, and keeps at most 20 unresolved markers per executable path.
+- On the next startup after an unclean same-path session whose process is no
+  longer active, shows the originating path and asks for consent before reading
   Windows Application events. Declining performs no event query.
 - With consent, queries only event IDs 1000/1001 within ±2 minutes of the last
   heartbeat and filters by executable name/path. It stores only sanitized event
@@ -53,22 +64,23 @@ Latest known validation:
 
 ```text
 ruff check .: passed
-pytest: 148 passed
+pytest: 154 passed
 PowerShell syntax validation: passed
 PUBLISH_RELEASE.ps1 -VerifyOnly: passed
-packaged executable smoke test: exit code 0
+latest packaged executable smoke test (v1.17.3): exit code 0, no remaining
+session marker, and no Windows Application crash event 1000/1001
 ```
 
 Latest generated executable:
 
 ```text
-size: 47,538,812 bytes
-SHA256: 82D67F9CA78E261A967706E285383BCD876A5BF49305FF3F2589A34165F09A30
+size: 47,545,664 bytes
+SHA256: C7EDDF1B8222E56A6E49BFE656E184C16D27B967D4B32291F470A80847F3337F
 ```
 
 ## Active Roadmap
 
-Planned next minor milestone after `v1.17.2`:
+Planned next minor milestone after `v1.17.3`:
 
 ```text
 v1.18.0 - new IED types
