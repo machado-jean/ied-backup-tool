@@ -42,7 +42,7 @@ can be configured in another location.
 - The SE, ETD, bay, or equipment name must come before the first underscore
   `"_"`.
 - Spaces in that text are automatically converted to hyphens; for example,
-  `SE CTR` is identified as `SE-CTR`.
+  `SE CCC` is identified as `SE-CCC`.
 - Everything after the first underscore is treated as a user comment.
 - Always check the `Project` column in the batch preview before generating
   backups.

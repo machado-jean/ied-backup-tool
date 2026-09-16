@@ -36,15 +36,15 @@ def test_get_project_id_uses_first_block_even_without_timestamp_suffix() -> None
 
 
 def test_get_project_id_replaces_spaces_with_hyphens() -> None:
-    assert get_project_id("SE CTR_20260916_0800.dz5") == "SE-CTR"
+    assert get_project_id("SE CCC_20260916_0800.dz5") == "SE-CCC"
 
 
 def test_get_project_id_collapses_multiple_spaces_into_one_hyphen() -> None:
-    assert get_project_id("SE   CTR_20260916_0800.dz5") == "SE-CTR"
+    assert get_project_id("SE   CCC_20260916_0800.dz5") == "SE-CCC"
 
 
 def test_get_project_id_keeps_underscore_as_the_identifier_delimiter() -> None:
-    assert get_project_id("SE_CTR_20260916_0800.dz5") == "SE"
+    assert get_project_id("SE_CCC_20260916_0800.dz5") == "SE"
 
 
 def test_build_backup_name_uses_required_pattern() -> None:

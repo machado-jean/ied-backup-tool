@@ -22,8 +22,8 @@ generated and passed local verification. No tag or GitHub Release was created.
 
 ## Current v1.17.3 Scope
 
-- Normalizes whitespace in the project identifier to hyphens, so `SE CTR`
-  becomes `SE-CTR`, while `_` remains the identifier delimiter.
+- Normalizes whitespace in the project identifier to hyphens, so the fictional
+  example `SE CCC` becomes `SE-CCC`, while `_` remains the identifier delimiter.
 - Keeps the `v1.17.0` readable ZIP naming policy:
   `SOFTWARE_PROJECT_YYYY-MM-DD_HHhMM_FIRST LAST_STAGE.zip`.
 - Fixes Qt worker lifecycle for update checks, preview planning, and backup
@@ -74,8 +74,8 @@ session marker, and no Windows Application crash event 1000/1001
 Latest generated executable:
 
 ```text
-size: 47,545,664 bytes
-SHA256: C7EDDF1B8222E56A6E49BFE656E184C16D27B967D4B32291F470A80847F3337F
+size: 47,546,714 bytes
+SHA256: 0D6DFD250192931FD7CD6F906D0419DD61C29B61E1B73825401507D145B9FB2E
 ```
 
 ## Active Roadmap

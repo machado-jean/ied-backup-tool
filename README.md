@@ -117,7 +117,8 @@ VAO-ZZZ_COMENTARIO-GENERICO_20260712_1050.efsPro -> Projeto: VAO-ZZZ
 
 Todo texto depois do primeiro sublinhado `"_"` é tratado como comentário do
 usuário e não entra na chave técnica do backup.
-Se o identificador vier como `SE CTR`, ele será normalizado para `SE-CTR`.
+Se um identificador fictício vier como `SE CCC`, ele será normalizado para
+`SE-CCC`.
 
 Evite:
 

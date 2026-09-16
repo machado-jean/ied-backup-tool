@@ -41,15 +41,15 @@ def test_parse_config_prefers_first_and_last_name_fields() -> None:
 def test_parse_config_compacts_legacy_collaborator_to_first_and_last_name() -> None:
     config = parse_config(
         {
-            "colaborador": "Jean Carlos Machado",
+            "colaborador": "Colaborador Nome Sobrenome",
             "atu_path": "C:/BKP/ATU",
             "his_path": "C:/BKP/HIS",
         }
     )
 
-    assert config.collaborator == "JEAN MACHADO"
-    assert config.collaborator_first_name == "JEAN"
-    assert config.collaborator_last_name == "MACHADO"
+    assert config.collaborator == "COLABORADOR SOBRENOME"
+    assert config.collaborator_first_name == "COLABORADOR"
+    assert config.collaborator_last_name == "SOBRENOME"
 
 
 def test_parse_config_keeps_single_legacy_collaborator_name() -> None:

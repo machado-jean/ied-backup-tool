@@ -94,10 +94,10 @@ first underscore `"_"`. Spaces inside that text are collapsed and converted to
 hyphens:
 
 ```text
-SE CTR_20260916_0800.dz5        -> Project: SE-CTR
-SE   CTR_REVISION_FINAL.dz5     -> Project: SE-CTR
-SE-CTR_20260916_0800.dz5        -> Project: SE-CTR
-SE_CTR_20260916_0800.dz5        -> Project: SE
+SE CCC_20260916_0800.dz5        -> Project: SE-CCC
+SE   CCC_REVISION_FINAL.dz5     -> Project: SE-CCC
+SE-CCC_20260916_0800.dz5        -> Project: SE-CCC
+SE_CCC_20260916_0800.dz5        -> Project: SE
 ```
 
 The underscore remains the identifier delimiter. Everything after the first

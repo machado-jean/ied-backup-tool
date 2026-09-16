@@ -343,7 +343,7 @@ lista:
 Para os tipos suportados, o programa identifica o projeto/subestação pelo nome
 do arquivo. Pela política atual, o projeto é sempre o primeiro bloco antes do
 primeiro sublinhado `"_"`.
-Espaços nesse primeiro bloco são convertidos em hífens: `SE CTR` vira `SE-CTR`.
+Espaços nesse primeiro bloco são convertidos em hífens: `SE CCC` vira `SE-CCC`.
 
 Para DIGSI 5, o padrão recomendado e:
 
@@ -359,7 +359,7 @@ Exemplos:
 
 ```text
 SE-AAA_20260529_1624.dz5           -> Projeto: SE-AAA
-SE CTR_20260916_0800.dz5           -> Projeto: SE-CTR
+SE CCC_20260916_0800.dz5           -> Projeto: SE-CCC
 SE-BBB_DEV_01_20260619_0013.dz5    -> Projeto: SE-BBB
 SE-ABC_REVISAO_FINAL_20260619_1015.dz5 -> Projeto: SE-ABC
 ESD-AAA.rdb                        -> Projeto: ESD-AAA

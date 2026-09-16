@@ -29,6 +29,11 @@ When behavior or workflow changes, also review both languages of:
 
 Do not rewrite historical release notes from older versions.
 
+Before packaging, confirm that release notes and public documentation use only
+fictional generic examples such as `SE-AAA`, `SE-BBB`, or `SE-CCC`. Real cases
+may guide implementation, but never reproduce operational identifiers supplied
+during diagnosis.
+
 ## 3. Validate Before Build
 
 ```powershell

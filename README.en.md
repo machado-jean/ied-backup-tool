@@ -80,7 +80,7 @@ VAO-ZZZ_GENERIC-COMMENT_20260712_1050.efsPro -> Project: VAO-ZZZ
 
 Everything after the first underscore is treated as a user comment and is not
 part of the technical backup key.
-For example, `SE CTR` is normalized to `SE-CTR`.
+For example, a fictional `SE CCC` is normalized to `SE-CCC`.
 
 ## Public Sample Files
 

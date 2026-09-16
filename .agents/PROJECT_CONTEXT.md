@@ -16,7 +16,8 @@ generates consistent ZIP names for technical traceability.
 - The application/project identifier is the text before the first underscore
   `"_"`.
 - Whitespace inside that identifier is collapsed and converted to a hyphen, so
-  `SE CTR` becomes `SE-CTR`; an underscore still ends the identifier.
+  a fictional `SE CCC` becomes `SE-CCC`; an underscore still ends the
+  identifier.
 - Text after the first underscore is treated as user comment and is not part of
   the backup technical key.
 - `ATU` contains the current backup for each technical key.

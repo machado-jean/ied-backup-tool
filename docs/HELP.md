@@ -66,7 +66,7 @@ e `HIS` podem ficar em outro local, desde que estejam configuradas.
 - O nome da SE, ETD, vão ou equipamento deve vir antes do primeiro sublinhado
   `"_"`.
 - Espaços dentro desse trecho são convertidos automaticamente em hífen `"-"`;
-  por exemplo, `SE CTR` será identificado como `SE-CTR`.
+  por exemplo, `SE CCC` será identificado como `SE-CCC`.
 - Todo texto depois do primeiro sublinhado `"_"` é tratado como comentário do
   usuário e não entra na chave técnica do backup.
 - Confira sempre a coluna `Projeto` na prévia do lote antes de gerar backups.

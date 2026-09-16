@@ -31,11 +31,19 @@ Examples:
 ```text
 SE-AAA_COMMENT_20260622_1350.dz5 -> SE-AAA
 ETD-BBB_OTHER-COMMENT.rdb -> ETD-BBB
-SE CTR_20260916_0800.dz5 -> SE-CTR
-SE_CTR_20260916_0800.dz5 -> SE
+SE CCC_20260916_0800.dz5 -> SE-CCC
+SE_CCC_20260916_0800.dz5 -> SE
 ```
 
 Avoid underscores inside the project identifier.
+
+## Generic Public Examples
+
+Real operational cases may guide a fix, but public documentation, release notes,
+screenshots, examples, tests, and user-facing text must use fictional generic
+identifiers such as `SE-AAA`, `SE-BBB`, or `SE-CCC`. Do not repeat customer,
+site, substation, project, equipment, collaborator, or path names supplied in a
+real diagnosis.
 
 ## SHA256 Policy
 
