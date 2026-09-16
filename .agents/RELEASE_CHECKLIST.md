@@ -70,6 +70,9 @@ releases/vX.Y.Z/SHA256SUMS.txt
 releases/vX.Y.Z/PUBLISH_RELEASE.ps1
 ```
 
+The generated publisher must create the GitHub Release with title `vX.Y.Z`,
+exactly matching the tag. Do not prefix the title with the product name.
+
 `releases/` remains ignored by Git. Never force-add it.
 
 ## 5. Smoke Test

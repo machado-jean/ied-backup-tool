@@ -57,6 +57,8 @@ generated and passed local verification. No tag or GitHub Release was created.
   green CI on `master`, and green tag CI for the exact commit. It then prints a
   `CORRETO`/`INCORRETO` report and asks for final confirmation before creating
   the GitHub Release and uploading assets.
+- GitHub Release titles use only the canonical tag form `vX.Y.Z`; the publisher
+  does not prefix them with the product name.
 
 ## Validation Baseline
 

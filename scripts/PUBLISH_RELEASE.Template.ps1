@@ -276,7 +276,7 @@ try {
     gh release create $Tag @AssetPaths `
         --repo $Repository `
         --verify-tag `
-        --title "IED Backup Manager $Tag" `
+        --title $Tag `
         --notes-file $ReleaseNotes
     if ($LASTEXITCODE -ne 0) {
         Stop-Check "Criação do GitHub Release" "A tag aprovada foi mantida para nova tentativa."

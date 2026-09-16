@@ -45,6 +45,12 @@ identifiers such as `SE-AAA`, `SE-BBB`, or `SE-CCC`. Do not repeat customer,
 site, substation, project, equipment, collaborator, or path names supplied in a
 real diagnosis.
 
+## GitHub Release Title
+
+The Git tag and GitHub Release title must both use only the canonical version
+form `vX.Y.Z`. Keep the product name in release-note content, not in the GitHub
+Release title, so the release list remains compact and consistent.
+
 ## SHA256 Policy
 
 SHA256 is calculated from source files, not from the final ZIP.
