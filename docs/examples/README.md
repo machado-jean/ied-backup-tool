@@ -45,3 +45,20 @@ The application reads the `GE-IED-*` folders and includes only files with
 
 These files are intended for preview and screenshot generation. Avoid using
 them as technical reference for real vendor file formats.
+
+## Reproducible Screenshots
+
+Documentation screenshots must use a temporary sanitized workspace with generic
+paths, names, and projects. After preparing that workspace and its local
+`config.json`, regenerate every image with:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.capture_documentation_screenshots `
+  --project-dir "C:\IED-Backup-Manager-Demo" `
+  --output-dir ".\docs\images"
+```
+
+The generator captures the real Qt widgets in Portuguese and English, including
+dark/light themes, settings, startup instructions, and controlled `HIS` cleanup.
+Do not capture a personal desktop or a workspace path containing a real user,
+customer, project, or company name.

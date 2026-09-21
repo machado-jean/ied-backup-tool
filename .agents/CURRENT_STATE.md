@@ -1,6 +1,6 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-09-16
+Last updated: 2026-09-21
 
 ## Current Version
 
@@ -81,6 +81,11 @@ SHA256: 0D6DFD250192931FD7CD6F906D0419DD61C29B61E1B73825401507D145B9FB2E
 ```
 
 ## Active Roadmap
+
+Public documentation now has an updated GitHub landing page with CI/release/
+platform/runtime/license badges, current dark/light and bilingual screenshots,
+feature explanations, and a reproducible sanitized Qt screenshot generator at
+`scripts/capture_documentation_screenshots.py`.
 
 Planned next minor milestone after `v1.17.3`:
 

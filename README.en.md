@@ -1,12 +1,30 @@
-# IED Backup Manager
+<p align="center">
+  <img src="assets/app_icon.png" alt="IED Backup Manager icon" width="96">
+</p>
 
-[Português](README.md) | [English](README.en.md)
+<h1 align="center">IED Backup Manager</h1>
+
+<p align="center">
+  Standardized and traceable IED project backups, organized between
+  <code>ATU</code> and <code>HIS</code>.
+</p>
+
+<p align="center">
+  <a href="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml"><img src="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI"></a>
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/v/release/machado-jean/ied-backup-tool?display_name=tag&sort=semver" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows" alt="Windows 10 and 11">
+  <img src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white" alt="Python 3.13">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-non--commercial-blue" alt="Non-commercial license"></a>
+</p>
+
+<p align="center">
+  <a href="README.md">Português</a> · <a href="README.en.md">English</a> ·
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest">Download latest release</a>
+</p>
 
 Windows application for standardizing IED project backups, keeping the current
 backup in `ATU`, historical backups in `HIS`, and consistent ZIP names for
-technical traceability.
-
-Current version: `1.17.3`
+technical traceability. Current version: `1.17.3`.
 
 - Executable usage guide: [docs/EXECUTABLE_USAGE.en.md](docs/EXECUTABLE_USAGE.en.md)
 - Operational help: [docs/HELP.en.md](docs/HELP.en.md)
@@ -30,6 +48,45 @@ backup files manually.
 When older backups exist in `ATU`/`HIS` using the previous `YYYYMMDD-HHMM`
 format, the application identifies them and asks whether the user wants to
 rename them to the current pattern.
+
+## Interface
+
+### Preview before any change
+
+The main screen detects source files, calculates destinations, and summarizes
+new backups, replacements, history entries, conflicts, and skipped items. The
+preview does not move or create files.
+
+![Main window preview](docs/images/en-main-window-preview.png)
+
+### Consistent light and dark themes
+
+The theme button changes colors without changing interface geometry. The first
+run follows Windows; an explicit choice is then saved in `config.json`.
+
+![Main window in dark theme](docs/images/pt-main-window-preview.png)
+
+![Main window in light theme](docs/images/pt-main-window-light.png)
+
+### Local settings and controlled history cleanup
+
+Collaborator and storage paths remain in the local `config.json`. `HIS` cleanup
+shows retention, age, size, and reason, and deletes only explicitly selected
+items after confirmation.
+
+![Settings window](docs/images/pt-settings-window.png)
+
+![Controlled HIS cleanup](docs/images/pt-history-cleanup.png)
+
+## Five-step workflow
+
+| Step | Action | Result |
+| --- | --- | --- |
+| 1 | Place the executable with the working files | The local project is detected. |
+| 2 | Configure collaborator, `ATU`, `HIS`, and IED types | Preferences stay in local `config.json`. |
+| 3 | Select the stage and review the preview | Destinations, versions, and conflicts are visible. |
+| 4 | Click `Generate backups` | Validated ZIPs go to `ATU`; older current backups move to `HIS`. |
+| 5 | Use `HIS cleanup` when required | Old candidates are removed only after confirmation. |
 
 ## Main Features
 

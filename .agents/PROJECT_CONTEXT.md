@@ -20,6 +20,8 @@ generates consistent ZIP names for technical traceability.
   identifier.
 - Text after the first underscore is treated as user comment and is not part of
   the backup technical key.
+- Public screenshots are generated from `docs/examples` with generic paths and
+  names through `scripts/capture_documentation_screenshots.py`.
 - `ATU` contains the current backup for each technical key.
 - `HIS` contains older backups and prevents duplicate technical identities.
 - Technical key: `SOFTWARE_PROJECT`.

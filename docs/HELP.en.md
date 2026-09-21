@@ -14,6 +14,28 @@ IED Backup Manager standardizes IED project backups. It identifies working files
 in the local folder, creates ZIPs with consistent names, keeps the current backup
 in `ATU`, and archives previous backups in `HIS`.
 
+## Interface
+
+The batch preview shows actions, detected projects and versions, timestamps,
+destinations, and a summary before any file is changed:
+
+![Main window preview](images/en-main-window-preview.png)
+
+Light and dark themes keep the same layout and controls:
+
+![Dark theme](images/pt-main-window-preview.png)
+
+![Light theme](images/pt-main-window-light.png)
+
+Local settings keep collaborator and storage paths together:
+
+![Settings window](images/pt-settings-window.png)
+
+Controlled `HIS` cleanup lists candidates and never deletes without explicit
+selection and confirmation:
+
+![Controlled HIS cleanup](images/pt-history-cleanup.png)
+
 ## Recommended Structure
 
 The executable must stay inside the folder that contains the substation,

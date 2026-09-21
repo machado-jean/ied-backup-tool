@@ -1,12 +1,30 @@
-# IED Backup Manager
+<p align="center">
+  <img src="assets/app_icon.png" alt="Ícone do IED Backup Manager" width="96">
+</p>
 
-[Português](README.md) | [English](README.en.md)
+<h1 align="center">IED Backup Manager</h1>
+
+<p align="center">
+  Backups de projetos de IED padronizados, rastreáveis e organizados entre
+  <code>ATU</code> e <code>HIS</code>.
+</p>
+
+<p align="center">
+  <a href="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml"><img src="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI"></a>
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/v/release/machado-jean/ied-backup-tool?display_name=tag&sort=semver" alt="Última versão"></a>
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows" alt="Windows 10 e 11">
+  <img src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white" alt="Python 3.13">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licença-não%20comercial-blue" alt="Licença não comercial"></a>
+</p>
+
+<p align="center">
+  <a href="README.md">Português</a> · <a href="README.en.md">English</a> ·
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest">Baixar última versão</a>
+</p>
 
 Aplicação Windows para padronizar backups de projetos de IED, mantendo um backup
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
-rastreabilidade técnica.
-
-Versão atual: `1.17.3`
+rastreabilidade técnica. Versão atual: `1.17.3`.
 
 - Manual do executável: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
@@ -32,22 +50,54 @@ deseja renomeá-los para o padrão atual.
 
 ## Interface
 
-Tela principal com prévia do lote, resumo, seleção de tipos de IED, etapa e
-destino compacto:
+### Prévia antes de qualquer alteração
+
+A tela principal identifica os arquivos, calcula o destino e resume quantos
+backups serão criados, substituídos, arquivados ou ignorados. Nenhum arquivo é
+movido durante a prévia.
 
 ![Tela principal com prévia](docs/images/pt-main-window-preview.png)
 
-Configuração do nome/sobrenome e das pastas de armazenamento:
+### Temas claro e escuro
+
+O botão de tema alterna a aparência sem mudar a geometria da interface. Na
+primeira execução, o aplicativo acompanha o Windows; depois de uma escolha
+manual, a preferência é salva no `config.json`.
+
+![Tela principal no tema claro](docs/images/pt-main-window-light.png)
+
+### Configuração local
+
+Nome, sobrenome e pastas `ATU`/`HIS` são configurados localmente. O arquivo
+`config.json` fica ao lado do executável e não é enviado automaticamente.
 
 ![Tela de configurações](docs/images/pt-settings-window.png)
 
-Limpeza controlada da pasta `HIS`, sempre com prévia e confirmação manual:
+### Limpeza controlada do histórico
+
+A limpeza de `HIS` apresenta retenção, candidatos, idade, tamanho e motivo. A
+remoção só acontece após seleção explícita e confirmação do usuário.
 
 ![Limpeza HIS](docs/images/pt-history-cleanup.png)
 
-Exemplo da interface em inglês:
+### Primeira abertura e interface bilíngue
+
+As instruções iniciais explicam a estrutura recomendada e as regras de nomes. A
+interface pode ser alternada entre português e inglês a qualquer momento.
+
+![Instruções de uso](docs/images/pt-startup-instructions.png)
 
 ![Main window preview](docs/images/en-main-window-preview.png)
+
+## Fluxo em 5 passos
+
+| Passo | Ação | Resultado |
+| --- | --- | --- |
+| 1 | Coloque o executável junto aos arquivos de trabalho | O projeto é detectado na pasta local. |
+| 2 | Configure colaborador, `ATU`, `HIS` e tipos de IED | As preferências ficam no `config.json` local. |
+| 3 | Escolha a etapa e confira a prévia | Destinos, versões e possíveis conflitos ficam visíveis. |
+| 4 | Clique em `Gerar backups` | ZIPs validados são publicados em `ATU` e versões anteriores vão para `HIS`. |
+| 5 | Use `Limpeza HIS` quando necessário | Candidatos antigos são removidos somente após confirmação. |
 
 ## Principais Recursos
 

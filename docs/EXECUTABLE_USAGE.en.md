@@ -9,6 +9,29 @@ For visual guidance, see [README.en.md](../README.en.md) and
 [HELP.en.md](HELP.en.md). For project-type rules, see
 [IED_IDENTIFICATION_LOGIC.en.md](IED_IDENTIFICATION_LOGIC.en.md).
 
+## Quick Interface Tour
+
+The main window combines the preview summary, detected source files, project
+types, stage, and execution controls. Preview is read-only: no backup is created
+or moved until the user confirms execution.
+
+![Main window](images/en-main-window-preview.png)
+
+Light and dark themes preserve the same geometry and functions:
+
+![Dark theme](images/pt-main-window-preview.png)
+
+![Light theme](images/pt-main-window-light.png)
+
+Settings keep collaborator and `ATU`/`HIS` paths in local `config.json`:
+
+![Settings](images/pt-settings-window.png)
+
+`HIS` cleanup shows candidate age, size, and reason. Only checked and confirmed
+items are removed:
+
+![Controlled HIS cleanup](images/pt-history-cleanup.png)
+
 ## 1. Expected Folder Structure
 
 The executable must be placed in the project folder that will be processed.

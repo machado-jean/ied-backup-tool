@@ -34,6 +34,11 @@ fictional generic examples such as `SE-AAA`, `SE-BBB`, or `SE-CCC`. Real cases
 may guide implementation, but never reproduce operational identifiers supplied
 during diagnosis.
 
+When the interface changed materially, regenerate documentation screenshots
+with the Qt capture script and `docs/examples` copied to a generic temporary
+path. Check every PNG visually and scan it for user-profile, customer, company,
+project, and collaborator identifiers before committing.
+
 ## 3. Validate Before Build
 
 ```powershell

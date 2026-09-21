@@ -45,6 +45,11 @@ identifiers such as `SE-AAA`, `SE-BBB`, or `SE-CCC`. Do not repeat customer,
 site, substation, project, equipment, collaborator, or path names supplied in a
 real diagnosis.
 
+Documentation screenshots must be generated from the artificial files under
+`docs/examples` in a temporary generic path such as
+`C:\IED-Backup-Manager-Demo`. Use the reproducible Qt capture script; never
+capture a personal desktop or expose a user-profile path.
+
 ## GitHub Release Title
 
 The Git tag and GitHub Release title must both use only the canonical version

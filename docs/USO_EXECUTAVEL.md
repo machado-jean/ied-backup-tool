@@ -14,6 +14,28 @@ instruções de uso e limpeza `HIS`.
 Para entender a regra técnica de cada tipo de IED, incluindo os casos especiais
 de INGETEAM e GE Multilin, consulte `docs/LOGICA_IDENTIFICACAO_IEDS.md`.
 
+## Visão rápida da interface
+
+A tela principal reúne o resumo da prévia, a tabela com cada arquivo detectado,
+a etapa, os tipos de IED e os comandos de execução. A prévia é somente leitura:
+nenhum backup é criado ou movido até a confirmação do usuário.
+
+![Tela principal no tema escuro](images/pt-main-window-preview.png)
+
+O tema claro preserva as mesmas proporções e funcionalidades:
+
+![Tela principal no tema claro](images/pt-main-window-light.png)
+
+A configuração mantém nome, sobrenome e caminhos de `ATU`/`HIS` no
+`config.json` local:
+
+![Tela de configurações](images/pt-settings-window.png)
+
+A limpeza de `HIS` mostra candidatos, idade, tamanho e motivo. Somente itens
+marcados e confirmados são removidos:
+
+![Limpeza controlada de HIS](images/pt-history-cleanup.png)
+
 ## 1. Estrutura esperada
 
 O executável deve ficar na pasta do projeto que será processada. Essa mesma

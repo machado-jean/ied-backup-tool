@@ -22,6 +22,10 @@ destino compacto:
 
 ![Tela principal com prévia](images/pt-main-window-preview.png)
 
+O tema claro mantém os mesmos componentes, proporções, contornos e informações:
+
+![Tela principal no tema claro](images/pt-main-window-light.png)
+
 Configuração do nome/sobrenome e das pastas de armazenamento:
 
 ![Tela de configurações](images/pt-settings-window.png)
