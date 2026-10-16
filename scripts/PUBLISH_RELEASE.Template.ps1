@@ -155,15 +155,39 @@ try {
     }
     Confirm-Check "Ambiente Python" "Python do ambiente virtual encontrado."
 
+    $TestTempDir = Join-Path $ProjectRoot ".pytest-publish"
+    $RuntimeTempDir = Join-Path $ProjectRoot ".temp-publish"
+
     & $Python -m ruff check .
     if ($LASTEXITCODE -ne 0) {
         Stop-Check "Lint local" "O lint local falhou; nenhuma tag ou release foi criado."
     }
     Confirm-Check "Lint local" "Todas as verificações de lint passaram."
 
-    & $Python -m pytest
-    if ($LASTEXITCODE -ne 0) {
-        Stop-Check "Testes locais" "Os testes locais falharam; nenhuma tag ou release foi criado."
+    foreach ($TemporaryTestPath in @($TestTempDir, $RuntimeTempDir)) {
+        if (Test-Path -LiteralPath $TemporaryTestPath) {
+            Remove-Item -LiteralPath $TemporaryTestPath -Recurse -Force
+        }
+    }
+    New-Item -ItemType Directory -Path $RuntimeTempDir | Out-Null
+    $OriginalTemp = $env:TEMP
+    $OriginalTmp = $env:TMP
+    try {
+        $env:TEMP = $RuntimeTempDir
+        $env:TMP = $RuntimeTempDir
+        & $Python -m pytest --basetemp $TestTempDir
+        if ($LASTEXITCODE -ne 0) {
+            Stop-Check "Testes locais" "Os testes locais falharam; nenhuma tag ou release foi criado."
+        }
+    }
+    finally {
+        $env:TEMP = $OriginalTemp
+        $env:TMP = $OriginalTmp
+        foreach ($TemporaryTestPath in @($TestTempDir, $RuntimeTempDir)) {
+            if (Test-Path -LiteralPath $TemporaryTestPath) {
+                Remove-Item -LiteralPath $TemporaryTestPath -Recurse -Force
+            }
+        }
     }
     Confirm-Check "Testes locais" "Todos os testes locais passaram."
 

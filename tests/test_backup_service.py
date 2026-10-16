@@ -5,6 +5,9 @@ from datetime import datetime
 from pathlib import Path
 from zipfile import ZipFile
 
+import pytest
+
+from src.core.backup_models import BackupPlan, BackupStatus
 from src.core.backup_service import (
     execute_backup_plan,
     filter_current_and_newer_plans,
@@ -461,6 +464,47 @@ def test_grouped_backups_package_selected_types_by_substation(tmp_path: Path) ->
         assert "SE-AAA_20260619_1200.dz5" not in backup_info
 
 
+def test_grouped_backup_archives_individual_backups_covered_by_package(
+    tmp_path: Path,
+) -> None:
+    project_dir = tmp_path / "IED-DES"
+    atu = tmp_path / "IED-ATU"
+    his = tmp_path / "IED-HIS"
+    project_dir.mkdir()
+    atu.mkdir()
+    timestamp = datetime(2026, 6, 19, 12, 30)
+    create_dz5(project_dir / "SE-AAA_20260619_1230.dz5", timestamp)
+    rdb = project_dir / "SE-AAA.rdb"
+    rdb.write_text("Saved with Main Shell Version: 8.0.2", encoding="utf-8")
+    os.utime(rdb, (timestamp.timestamp(), timestamp.timestamp()))
+    digsi_current = (
+        atu / "DIGSI5-V9.00_SE-AAA_2026-06-18_10h00_COLABORADOR EXEMPLO_DEV.zip"
+    )
+    sel_current = (
+        atu / "QUICKSET-V7.5.3.10_SE-AAA_2026-06-18_10h00_COLABORADOR EXEMPLO_DEV.zip"
+    )
+    create_plain_zip(digsi_current, "digsi")
+    create_plain_zip(sel_current, "sel")
+
+    [plan] = plan_grouped_backups(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="COLABORADOR EXEMPLO",
+        stage=BackupStage.TAF,
+        project_types=[get_project_type("digsi5"), get_project_type("sel")],
+    )
+
+    assert plan.status == "replaced_current"
+    assert set(plan.additional_current_backups) == {digsi_current, sel_current}
+    execute_backup_plan(plan=plan, atu_path=atu, his_path=his)
+    assert sorted(path.name for path in atu.glob("*.zip")) == [plan.backup_name]
+    assert {path.name for path in his.glob("*.zip")} == {
+        digsi_current.name,
+        sel_current.name,
+    }
+
+
 def test_grouped_backups_uses_individual_name_when_only_one_type_exists(
     tmp_path: Path,
 ) -> None:
@@ -524,6 +568,30 @@ def test_grouped_backups_processes_all_files_when_only_one_type_exists(
     assert sorted(path.name for path in his.glob("*.zip")) == [
         "DIGSI5-V10.00_SE-AAA_2026-05-26_11h33_COLABORADOR EXEMPLO_DEV.zip",
     ]
+
+
+def test_unresolved_cross_software_plan_cannot_execute(tmp_path: Path) -> None:
+    source = tmp_path / "SE-AAA.dz5"
+    plan = BackupPlan(
+        source_file=source,
+        backup_name="DIGSI5-V10.00_SE-AAA_2026-06-22_13h50_COLABORADOR EXEMPLO_DEV.zip",
+        destination_path=tmp_path / "ATU" / "backup.zip",
+        status=BackupStatus.SOFTWARE_CHOICE,
+        software="DIGSI5-V10.00",
+        project="SE-AAA",
+        timestamp_text="2026-06-22_13h50",
+        collaborator="COLABORADOR EXEMPLO",
+        stage="DEV",
+        project_type_key="digsi5",
+        project_type_label="DIGSI 5 (.dz5)",
+    )
+
+    with pytest.raises(RuntimeError, match="decisao entre familias"):
+        execute_backup_plan(
+            plan=plan,
+            atu_path=tmp_path / "ATU",
+            his_path=tmp_path / "HIS",
+        )
 
 
 def create_dz5(path: Path, mtime: datetime) -> Path:

@@ -13,6 +13,7 @@ STATUS_TEXT = {
         "sha_conflict": "Conflito SHA",
         "skipped_older": "Ignorado",
         "already_current": "Já atual",
+        "software_choice": "Decisão necessária",
     },
     "en_US": {
         "stored": "New",
@@ -22,6 +23,7 @@ STATUS_TEXT = {
         "sha_conflict": "SHA conflict",
         "skipped_older": "Skipped",
         "already_current": "Already current",
+        "software_choice": "Decision required",
     },
 }
 
@@ -261,6 +263,29 @@ UI_TEXT = {
         "summary_total_line": "Total analisado: {total}",
         "summary_total_title": "Total analisado",
         "software_version": "Versão do software",
+        "software_choice_title": "Backup de outro software encontrado",
+        "software_choice_message": (
+            "Já existe backup atual para {project}, criado com outro software.\n\n"
+            "Backup(s) existente(s): {existing}\n"
+            "Novo backup: {new}\n\n"
+            "Manter os dois: considera partes diferentes do mesmo desenvolvimento; "
+            "todos permanecem em ATU.\n\n"
+            "Substituir existente: considera um novo desenvolvimento; os backups "
+            "existentes vão para HIS e o novo permanece em ATU.\n\n"
+            "Cancelar: não cria, move ou modifica arquivos."
+        ),
+        "software_choice_keep": "Manter os dois",
+        "software_choice_replace": "Substituir existente",
+        "software_replace_confirm": (
+            "Confirma a substituição para {project}?\n\n"
+            "Os backups atuais de {existing} serão movidos para HIS. "
+            "O novo backup de {new} passará a ser o atual."
+        ),
+        "software_pack_conflict": (
+            "Já existe um IED-PACK atual para {project}. Um backup individual não "
+            "pode substituí-lo sem remover a cobertura dos demais softwares.\n\n"
+            "Gere novamente o backup agrupado com os tipos desejados."
+        ),
         "ingeteam_software_version": "v",
         "software_version_placeholder": "Ex.: 5.5.4",
         "timestamp": "Data/Hora",
@@ -492,6 +517,29 @@ UI_TEXT = {
         "summary_total_line": "Total analyzed: {total}",
         "summary_total_title": "Total analyzed",
         "software_version": "Software version",
+        "software_choice_title": "Backup from another software found",
+        "software_choice_message": (
+            "A current backup already exists for {project}, created with another software.\n\n"
+            "Existing backup(s): {existing}\n"
+            "New backup: {new}\n\n"
+            "Keep both: treats them as different parts of the same development; "
+            "all remain in ATU.\n\n"
+            "Replace existing: treats this as a new development; existing backups "
+            "move to HIS and the new one remains in ATU.\n\n"
+            "Cancel: does not create, move, or modify files."
+        ),
+        "software_choice_keep": "Keep both",
+        "software_choice_replace": "Replace existing",
+        "software_replace_confirm": (
+            "Confirm replacement for {project}?\n\n"
+            "Current backups from {existing} will be moved to HIS. "
+            "The new backup from {new} will become current."
+        ),
+        "software_pack_conflict": (
+            "A current IED-PACK already exists for {project}. An individual backup "
+            "cannot replace it without removing coverage for its other software.\n\n"
+            "Generate the grouped backup again with the intended types."
+        ),
         "ingeteam_software_version": "v",
         "software_version_placeholder": "Example: 5.5.4",
         "timestamp": "Date/Time",

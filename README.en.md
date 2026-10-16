@@ -24,7 +24,7 @@
 
 Windows application for standardizing IED project backups, keeping the current
 backup in `ATU`, historical backups in `HIS`, and consistent ZIP names for
-technical traceability. Current version: `1.17.3`.
+technical traceability. Current version: `1.18.0`.
 
 - Executable usage guide: [docs/EXECUTABLE_USAGE.en.md](docs/EXECUTABLE_USAGE.en.md)
 - Operational help: [docs/HELP.en.md](docs/HELP.en.md)
@@ -138,6 +138,21 @@ VAO-ZZZ_GENERIC-COMMENT_20260712_1050.efsPro -> Project: VAO-ZZZ
 Everything after the first underscore is treated as a user comment and is not
 part of the technical backup key.
 For example, a fictional `SE CCC` is normalized to `SE-CCC`.
+
+## Software Version and Current Backup
+
+The complete version remains in the ZIP name and historical identity, but it
+does not create another current-backup slot. A newer version of the same family,
+such as `DIGSI5-V10.00` after `DIGSI5-V9.00`, replaces the previous backup for
+the same project in `ATU` and moves it to `HIS`.
+
+When the same project already has an individual backup from another software
+family, the application does not assume whether the work is complementary or a
+new development. Before execution it offers `Keep both`, `Replace existing`,
+and `Cancel`, with the effect of each action. An `IED-PACK` automatically
+replaces only individual backups from the families included in that package.
+
+![Cross-software decision](docs/images/pt-software-choice.png)
 
 ## Public Sample Files
 

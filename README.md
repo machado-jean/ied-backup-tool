@@ -24,7 +24,7 @@
 
 Aplicação Windows para padronizar backups de projetos de IED, mantendo um backup
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
-rastreabilidade técnica. Versão atual: `1.17.3`.
+rastreabilidade técnica. Versão atual: `1.18.0`.
 
 - Manual do executável: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
@@ -179,6 +179,21 @@ DEV_SE-AAA_20260712_1030.dz5
 ```
 
 Nesses casos, o projeto pode ser identificado incorretamente.
+
+## Versão do Software e Backup Atual
+
+A versão completa continua no nome e na identidade histórica do ZIP, mas não
+cria outro espaço de backup atual. Uma versão mais nova da mesma família, como
+`DIGSI5-V10.00` depois de `DIGSI5-V9.00`, substitui o backup anterior da mesma
+SE em `ATU` e move o anterior para `HIS`.
+
+Quando a mesma SE já possui um backup individual de outra família, a aplicação
+não presume se o trabalho é complementar ou um novo desenvolvimento. Antes da
+execução, ela apresenta as opções `Manter os dois`, `Substituir existente` e
+`Cancelar`, explicando o efeito de cada uma. Um `IED-PACK` substitui
+automaticamente somente os backups individuais das famílias incluídas nele.
+
+![Decisão entre famílias de software](docs/images/pt-software-choice.png)
 
 ## Nome dos Backups
 

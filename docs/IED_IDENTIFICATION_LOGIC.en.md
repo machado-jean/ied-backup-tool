@@ -109,6 +109,22 @@ Rules:
 - the ZIP includes `IEDS-BACKUP-INFO.txt` with detected software versions for
   each included type.
 
+## Current Backup Identity
+
+The current-backup key uses `SOFTWARE_FAMILY + PROJECT`; the complete version
+remains in the historical identity `SOFTWARE + PROJECT + TIMESTAMP`. Therefore,
+a version upgrade replaces the current backup from the same family without
+losing the archived version traceability.
+
+Currently recognized families are `DIGSI4`, `DIGSI5`, `QUICKSET`, `PCM600`, `INGESYS`,
+`GE-MULTILIN`, and `IED-PACK`.
+
+Individual backups from different families may represent complementary parts
+of the same project or alternative developments. On the first such occurrence,
+the user must choose whether to keep both or replace the existing backup. The
+known composition of an `IED-PACK` allows the app to archive automatically only
+the individual backups covered by that package.
+
 ## When to Update This Document
 
 Update this document whenever a new vendor/software is added, version detection

@@ -11,6 +11,7 @@ from src.core.backup_models import (
     STATUS_ARCHIVED_HISTORY,
     STATUS_SHA_CONFLICT,
     STATUS_SKIPPED_OLDER,
+    STATUS_SOFTWARE_CHOICE,
     BackupPlan,
     BackupResult,
 )
@@ -39,6 +40,11 @@ def execute_backup_plan(
     cancellation_callback: CancellationCallback | None = None,
 ) -> BackupResult:
     """Execute a previously computed plan without recalculating its metadata."""
+
+    if plan.status == STATUS_SOFTWARE_CHOICE:
+        raise RuntimeError(
+            "A decisao entre familias de software deve ser resolvida antes da execucao."
+        )
 
     if plan.status in {STATUS_SKIPPED_OLDER, STATUS_ALREADY_CURRENT, STATUS_SHA_CONFLICT}:
         return BackupResult(
@@ -81,6 +87,7 @@ def execute_backup_plan(
             atu_path=atu_path,
             his_path=his_path,
             progress_callback=progress_callback,
+            additional_current_backups=plan.additional_current_backups,
         )
 
     return BackupResult(

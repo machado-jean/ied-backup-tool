@@ -1,101 +1,82 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-09-21
+Last updated: 2026-10-16
 
 ## Current Version
 
-Current application version: `1.17.3` (release artifacts generated locally;
-publication pending user commit and publisher execution)
+Current application version: `1.18.0`.
 
-Latest generated executable:
+The user approved the family-based identity workflow and the updated printable
+manual. Packaging is complete. The generated release remains local until the
+tracked changes are committed and pushed and the user runs the generated
+publisher manually.
+
+Expected release assets:
 
 ```text
-releases/v1.17.3/IED_Backup_Manager.exe
+releases/v1.18.0/IED_Backup_Manager.exe
+releases/v1.18.0/RELEASE_NOTES.md
+releases/v1.18.0/SHA256SUMS.txt
+releases/v1.18.0/PUBLISH_RELEASE.ps1
 ```
 
-The local release folder also contains `RELEASE_NOTES.md`, `SHA256SUMS.txt`, and
-the generated `PUBLISH_RELEASE.ps1`. Generated release folders remain ignored by
-Git and are published through GitHub Releases.
+Generated release folders remain ignored by Git and are published through
+GitHub Releases.
 
-The `v1.17.3` executable, release notes, SHA256 file, and manual publisher were
-generated and passed local verification. No tag or GitHub Release was created.
+## Current v1.18.0 Scope
 
-## Current v1.17.3 Scope
-
-- Normalizes whitespace in the project identifier to hyphens, so the fictional
-  example `SE CCC` becomes `SE-CCC`, while `_` remains the identifier delimiter.
-- Keeps the `v1.17.0` readable ZIP naming policy:
-  `SOFTWARE_PROJECT_YYYY-MM-DD_HHhMM_FIRST LAST_STAGE.zip`.
-- Fixes Qt worker lifecycle for update checks, preview planning, and backup
-  execution; workers and threads use controlled deferred deletion.
-- Logs thread shutdown, `QApplication about to quit`, and the Qt event-loop exit
-  code so a normal close is distinguishable from abrupt termination.
-- Stores one UUID marker per running instance under
-  `%LOCALAPPDATA%\IED Backup Manager\logs\sessions\`, with PID, process start
-  time, executable path, and a 10-second heartbeat. Concurrent copies cannot
-  overwrite one another.
-- Removes clean/handled markers immediately, expires unresolved markers after
-  30 days, and keeps at most 20 unresolved markers per executable path.
-- On the next startup after an unclean same-path session whose process is no
-  longer active, shows the originating path and asks for consent before reading
-  Windows Application events. Declining performs no event query.
-- With consent, queries only event IDs 1000/1001 within ±2 minutes of the last
-  heartbeat and filters by executable name/path. It stores only sanitized event
-  fields in the local log; it does not access dumps, upload data, or request UAC.
-- Keeps the update notice's direct executable download and adds a separate
-  `O que há de novo?` / `What's new?` link to the specific GitHub release page.
-- Adds a persistent light/dark theme toggle that follows the system until the
-  user makes an explicit choice, while preserving identical interface geometry.
-- Improves theme contrast, field borders, status colors, progress bars,
-  tooltips, and the stage dropdown frame/padding.
-- Uses current GitHub Actions releases compatible with Node.js 24.
-- Keeps a Windows GitHub Actions workflow named `CI` for `master`, pull
-  requests, and `v*` tags.
-- `scripts/release.ps1` builds the executable and generates notes, SHA256, and a
-  per-release publisher, then runs local `-VerifyOnly` validation.
-- The publisher requires a clean, synchronized `master`, local lint/tests,
-  green CI on `master`, and green tag CI for the exact commit. It then prints a
-  `CORRETO`/`INCORRETO` report and asks for final confirmation before creating
-  the GitHub Release and uploading assets.
-- GitHub Release titles use only the canonical tag form `vX.Y.Z`; the publisher
-  does not prefix them with the product name.
+- Uses `SOFTWARE_FAMILY_PROJECT` as the current-backup key while preserving the
+  complete software/version in historical identity.
+- Treats a version change in the same software family as an update and archives
+  the previous current backup automatically.
+- Requires an explicit `keep both`, `replace existing`, or `cancel` choice when
+  the same project first appears under another individual software family.
+- Requires a second confirmation before replacing another software family.
+- Prevents unresolved choices from executing through CLI, worker, or GUI
+  fallback behavior.
+- Prevents an individual backup from silently replacing an existing `IED-PACK`.
+- Archives only covered individual families when generating a new `IED-PACK`.
+- Adds the decision-needed preview state and bilingual dialog content.
+- Updates public Markdown documentation, sanitized screenshots, the printable
+  manual, roadmap, maintainer records, and documentation impact index.
 
 ## Validation Baseline
 
-Latest known validation:
+Latest release validation:
 
 ```text
 ruff check .: passed
-pytest: 154 passed
+pytest: 171 passed
+git diff --check: passed (line-ending normalization warnings only)
+printable DOCX: rendered to 10 pages and visually verified
+public examples/screenshots: reviewed for generic data
 PowerShell syntax validation: passed
 PUBLISH_RELEASE.ps1 -VerifyOnly: passed
-latest packaged executable smoke test (v1.17.3): exit code 0, no remaining
-session marker, and no Windows Application crash event 1000/1001
+packaged executable smoke test: exit code 0 and no remaining session marker
 ```
 
 Latest generated executable:
 
 ```text
-size: 47,546,714 bytes
-SHA256: 0D6DFD250192931FD7CD6F906D0419DD61C29B61E1B73825401507D145B9FB2E
+size: 47,553,113 bytes
+SHA256: E66587A75EE0F0AC700358B234B7246DAFCEF344C2F72974FB1CABD958063FC4
 ```
+
+The release tooling now aborts immediately when lint, tests, or PyInstaller
+fails. Both the builder and generated publisher isolate Python/pytest temporary
+files inside the project during validation and remove them afterward.
 
 ## Active Roadmap
 
-Public documentation now has an updated GitHub landing page with CI/release/
-platform/runtime/license badges, current dark/light and bilingual screenshots,
-feature explanations, and a reproducible sanitized Qt screenshot generator at
-`scripts/capture_documentation_screenshots.py`.
-
-Planned next minor milestone after `v1.17.3`:
+The next planned minor milestone is:
 
 ```text
-v1.18.0 - new IED types
+v1.19.0 - new IED types
 ```
 
 Add new types only with clean/sanitized samples and reliable identification,
-version, and included-file rules. Continue focused patch releases for concrete
-stability, diagnostics, usability, and documentation issues.
+version, and included-file rules. Focused patch releases may continue for
+concrete stability, diagnostics, usability, and documentation issues.
 
 Paused/out-of-scope items remain code signing, operational reports, external
 per-backup `.sha256` files, and automatic executable replacement.

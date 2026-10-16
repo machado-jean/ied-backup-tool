@@ -17,6 +17,7 @@ class BackupStatus(StrEnum):
     SHA_CONFLICT = "sha_conflict"
     SKIPPED_OLDER = "skipped_older"
     ALREADY_CURRENT = "already_current"
+    SOFTWARE_CHOICE = "software_choice"
 
 
 STATUS_STORED = BackupStatus.STORED
@@ -26,6 +27,7 @@ STATUS_ATU_DUPLICATE = BackupStatus.ATU_DUPLICATE
 STATUS_SHA_CONFLICT = BackupStatus.SHA_CONFLICT
 STATUS_SKIPPED_OLDER = BackupStatus.SKIPPED_OLDER
 STATUS_ALREADY_CURRENT = BackupStatus.ALREADY_CURRENT
+STATUS_SOFTWARE_CHOICE = BackupStatus.SOFTWARE_CHOICE
 
 BackupStatusValue = BackupStatus | str
 
@@ -60,6 +62,9 @@ class BackupPlan:
     history_path: Path | None = None
     source_files: tuple[Path, ...] = ()
     backup_info_text: str | None = None
+    covered_software_families: tuple[str, ...] = ()
+    other_current_backups: tuple[Path, ...] = ()
+    additional_current_backups: tuple[Path, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -74,6 +79,7 @@ class BackupSummary:
     sha_conflicts: int
     skipped_older: int
     already_current: int
+    software_choices: int = 0
 
 
 @dataclass(frozen=True)
@@ -96,11 +102,12 @@ def summarize_results(
     statuses = [result.status for result in results]
     return BackupSummary(
         total=len(results),
-        stored=statuses.count(STATUS_STORED),
+        stored=statuses.count(STATUS_STORED) + statuses.count(STATUS_SOFTWARE_CHOICE),
         replaced_current=statuses.count(STATUS_REPLACED_CURRENT),
         archived_history=statuses.count(STATUS_ARCHIVED_HISTORY),
         atu_duplicates=statuses.count(STATUS_ATU_DUPLICATE),
         sha_conflicts=statuses.count(STATUS_SHA_CONFLICT),
         skipped_older=statuses.count(STATUS_SKIPPED_OLDER),
         already_current=statuses.count(STATUS_ALREADY_CURRENT),
+        software_choices=statuses.count(STATUS_SOFTWARE_CHOICE),
     )

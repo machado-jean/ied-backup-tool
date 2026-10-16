@@ -96,7 +96,7 @@ def test_normalize_collaborator_keeps_space_between_name_parts() -> None:
 
 
 def test_compact_collaborator_name_uses_first_and_last_legacy_parts() -> None:
-    assert compact_collaborator_name("Jean-Carlos-Machado") == "JEAN MACHADO"
+    assert compact_collaborator_name("Nome-Do-Meio-Sobrenome") == "NOME SOBRENOME"
 
 
 def test_compact_collaborator_name_keeps_single_name() -> None:

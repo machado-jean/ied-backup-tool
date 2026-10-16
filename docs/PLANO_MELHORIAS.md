@@ -14,7 +14,7 @@ operacional claramente necessária.
 
 | Versão estimada | Marco | Entregas previstas |
 | --- | --- | --- |
-| `v1.18.0` | Novos tipos de IED | Adicionar novos fabricantes/softwares somente quando houver amostras limpas/sanitizadas e regra confiável de identificação, versão e arquivos incluídos. |
+| `v1.19.0` | Novos tipos de IED | Adicionar novos fabricantes/softwares somente quando houver amostras limpas/sanitizadas e regra confiável de identificação, versão e arquivos incluídos. |
 
 ## Histórico Implementado
 
@@ -23,6 +23,7 @@ notes detalhadas, mas ajuda a entender a evolução técnica do projeto.
 
 | Versão | Marco | Entregas principais |
 | --- | --- | --- |
+| `v1.18.0` | Identidade por família e decisão entre softwares | Trata mudança somente de versão como atualização do mesmo backup atual; solicita decisão explícita quando a mesma SE aparece em outra família; usa a composição do `IED-PACK` para arquivar somente os individuais cobertos. |
 | `v1.0.0` | Versão inicial funcional | Primeira versão consolidada do fluxo de backup, com processamento de arquivos de projeto, geração de ZIP padronizado e organização entre backup atual e histórico. |
 | `v1.1.0` | Preparação para multiplos tipos de IED | Estrutura preparada para receber adaptadores por fabricante/software, reduzindo acoplamento das regras específicas no fluxo principal. |
 | `v1.4.2` | Segurança operacional de pastas | Validação de `ATU`/`HIS`, bloqueio de pastas iguais, criação assistida de pastas ausentes, revalidação antes de gerar backup e aviso para pastas sincronizadas. |

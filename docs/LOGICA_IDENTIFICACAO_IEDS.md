@@ -298,6 +298,23 @@ Exemplo:
 IED-PACK_SE-AAA_YYYY-MM-DD_HHhMM_NOME SOBRENOME_ETAPA.zip
 ```
 
+## Identidade do Backup Atual
+
+A chave do backup atual usa `FAMÍLIA_DO_SOFTWARE + PROJETO`; a versão completa
+permanece na identidade histórica `SOFTWARE + PROJETO + DATA/HORA`. Assim, uma
+atualização de versão substitui o backup atual da mesma família sem perder a
+rastreabilidade da versão arquivada.
+
+Famílias reconhecidas atualmente: `DIGSI4`, `DIGSI5`, `QUICKSET`, `PCM600`, `INGESYS`,
+`GE-MULTILIN` e `IED-PACK`.
+
+Backups individuais de famílias diferentes podem representar partes
+complementares da mesma SE ou desenvolvimentos alternativos. Por isso, na
+primeira ocorrência dessa combinação, a decisão entre manter ambos e substituir
+o existente é obrigatoriamente do usuário. A composição conhecida de um
+`IED-PACK` permite arquivar automaticamente somente os backups individuais
+cobertos por ele.
+
 ## Quando Atualizar Esta Lógica
 
 Este documento deve ser atualizado sempre que:

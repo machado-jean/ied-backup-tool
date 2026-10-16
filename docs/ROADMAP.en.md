@@ -9,12 +9,13 @@ discarded decisions.
 
 | Estimated version | Milestone | Expected scope |
 | --- | --- | --- |
-| `v1.18.0` | New IED types | Add new vendors/software only when clean/sanitized samples and reliable identification, version, and included-file rules are available. |
+| `v1.19.0` | New IED types | Add new vendors/software only when clean/sanitized samples and reliable identification, version, and included-file rules are available. |
 
 ## Implemented History
 
 | Version | Milestone | Main deliveries |
 | --- | --- | --- |
+| `v1.18.0` | Family identity and cross-software choice | Treats version-only changes as updates to the same current backup; requires an explicit choice when the same project appears under another family; uses `IED-PACK` composition to archive only covered individual backups. |
 | `v1.0.0` | Initial functional version | Consolidated backup flow, standardized ZIP generation, and `ATU`/`HIS` organization. |
 | `v1.5.0` | Metadata in every ZIP | `IEDS-BACKUP-INFO.txt` with backup, project, software, stage, included files, size, and dates. |
 | `v1.6.0` | Advanced integrity | SHA256 comparison, `SHA conflict`, and execution blocking while conflicts exist. |

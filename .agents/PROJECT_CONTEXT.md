@@ -24,7 +24,7 @@ generates consistent ZIP names for technical traceability.
   names through `scripts/capture_documentation_screenshots.py`.
 - `ATU` contains the current backup for each technical key.
 - `HIS` contains older backups and prevents duplicate technical identities.
-- Technical key: `SOFTWARE_PROJECT`.
+- Current-backup key: `SOFTWARE_FAMILY_PROJECT`.
 - Technical identity: `SOFTWARE_PROJECT_TIMESTAMP`.
 - Collaborator and stage are part of the ZIP name, but not part of technical
   identity.
@@ -39,6 +39,15 @@ generates consistent ZIP names for technical traceability.
   that actually have more than one selected type present. If only one real type
   exists for the project, process all files of that type unless the user checked
   `Processar apenas a partir do backup atual`.
+- A version change inside the same software family replaces the previous ATU
+  backup automatically. The complete software/version remains in historical
+  identity.
+- The first individual backup for a project in another software family requires
+  the user to choose between keeping both current backups or archiving the
+  existing one. Cancel changes nothing. An individual backup cannot replace an
+  existing `IED-PACK`; the grouped package must be regenerated.
+- A new `IED-PACK` archives only individual current backups whose software
+  families are included in that package.
 
 ## Supported IED Types
 
@@ -206,7 +215,8 @@ Verify generated release assets without publishing:
   Clean/handled markers are removed immediately; unresolved markers expire
   after 30 days and are limited to 20 per path. Windows events are queried only
   after explicit consent, within a narrow time window, and are never uploaded.
-- The active next roadmap milestone after `v1.17.3` is new IED types when
+- The active next roadmap milestone after `v1.18.0` is new IED types. Add them
+  only when
   clean/sanitized samples and reliable version rules are available.
   Operational reports and external `.sha256` files are intentionally outside
   the active roadmap for now.

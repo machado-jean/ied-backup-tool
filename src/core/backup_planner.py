@@ -11,6 +11,7 @@ from src.core.backup_models import (
     STATUS_REPLACED_CURRENT,
     STATUS_SHA_CONFLICT,
     STATUS_SKIPPED_OLDER,
+    STATUS_SOFTWARE_CHOICE,
     STATUS_STORED,
     BackupPlan,
     BackupStatusValue,
@@ -28,7 +29,9 @@ from src.core.storage import (
     BackupFileInfo,
     find_backup_by_identity,
     find_current_backup,
+    find_current_project_backups,
     parse_backup_filename,
+    software_family,
 )
 
 StageValue = BackupStage | str
@@ -90,6 +93,7 @@ def plan_grouped_backups(
                     STATUS_STORED,
                     STATUS_REPLACED_CURRENT,
                     STATUS_ALREADY_CURRENT,
+                    STATUS_SOFTWARE_CHOICE,
                 }:
                     current_by_key[planned_info.key] = plan.destination_path
             continue
@@ -138,11 +142,19 @@ def plan_grouped_backups(
                 for project_type, project_file, _, version in entries
             ],
             extra_metadata_sections=extra_metadata_sections,
+            covered_software_families=tuple(
+                software_family(version) for _, _, _, version in entries
+            ),
         )
         plans.append(plan)
 
         planned_info = parse_backup_filename(Path(plan.backup_name))
-        if plan.status in {STATUS_STORED, STATUS_REPLACED_CURRENT, STATUS_ALREADY_CURRENT}:
+        if plan.status in {
+            STATUS_STORED,
+            STATUS_REPLACED_CURRENT,
+            STATUS_ALREADY_CURRENT,
+            STATUS_SOFTWARE_CHOICE,
+        }:
             current_by_key[planned_info.key] = plan.destination_path
 
     return sorted(plans, key=lambda plan: (plan.project, plan.timestamp_text))
@@ -200,7 +212,12 @@ def plan_all_backups(
         plans.append(plan)
 
         planned_info = parse_backup_filename(Path(plan.backup_name))
-        if plan.status in {STATUS_STORED, STATUS_REPLACED_CURRENT, STATUS_ALREADY_CURRENT}:
+        if plan.status in {
+            STATUS_STORED,
+            STATUS_REPLACED_CURRENT,
+            STATUS_ALREADY_CURRENT,
+            STATUS_SOFTWARE_CHOICE,
+        }:
             current_by_key[planned_info.key] = plan.destination_path
 
     return plans
@@ -218,6 +235,7 @@ def filter_current_and_newer_plans(plans: list[BackupPlan]) -> list[BackupPlan]:
             STATUS_SHA_CONFLICT,
             STATUS_STORED,
             STATUS_REPLACED_CURRENT,
+            STATUS_SOFTWARE_CHOICE,
         }
     ]
 
@@ -296,16 +314,36 @@ def _plan_backup_name(
     project_type_label: str,
     detected_versions: list[tuple[str, str, Path]] | None = None,
     extra_metadata_sections: list[str] | None = None,
+    covered_software_families: tuple[str, ...] | None = None,
 ) -> BackupPlan:
     """Plan storage behavior for an already built backup filename."""
 
     planned_info = parse_backup_filename(Path(backup_name))
+    covered_families = tuple(
+        dict.fromkeys(covered_software_families or (planned_info.software_family,))
+    )
     current = _find_current_for_plan(
         atu_path=atu_path,
         planned_key=planned_info.key,
         current_override=current_override,
     )
     destination = atu_path / backup_name
+    project_backups = find_current_project_backups(atu_path, planned_info.project)
+    different_family_backups = tuple(
+        info
+        for info in project_backups
+        if info.key != planned_info.key
+    )
+    automatic_archive_backups: tuple[Path, ...] = ()
+    other_current_backups: tuple[Path, ...] = ()
+    if project_type_key == GROUPED_PROJECT_TYPE_KEY:
+        automatic_archive_backups = tuple(
+            info.path
+            for info in different_family_backups
+            if info.software_family in covered_families
+        )
+    elif current is None:
+        other_current_backups = tuple(info.path for info in different_family_backups)
     software = software_display or planned_info.software
     backup_info_text = build_backup_info_text(
         backup_name=backup_name,
@@ -411,6 +449,26 @@ def _plan_backup_name(
                 source_files=source_files,
                 backup_info_text=backup_info_text,
             )
+        if automatic_archive_backups:
+            return BackupPlan(
+                source_file=source_file,
+                backup_name=backup_name,
+                destination_path=current.path,
+                status=STATUS_REPLACED_CURRENT,
+                software=software,
+                project=planned_info.project,
+                timestamp_text=format_backup_timestamp(planned_info.timestamp),
+                collaborator=planned_info.collaborator,
+                stage=planned_info.stage,
+                project_type_key=project_type_key,
+                project_type_label=project_type_label,
+                current_backup=current.path,
+                history_path=his_path / automatic_archive_backups[0].name,
+                source_files=source_files,
+                backup_info_text=backup_info_text,
+                covered_software_families=covered_families,
+                additional_current_backups=automatic_archive_backups,
+            )
         # Collaborator/stage differences do not create a new technical backup.
         return BackupPlan(
             source_file=source_file,
@@ -447,6 +505,47 @@ def _plan_backup_name(
             history_path=his_path / current.path.name,
             source_files=source_files,
             backup_info_text=backup_info_text,
+            covered_software_families=covered_families,
+            additional_current_backups=automatic_archive_backups,
+        )
+
+    if automatic_archive_backups:
+        return BackupPlan(
+            source_file=source_file,
+            backup_name=backup_name,
+            destination_path=destination,
+            status=STATUS_REPLACED_CURRENT,
+            software=software,
+            project=planned_info.project,
+            timestamp_text=format_backup_timestamp(planned_info.timestamp),
+            collaborator=planned_info.collaborator,
+            stage=planned_info.stage,
+            project_type_key=project_type_key,
+            project_type_label=project_type_label,
+            history_path=his_path / automatic_archive_backups[0].name,
+            source_files=source_files,
+            backup_info_text=backup_info_text,
+            covered_software_families=covered_families,
+            additional_current_backups=automatic_archive_backups,
+        )
+
+    if other_current_backups:
+        return BackupPlan(
+            source_file=source_file,
+            backup_name=backup_name,
+            destination_path=destination,
+            status=STATUS_SOFTWARE_CHOICE,
+            software=software,
+            project=planned_info.project,
+            timestamp_text=format_backup_timestamp(planned_info.timestamp),
+            collaborator=planned_info.collaborator,
+            stage=planned_info.stage,
+            project_type_key=project_type_key,
+            project_type_label=project_type_label,
+            source_files=source_files,
+            backup_info_text=backup_info_text,
+            covered_software_families=covered_families,
+            other_current_backups=other_current_backups,
         )
 
     return BackupPlan(
@@ -463,6 +562,7 @@ def _plan_backup_name(
         project_type_label=project_type_label,
         source_files=source_files,
         backup_info_text=backup_info_text,
+        covered_software_families=covered_families,
     )
 
 
@@ -480,6 +580,8 @@ def _build_plan(
     history_path: Path | None = None,
     source_files: tuple[Path, ...] = (),
     backup_info_text: str | None = None,
+    covered_software_families: tuple[str, ...] = (),
+    additional_current_backups: tuple[Path, ...] = (),
 ) -> BackupPlan:
     """Create a plan from parsed filename metadata."""
 
@@ -499,6 +601,8 @@ def _build_plan(
         history_path=history_path,
         source_files=source_files,
         backup_info_text=backup_info_text,
+        covered_software_families=covered_software_families,
+        additional_current_backups=additional_current_backups,
     )
 
 

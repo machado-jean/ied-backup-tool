@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -11,8 +12,10 @@ from PySide6.QtCore import QCoreApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QWidget
 
+from src.config.config_manager import AppConfig, save_config
 from src.gui.history_cleanup_window import HistoryCleanupWindow
 from src.gui.main_window import MainWindow
+from src.gui.message_box import create_software_choice_message_box
 from src.gui.resources import app_icon_path
 from src.gui.settings_window import SettingsWindow
 from src.gui.startup_instructions import StartupInstructionsDialog
@@ -25,7 +28,39 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--project-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, default=Path("docs/images"))
+    parser.add_argument(
+        "--prepare-demo",
+        action="store_true",
+        help="Create the target from docs/examples before capturing.",
+    )
     return parser.parse_args()
+
+
+def prepare_demo(project_dir: Path) -> None:
+    """Create a sanitized standalone workspace at the requested public path."""
+
+    if project_dir.exists():
+        raise FileExistsError(f"Demo target already exists: {project_dir}")
+    repository_root = Path(__file__).resolve().parent.parent
+    examples = repository_root / "docs" / "examples"
+    shutil.copytree(examples / "sample-workspace", project_dir)
+    storage = project_dir.parent / "sample-storage"
+    shutil.copytree(examples / "sample-storage", storage)
+    save_config(
+        project_dir / "config.json",
+        AppConfig(
+            collaborator="NOME SOBRENOME",
+            collaborator_first_name="NOME",
+            collaborator_last_name="SOBRENOME",
+            atu_path=storage / "ATU",
+            his_path=storage / "HIS",
+            language="pt_BR",
+            theme="dark",
+            project_types=("digsi5", "sel", "pcm600", "ingeteam", "ge_multilin"),
+            software_versions={"ingeteam": "5.5.4"},
+            show_startup_instructions=True,
+        ),
+    )
 
 
 def wait_until(app: QApplication, predicate, *, timeout_seconds: float = 15.0) -> None:
@@ -57,6 +92,8 @@ def capture(app: QApplication, widget: QWidget, path: Path) -> None:
 def main() -> int:
     args = parse_args()
     project_dir = args.project_dir.resolve()
+    if args.prepare_demo:
+        prepare_demo(project_dir)
     output_dir = args.output_dir.resolve()
     config_path = project_dir / "config.json"
     if not config_path.is_file():
@@ -119,6 +156,16 @@ def main() -> int:
     instructions.resize(780, min(900, instructions.sizeHint().height()))
     capture(app, instructions, output_dir / "pt-startup-instructions.png")
     instructions.close()
+
+    software_choice, _, _ = create_software_choice_message_box(
+        window,
+        project="SE-AAA",
+        existing="QUICKSET",
+        new="DIGSI5",
+        language="pt_BR",
+    )
+    capture(app, software_choice, output_dir / "pt-software-choice.png")
+    software_choice.close()
 
     window.toggle_theme()
     app.processEvents()

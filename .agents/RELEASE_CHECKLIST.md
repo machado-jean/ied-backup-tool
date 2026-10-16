@@ -59,6 +59,9 @@ The script must:
 
 - run lint/tests unless `-SkipTests` follows equivalent validation in the same
   release task;
+- abort immediately when lint, tests, or PyInstaller returns a failure code;
+- use and remove a controlled local pytest base directory so Windows temporary
+  folder permissions cannot turn into an ignored release failure;
 - sanitize `PATH` while PyInstaller runs;
 - build the fixed filename `IED_Backup_Manager.exe` with `--onefile`;
 - create/preserve `RELEASE_NOTES.md`;

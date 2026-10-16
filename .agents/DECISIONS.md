@@ -5,10 +5,10 @@ history.
 
 ## Backup Identity
 
-Technical key:
+Current-backup key:
 
 ```text
-SOFTWARE_PROJECT
+SOFTWARE_FAMILY_PROJECT
 ```
 
 Technical identity:
@@ -18,6 +18,19 @@ SOFTWARE_PROJECT_TIMESTAMP
 ```
 
 Collaborator and stage do not change technical identity.
+
+The software family removes version numbers while preserving the product type,
+for example `DIGSI4`, `DIGSI5`, `QUICKSET`, `PCM600`, `INGESYS`, or `GE-MULTILIN`.
+Changing only the software version replaces the current backup from that family.
+
+If the same project first appears as an individual backup from another family,
+the GUI must require an explicit choice: keep both, replace the existing
+individual backup, or cancel. Replacement requires a second confirmation. An
+individual backup must not replace an existing `IED-PACK`; instruct the user to
+regenerate the grouped package.
+
+An `IED-PACK` declares its covered families during planning and archives only
+individual current backups from that coverage set.
 
 ## Project Name Policy
 

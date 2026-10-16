@@ -21,6 +21,7 @@ STATUS_COLORS = {
         "sha_conflict": "#b42318",
         "skipped_older": "#666666",
         "already_current": "#2f6f73",
+        "software_choice": "#9a5b00",
     },
     "dark": {
         "stored": "#56d364",
@@ -30,6 +31,7 @@ STATUS_COLORS = {
         "sha_conflict": "#ff7b72",
         "skipped_older": "#aab2bd",
         "already_current": "#76e3ea",
+        "software_choice": "#ffa657",
     },
 }
 

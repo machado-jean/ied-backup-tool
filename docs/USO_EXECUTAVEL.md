@@ -440,6 +440,31 @@ Status possiveis:
   verificar o arquivo problemático.
 - `Ignorado`: o arquivo é antigo e já existe no histórico.
 - `Ja atual`: o arquivo já corresponde ao backup atual em `ATU`.
+- `Decisão necessária`: já existe um backup individual da mesma SE em outra
+  família de software; a aplicação precisa saber se os dois representam partes
+  complementares ou se o novo substitui o anterior.
+
+### Mesma SE em softwares diferentes
+
+Quando aparecer `Decisão necessária`, o popup explica três ações:
+
+- `Manter os dois`: considera desenvolvimento complementar; os backups das
+  duas famílias permanecem em `ATU`.
+- `Substituir existente`: considera um novo desenvolvimento; os backups
+  individuais existentes da outra família são movidos para `HIS` e o novo
+  permanece em `ATU`. Uma segunda confirmação é exigida.
+- `Cancelar`: encerra a operação sem criar, mover ou modificar arquivos.
+
+Uma mudança somente de versão dentro da mesma família não abre esse popup. O
+backup mais novo substitui automaticamente o anterior. Quando um `IED-PACK` é
+gerado, os dados de composição permitem substituir automaticamente apenas os
+backups individuais das famílias cobertas pelo pacote.
+
+Se já existir um `IED-PACK`, um backup individual não pode substituí-lo, pois
+isso retiraria de `ATU` a cobertura dos outros softwares do pacote. Gere
+novamente o backup agrupado com os tipos desejados.
+
+![Decisão entre famílias de software](images/pt-software-choice.png)
 
 ## 12. Modo de processamento
 

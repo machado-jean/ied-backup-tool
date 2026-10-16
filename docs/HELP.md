@@ -140,6 +140,21 @@ Se aparecer `Conflito SHA`, a execução fica bloqueada porque existe um backup
 com a mesma identidade técnica, mas conteúdo diferente. Verifique o arquivo
 indicado antes de continuar.
 
+Se aparecer `Decisão necessária`, já existe um backup individual da mesma SE
+feito com outra família de software. Ao gerar, escolha:
+
+- `Manter os dois`, para um desenvolvimento complementar;
+- `Substituir existente`, para mover o anterior a `HIS` após uma segunda
+  confirmação;
+- `Cancelar`, para não alterar arquivos.
+
+Trocas somente de versão dentro da mesma família substituem automaticamente o
+backup anterior. Um `IED-PACK` substitui somente os backups individuais das
+famílias declaradas em sua composição. Se já existir um `IED-PACK`, regenere o
+pacote agrupado em vez de tentar substituí-lo por um backup individual.
+
+![Decisão entre famílias de software](images/pt-software-choice.png)
+
 ## Saídas Esperadas
 
 Backup DIGSI:

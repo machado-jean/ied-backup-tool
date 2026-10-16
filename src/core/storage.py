@@ -1,6 +1,6 @@
 """Storage rules for the ATU/HIS backup folders.
 
-ATU stores the current backup for each technical key (`SOFTWARE_PROJECT`).
+ATU stores the current backup for each technical key (`SOFTWARE_FAMILY_PROJECT`).
 HIS stores older backups and prevents technical duplicates based on
 `SOFTWARE_PROJECT_TIMESTAMP`, regardless of collaborator or stage.
 """
@@ -27,6 +27,15 @@ LEGACY_BACKUP_TIMESTAMP_PATTERN = re.compile(r"^\d{8}-\d{4}$")
 BACKUP_DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 BACKUP_TIME_PATTERN = re.compile(r"^\d{2}h\d{2}$")
 QUARANTINE_FOLDER_NAME = "IED-QUARENTENA"
+KNOWN_SOFTWARE_FAMILIES = (
+    "GE-MULTILIN",
+    "QUICKSET",
+    "DIGSI4",
+    "DIGSI5",
+    "PCM600",
+    "INGESYS",
+    "IED-PACK",
+)
 
 
 @dataclass(frozen=True)
@@ -43,12 +52,20 @@ class BackupFileInfo:
     @property
     def key(self) -> str:
         """Technical group that can have only one current file in ATU."""
-        return f"{self.software}_{self.project}"
+        return f"{self.software_family}_{self.project}"
+
+    @property
+    def software_family(self) -> str:
+        """Stable product family used for current-backup replacement."""
+        return software_family(self.software)
 
     @property
     def identity(self) -> str:
         """Technical identity used to avoid duplicates across ATU and HIS."""
-        return f"{self.key}_{format_technical_timestamp(self.timestamp)}"
+        return (
+            f"{self.software}_{self.project}_"
+            f"{format_technical_timestamp(self.timestamp)}"
+        )
 
 
 @dataclass(frozen=True)
@@ -83,6 +100,7 @@ def update_storage(
     atu_path: Path,
     his_path: Path,
     progress_callback: ProgressCallback | None = None,
+    additional_current_backups: tuple[Path, ...] = (),
 ) -> Path:
     """Move a staged backup into ATU while preserving the previous current file in HIS."""
 
@@ -92,6 +110,11 @@ def update_storage(
     his_path.mkdir(parents=True, exist_ok=True)
 
     current = find_current_backup(atu_path, new_info.key)
+    archive_targets = _validated_archive_targets(
+        atu_path,
+        current.path if current else None,
+        additional_current_backups,
+    )
     if current is not None:
         # A staged older backup must never replace a newer current backup.
         if current.timestamp > new_info.timestamp:
@@ -99,6 +122,14 @@ def update_storage(
             raise StorageError("Ja existe um backup mais recente em ATU.")
         # Same technical identity means the current backup already exists.
         if current.identity == new_info.identity:
+            for archive_target in archive_targets:
+                if archive_target.resolve() == current.path.resolve():
+                    continue
+                move_to_history(
+                    archive_target,
+                    his_path,
+                    progress_callback=progress_callback,
+                )
             new_backup.unlink(missing_ok=True)
             cleanup_quarantine_for_successful_backup(current.path)
             return current.path
@@ -117,7 +148,12 @@ def update_storage(
             os.replace(prepared_backup, destination)
             validate_backup_zip(destination)
             try:
-                move_to_history(current.path, his_path, progress_callback=progress_callback)
+                for archive_target in archive_targets:
+                    move_to_history(
+                        archive_target,
+                        his_path,
+                        progress_callback=progress_callback,
+                    )
             except Exception:
                 destination.unlink(missing_ok=True)
                 raise
@@ -129,6 +165,32 @@ def update_storage(
             raise
 
     destination = atu_path / new_backup.name
+    if archive_targets:
+        if destination.exists():
+            new_backup.unlink(missing_ok=True)
+            raise StorageError(f"Ja existe um backup no destino: {destination}")
+        prepared_backup = _copy_to_destination_temp(
+            new_backup,
+            destination,
+            phase="copy_current",
+            progress_callback=progress_callback,
+        )
+        try:
+            os.replace(prepared_backup, destination)
+            validate_backup_zip(destination)
+            for archive_target in archive_targets:
+                move_to_history(
+                    archive_target,
+                    his_path,
+                    progress_callback=progress_callback,
+                )
+            new_backup.unlink()
+            cleanup_quarantine_for_successful_backup(destination)
+            return destination
+        except Exception:
+            prepared_backup.unlink(missing_ok=True)
+            destination.unlink(missing_ok=True)
+            raise
     if new_backup.resolve() != destination.resolve():
         place_staged_backup(new_backup, destination, progress_callback=progress_callback)
     validate_backup_zip(destination)
@@ -148,6 +210,53 @@ def find_current_backup(atu_path: Path, key: str) -> BackupFileInfo | None:
         if info.key == key:
             candidates.append(info)
     return max(candidates, key=lambda info: info.timestamp, default=None)
+
+
+def find_current_project_backups(atu_path: Path, project: str) -> list[BackupFileInfo]:
+    """Return every valid current backup belonging to a project."""
+
+    backups = []
+    if not atu_path.exists():
+        return backups
+    for path in atu_path.glob("*.zip"):
+        try:
+            info = parse_backup_filename(path)
+        except ValueError:
+            continue
+        if info.project == project:
+            backups.append(info)
+    return sorted(backups, key=lambda info: (info.software_family, info.timestamp))
+
+
+def software_family(software: str) -> str:
+    """Normalize a versioned software prefix to its stable product family."""
+
+    normalized = software.strip().upper()
+    for family in KNOWN_SOFTWARE_FAMILIES:
+        if normalized == family or normalized.startswith(f"{family}-"):
+            return family
+    match = re.match(r"^(.*?)-V\d", normalized)
+    return match.group(1) if match else normalized
+
+
+def _validated_archive_targets(
+    atu_path: Path,
+    current_path: Path | None,
+    additional_paths: tuple[Path, ...],
+) -> list[Path]:
+    """Validate and deduplicate files explicitly selected for ATU replacement."""
+
+    atu_resolved = atu_path.resolve()
+    targets: list[Path] = []
+    for path in ((current_path,) if current_path else ()) + tuple(additional_paths):
+        resolved = path.resolve()
+        if resolved.parent != atu_resolved:
+            raise StorageError(f"Backup a arquivar nao pertence a ATU: {path}")
+        if not path.exists():
+            raise StorageError(f"Backup atual nao encontrado em ATU: {path}")
+        if resolved not in {item.resolve() for item in targets}:
+            targets.append(path)
+    return targets
 
 
 def find_atu_duplicates(atu_path: Path, his_path: Path) -> list[AtuDuplicateInfo]:

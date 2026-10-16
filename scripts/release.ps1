@@ -26,6 +26,8 @@ $ReleaseNotes = Join-Path $ReleaseDir "RELEASE_NOTES.md"
 $ReleaseHashes = Join-Path $ReleaseDir "SHA256SUMS.txt"
 $PublishTemplate = Join-Path $Root "scripts\PUBLISH_RELEASE.Template.ps1"
 $PublishScript = Join-Path $ReleaseDir "PUBLISH_RELEASE.ps1"
+$TestTempDir = Join-Path $Root ".pytest-release"
+$RuntimeTempDir = Join-Path $Root ".temp-release"
 $VenvScripts = Join-Path $Root ".venv\Scripts"
 $SystemPath = @(
     $VenvScripts,
@@ -37,7 +39,35 @@ $SystemPath = @(
 
 if (-not $SkipTests) {
     .\.venv\Scripts\python.exe -m ruff check .
-    .\.venv\Scripts\python.exe -m pytest
+    if ($LASTEXITCODE -ne 0) {
+        throw "Lint failed; release build aborted."
+    }
+
+    foreach ($TemporaryTestPath in @($TestTempDir, $RuntimeTempDir)) {
+        if (Test-Path -LiteralPath $TemporaryTestPath) {
+            Remove-Item -LiteralPath $TemporaryTestPath -Recurse -Force
+        }
+    }
+    New-Item -ItemType Directory -Path $RuntimeTempDir | Out-Null
+    $OriginalTemp = $env:TEMP
+    $OriginalTmp = $env:TMP
+    try {
+        $env:TEMP = $RuntimeTempDir
+        $env:TMP = $RuntimeTempDir
+        .\.venv\Scripts\python.exe -m pytest --basetemp $TestTempDir
+        if ($LASTEXITCODE -ne 0) {
+            throw "Tests failed; release build aborted."
+        }
+    }
+    finally {
+        $env:TEMP = $OriginalTemp
+        $env:TMP = $OriginalTmp
+        foreach ($TemporaryTestPath in @($TestTempDir, $RuntimeTempDir)) {
+            if (Test-Path -LiteralPath $TemporaryTestPath) {
+                Remove-Item -LiteralPath $TemporaryTestPath -Recurse -Force
+            }
+        }
+    }
 }
 
 $OriginalPath = $env:PATH
@@ -54,6 +84,9 @@ try {
         --name $ExeName `
         --paths . `
         src\gui\app.py
+    if ($LASTEXITCODE -ne 0) {
+        throw "PyInstaller failed; release build aborted."
+    }
 }
 finally {
     $env:PATH = $OriginalPath

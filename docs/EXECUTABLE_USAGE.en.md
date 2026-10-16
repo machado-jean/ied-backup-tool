@@ -129,10 +129,29 @@ identifier.
 
 ## 6. Storage Behavior
 
-- `ATU` keeps the newest current backup for each technical key.
+- `ATU` keeps the newest current backup for each software family and project.
 - `HIS` keeps historical backups.
 - Existing current backups are archived to `HIS` when replaced.
 - Suspicious partial files from rare failures can be moved to `IED-QUARENTENA`.
+
+A software-version change within the same family replaces the previous current
+backup automatically; the complete versions remain visible in the filenames
+and historical identities.
+
+If an individual backup for the same project already exists under another
+software family, the preview shows `Decision required`. Before execution, the
+application explains three choices:
+
+- `Keep both`: treat the backups as complementary work and keep both in `ATU`.
+- `Replace existing`: treat the new backup as a new development, move the other
+  individual backup to `HIS`, and require a second confirmation.
+- `Cancel`: create, move, or modify nothing.
+
+An `IED-PACK` automatically replaces only individual backups for the families
+included in the package. An individual backup cannot replace an existing
+`IED-PACK`; regenerate the grouped package with the intended project types.
+
+![Cross-software decision](images/pt-software-choice.png)
 
 ## 7. HIS Cleanup
 

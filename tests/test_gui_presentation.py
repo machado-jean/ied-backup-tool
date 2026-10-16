@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QApplication, QMessageBox, QTableWidget
 
 from src.config.config_manager import AppConfig, HistoryCleanupConfig, save_config
 from src.core.app_logging import PreviousSessionIncident
-from src.core.backup_models import BackupPlan, BackupSummary
+from src.core.backup_models import BackupPlan, BackupStatus, BackupSummary
 from src.core.update_checker import UpdateCheckResult
 from src.gui import main_window as main_window_module
 from src.gui.app import parse_args
@@ -241,6 +241,87 @@ def test_confirmation_helpers_format_execution_and_conflicts(tmp_path: Path) -> 
         summary,
         fix_duplicates=False,
         language="pt_BR",
+    )
+
+
+def test_cross_software_choice_keep_preserves_both_backups(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    app = QApplication.instance() or QApplication([])
+    _ = app
+    monkeypatch.setattr(MainWindow, "refresh_preview", lambda self: None)
+    monkeypatch.setattr(MainWindow, "schedule_update_check", lambda self: None)
+    monkeypatch.setattr(main_window_module, "ask_software_choice", lambda *args, **kwargs: "keep")
+    window = MainWindow(project_dir=tmp_path, auto_startup_dialogs=False)
+    window.config = AppConfig(
+        collaborator="COLABORADOR EXEMPLO",
+        atu_path=tmp_path / "ATU",
+        his_path=tmp_path / "HIS",
+    )
+    existing = (
+        window.config.atu_path
+        / "QUICKSET-V8.0.2_SE-AAA_2026-06-20_10h00_COLABORADOR EXEMPLO_DEV.zip"
+    )
+    window.current_plans = [_software_choice_plan(tmp_path, existing)]
+
+    assert window._resolve_software_choices() is True
+    assert window.current_plans[0].status == BackupStatus.STORED
+    assert window.current_plans[0].additional_current_backups == ()
+
+
+def test_cross_software_choice_replace_marks_existing_for_history(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    app = QApplication.instance() or QApplication([])
+    _ = app
+    monkeypatch.setattr(MainWindow, "refresh_preview", lambda self: None)
+    monkeypatch.setattr(MainWindow, "schedule_update_check", lambda self: None)
+    monkeypatch.setattr(
+        main_window_module,
+        "ask_software_choice",
+        lambda *args, **kwargs: "replace",
+    )
+    monkeypatch.setattr(
+        main_window_module,
+        "question_yes_no",
+        lambda *args, **kwargs: QMessageBox.StandardButton.Yes,
+    )
+    window = MainWindow(project_dir=tmp_path, auto_startup_dialogs=False)
+    window.config = AppConfig(
+        collaborator="COLABORADOR EXEMPLO",
+        atu_path=tmp_path / "ATU",
+        his_path=tmp_path / "HIS",
+    )
+    existing = (
+        window.config.atu_path
+        / "QUICKSET-V8.0.2_SE-AAA_2026-06-20_10h00_COLABORADOR EXEMPLO_DEV.zip"
+    )
+    window.current_plans = [_software_choice_plan(tmp_path, existing)]
+
+    assert window._resolve_software_choices() is True
+    assert window.current_plans[0].status == BackupStatus.REPLACED_CURRENT
+    assert window.current_plans[0].additional_current_backups == (existing,)
+
+
+def _software_choice_plan(tmp_path: Path, existing: Path) -> BackupPlan:
+    source = tmp_path / "SE-AAA_COMENTARIO.dz5"
+    return BackupPlan(
+        source_file=source,
+        backup_name="DIGSI5-V10.00_SE-AAA_2026-06-22_13h50_COLABORADOR EXEMPLO_DEV.zip",
+        destination_path=tmp_path / "ATU" / "new.zip",
+        status=BackupStatus.SOFTWARE_CHOICE,
+        software="DIGSI5-V10.00",
+        project="SE-AAA",
+        timestamp_text="2026-06-22_13h50",
+        collaborator="COLABORADOR EXEMPLO",
+        stage="DEV",
+        project_type_key="digsi5",
+        project_type_label="DIGSI 5 (.dz5)",
+        source_files=(source,),
+        covered_software_families=("DIGSI5",),
+        other_current_backups=(existing,),
     )
 
 

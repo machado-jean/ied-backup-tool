@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 
@@ -36,6 +37,11 @@ from src.core.app_logging import (
     pending_previous_session,
     resolve_pending_incident,
 )
+from src.core.backup_models import (
+    STATUS_REPLACED_CURRENT,
+    STATUS_SOFTWARE_CHOICE,
+    STATUS_STORED,
+)
 from src.core.backup_service import (
     AtuDuplicatePlan,
     BackupPlan,
@@ -50,6 +56,7 @@ from src.core.project_types.registry import PROJECT_TYPES, get_project_type
 from src.core.storage import (
     StorageError,
     find_legacy_backup_rename_plans,
+    parse_backup_filename,
     rename_legacy_backups,
 )
 from src.gui.backup_application_service import (
@@ -68,7 +75,7 @@ from src.gui.backup_worker import BackupExecutionWorker, BackupProgressEvent
 from src.gui.execution_summary_dialog import show_execution_summary_dialog
 from src.gui.history_cleanup_window import HistoryCleanupWindow
 from src.gui.language_button import configure_language_button
-from src.gui.message_box import question_yes_no
+from src.gui.message_box import ask_software_choice, question_yes_no
 from src.gui.preview_table import populate_preview_table, source_files_text
 from src.gui.preview_worker import PreviewWorker
 from src.gui.resources import app_icon_path, help_document_url, language_flag_path, repository_url
@@ -860,6 +867,8 @@ class MainWindow(QMainWindow):
             self.refresh_preview()
             if not self.current_plans:
                 return
+        if not self._resolve_software_choices():
+            return
         summary = summarize_preview(self.current_plans, self.atu_duplicate_plans)
         if summary.sha_conflicts:
             QMessageBox.warning(
@@ -907,6 +916,67 @@ class MainWindow(QMainWindow):
             return
 
         self._start_backup_worker(fix_duplicates)
+
+    def _resolve_software_choices(self) -> bool:
+        """Resolve every cross-software decision before starting execution."""
+
+        resolved_plans = list(self.current_plans)
+        for index, plan in enumerate(resolved_plans):
+            if plan.status != STATUS_SOFTWARE_CHOICE:
+                continue
+            existing_infos = [
+                parse_backup_filename(path) for path in plan.other_current_backups
+            ]
+            existing_families = ", ".join(
+                sorted({info.software_family for info in existing_infos})
+            )
+            if any(info.software_family == "IED-PACK" for info in existing_infos):
+                QMessageBox.warning(
+                    self,
+                    ui_text("software_choice_title", self.language),
+                    ui_text("software_pack_conflict", self.language).format(
+                        project=plan.project,
+                    ),
+                )
+                return False
+            action = ask_software_choice(
+                self,
+                project=plan.project,
+                existing=existing_families,
+                new=", ".join(plan.covered_software_families),
+                language=self.language,
+            )
+            if action == "cancel":
+                return False
+            if action == "keep":
+                resolved_plans[index] = replace(
+                    plan,
+                    status=STATUS_STORED,
+                    other_current_backups=(),
+                )
+                continue
+            confirmation = question_yes_no(
+                self,
+                title=ui_text("software_choice_title", self.language),
+                text=ui_text("software_replace_confirm", self.language).format(
+                    project=plan.project,
+                    existing=existing_families,
+                    new=", ".join(plan.covered_software_families),
+                ),
+                language=self.language,
+                default_button=QMessageBox.StandardButton.No,
+            )
+            if confirmation != QMessageBox.StandardButton.Yes:
+                return False
+            resolved_plans[index] = replace(
+                plan,
+                status=STATUS_REPLACED_CURRENT,
+                history_path=self.config.his_path / plan.other_current_backups[0].name,
+                other_current_backups=(),
+                additional_current_backups=plan.other_current_backups,
+            )
+        self.current_plans = resolved_plans
+        return True
 
     def _start_backup_worker(
         self,

@@ -119,6 +119,21 @@ The preview shows:
 If `SHA conflict` appears, execution is blocked because a backup with the same
 technical identity has different source-file content.
 
+If `Decision required` appears, an individual backup for the same project
+already exists under another software family. When generating, choose:
+
+- `Keep both` for complementary development;
+- `Replace existing` to move the previous backup to `HIS` after a second
+  confirmation;
+- `Cancel` to leave every file unchanged.
+
+Version-only changes within the same family automatically replace the previous
+backup. An `IED-PACK` replaces only individual backups from the families in its
+composition. If an `IED-PACK` already exists, regenerate the grouped package
+instead of replacing it with an individual backup.
+
+![Cross-software decision](images/pt-software-choice.png)
+
 ## Expected Outputs
 
 ```text

@@ -5,11 +5,13 @@ import pytest
 
 from src.core.storage import (
     StorageError,
+    find_atu_duplicates,
     find_legacy_backup_rename_plans,
     parse_backup_filename,
     parse_legacy_backup_filename,
     quarantine_file,
     rename_legacy_backups,
+    software_family,
     update_storage,
 )
 
@@ -20,11 +22,30 @@ def test_parse_backup_filename_extracts_key_and_timestamp(tmp_path: Path) -> Non
 
     info = parse_backup_filename(path)
 
-    assert info.key == "DIGSI5-V10.00_SE_AAA"
+    assert info.key == "DIGSI5_SE_AAA"
     assert info.project == "SE_AAA"
     assert info.identity == "DIGSI5-V10.00_SE_AAA_20260612-1739"
     assert info.collaborator == "COLABORADOR EXEMPLO"
     assert info.stage == "DEV"
+
+
+@pytest.mark.parametrize(
+    ("software", "family"),
+    [
+        ("DIGSI5-V10.00", "DIGSI5"),
+        ("DIGSI4-V4.95", "DIGSI4"),
+        ("QUICKSET-V8.0.2-ARCHITECT-V3.2.0.28", "QUICKSET"),
+        ("PCM600-V2.11", "PCM600"),
+        ("INGESYS-V5.5.4", "INGESYS"),
+        ("GE-MULTILIN-V8.30", "GE-MULTILIN"),
+        ("IED-PACK", "IED-PACK"),
+    ],
+)
+def test_software_family_ignores_version_but_keeps_product(
+    software: str,
+    family: str,
+) -> None:
+    assert software_family(software) == family
 
 
 def test_parse_backup_filename_rejects_legacy_timestamp_pattern(tmp_path: Path) -> None:
@@ -36,7 +57,7 @@ def test_parse_backup_filename_rejects_legacy_timestamp_pattern(tmp_path: Path) 
 
 
 def test_legacy_backup_rename_plan_converts_old_zip_name(tmp_path: Path) -> None:
-    path = tmp_path / "DIGSI5-V10.00_SE_AAA_20260612-1739_JEAN-CARLOS-MACHADO_DEV.zip"
+    path = tmp_path / "DIGSI5-V10.00_SE_AAA_20260612-1739_NOME-DO-MEIO-SOBRENOME_DEV.zip"
     create_zip(path, "legacy")
 
     info = parse_legacy_backup_filename(path)
@@ -44,10 +65,10 @@ def test_legacy_backup_rename_plan_converts_old_zip_name(tmp_path: Path) -> None
     renamed = rename_legacy_backups(plans)
 
     assert info.identity == "DIGSI5-V10.00_SE_AAA_20260612-1739"
-    assert info.collaborator == "JEAN-CARLOS-MACHADO"
+    assert info.collaborator == "NOME-DO-MEIO-SOBRENOME"
     assert len(plans) == 1
     assert renamed == [
-        tmp_path / "DIGSI5-V10.00_SE_AAA_2026-06-12_17h39_JEAN MACHADO_DEV.zip"
+        tmp_path / "DIGSI5-V10.00_SE_AAA_2026-06-12_17h39_NOME SOBRENOME_DEV.zip"
     ]
     assert not path.exists()
     assert renamed[0].exists()
@@ -78,6 +99,81 @@ def test_update_storage_moves_previous_atu_backup_to_his(tmp_path: Path) -> None
     assert read_zip_payload(final_path) == "new"
     assert not old.exists()
     assert read_zip_payload(his / old.name) == "old"
+
+
+def test_update_storage_treats_version_upgrade_as_same_current_slot(tmp_path: Path) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+    atu.mkdir()
+    old = atu / "DIGSI5-V9.00_SE-AAA_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
+    create_zip(old, "old")
+    new = tmp_path / "DIGSI5-V10.00_SE-AAA_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
+    create_zip(new, "new")
+
+    final_path = update_storage(new_backup=new, atu_path=atu, his_path=his)
+
+    assert final_path == atu / new.name
+    assert not old.exists()
+    assert (his / old.name).exists()
+
+
+def test_update_storage_keeps_other_family_without_explicit_replacement(
+    tmp_path: Path,
+) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+    atu.mkdir()
+    sel = atu / "QUICKSET-V8.0.2_SE-AAA_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
+    create_zip(sel, "sel")
+    siemens = tmp_path / "DIGSI5-V10.00_SE-AAA_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
+    create_zip(siemens, "siemens")
+
+    update_storage(new_backup=siemens, atu_path=atu, his_path=his)
+
+    assert sel.exists()
+    assert (atu / siemens.name).exists()
+    assert not list(his.glob("*.zip"))
+
+
+def test_update_storage_archives_other_family_only_when_explicitly_selected(
+    tmp_path: Path,
+) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+    atu.mkdir()
+    sel = atu / "QUICKSET-V8.0.2_SE-AAA_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
+    create_zip(sel, "sel")
+    siemens = tmp_path / "DIGSI5-V10.00_SE-AAA_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
+    create_zip(siemens, "siemens")
+
+    update_storage(
+        new_backup=siemens,
+        atu_path=atu,
+        his_path=his,
+        additional_current_backups=(sel,),
+    )
+
+    assert not sel.exists()
+    assert (his / sel.name).exists()
+    assert (atu / siemens.name).exists()
+
+
+def test_atu_duplicate_detection_groups_different_versions_of_same_family(
+    tmp_path: Path,
+) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+    atu.mkdir()
+    older = atu / "DIGSI5-V9.00_SE-AAA_2026-06-12_17h39_COLABORADOR EXEMPLO_DEV.zip"
+    newer = atu / "DIGSI5-V10.00_SE-AAA_2026-06-15_09h10_COLABORADOR EXEMPLO_DEV.zip"
+    create_zip(older, "old")
+    create_zip(newer, "new")
+
+    duplicates = find_atu_duplicates(atu, his)
+
+    assert len(duplicates) == 1
+    assert duplicates[0].duplicate.path == older
+    assert duplicates[0].keep.path == newer
 
 
 def test_update_storage_recreates_files_in_destination(tmp_path: Path) -> None:
@@ -266,6 +362,33 @@ def test_update_storage_treats_same_timestamp_with_different_stage_as_same_backu
     assert read_zip_payload(current) == "current"
     assert not same_identity.exists()
     assert not list(his.glob("*.zip"))
+
+
+def test_same_identity_can_archive_explicit_other_family_without_replacing_current(
+    tmp_path: Path,
+) -> None:
+    atu = tmp_path / "ATU"
+    his = tmp_path / "HIS"
+    atu.mkdir()
+    current = atu / "IED-PACK_SE-AAA_2026-06-20_10h00_COLABORADOR EXEMPLO_DEV.zip"
+    individual = atu / "DIGSI5-V10.00_SE-AAA_2026-06-19_10h00_COLABORADOR EXEMPLO_DEV.zip"
+    staged = tmp_path / current.name
+    create_zip(current, "current")
+    create_zip(individual, "individual")
+    create_zip(staged, "same identity")
+
+    final_path = update_storage(
+        new_backup=staged,
+        atu_path=atu,
+        his_path=his,
+        additional_current_backups=(individual,),
+    )
+
+    assert final_path == current
+    assert read_zip_payload(current) == "current"
+    assert not staged.exists()
+    assert not individual.exists()
+    assert (his / individual.name).exists()
 
 
 def test_update_storage_validates_new_zip_before_touching_current(tmp_path: Path) -> None:
