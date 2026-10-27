@@ -12,6 +12,8 @@
 <p align="center">
   <a href="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml"><img src="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI"></a>
   <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/v/release/machado-jean/ied-backup-tool?display_name=tag&sort=semver" alt="Última versão"></a>
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/total?label=downloads&color=blue" alt="Downloads totais"></a>
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/latest/total?label=downloads%20da%20vers%C3%A3o&color=blue" alt="Downloads da versão atual"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows" alt="Windows 10 e 11">
   <img src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white" alt="Python 3.13">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licença-não%20comercial-blue" alt="Licença não comercial"></a>
