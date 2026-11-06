@@ -12,8 +12,8 @@
 <p align="center">
   <a href="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml"><img src="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI"></a>
   <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/v/release/machado-jean/ied-backup-tool?display_name=tag&sort=semver" alt="Latest release"></a>
-  <a href="https://github.com/machado-jean/ied-backup-tool/releases"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/total?label=downloads&amp;color=blue&amp;cacheSeconds=3600" alt="Total downloads"></a>
-  <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/latest/total?sort=semver&amp;label=latest%20downloads&amp;color=blue&amp;cacheSeconds=3600" alt="Latest release downloads"></a>
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/IED_Backup_Manager.exe?label=downloads&amp;color=blue&amp;cacheSeconds=3600" alt="Total executable downloads"></a>
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/latest/IED_Backup_Manager.exe?sort=semver&amp;label=latest%20downloads&amp;color=blue&amp;cacheSeconds=3600" alt="Latest release executable downloads"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows" alt="Windows 10 and 11">
   <img src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white" alt="Python 3.13">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-non--commercial-blue" alt="Non-commercial license"></a>
