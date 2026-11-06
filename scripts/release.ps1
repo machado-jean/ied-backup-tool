@@ -22,6 +22,8 @@ $BuildDir = Join-Path $Root "build"
 $DistDir = Join-Path $Root "dist"
 $ReleaseDir = Join-Path $Root "releases\$Tag"
 $ReleaseExe = Join-Path $ReleaseDir "$ExeName.exe"
+$DiagnosticsName = "IED_Backup_Manager_Diagnostics_Tool.zip"
+$DiagnosticsArchive = Join-Path $ReleaseDir $DiagnosticsName
 $ReleaseNotes = Join-Path $ReleaseDir "RELEASE_NOTES.md"
 $ReleaseHashes = Join-Path $ReleaseDir "SHA256SUMS.txt"
 $PublishTemplate = Join-Path $Root "scripts\PUBLISH_RELEASE.Template.ps1"
@@ -94,6 +96,16 @@ finally {
 
 New-Item -ItemType Directory -Force -Path $ReleaseDir | Out-Null
 Copy-Item -LiteralPath $ExePath -Destination $ReleaseExe -Force
+if (Test-Path -LiteralPath $DiagnosticsArchive) {
+    Remove-Item -LiteralPath $DiagnosticsArchive -Force
+}
+Compress-Archive `
+    -LiteralPath @(
+        (Join-Path $Root "scripts\COLETAR_DIAGNOSTICO.cmd"),
+        (Join-Path $Root "scripts\Collect-Diagnostics.ps1"),
+        (Join-Path $Root "docs\COLETA_DIAGNOSTICO.md")
+    ) `
+    -DestinationPath $DiagnosticsArchive
 
 $SpecPath = Join-Path $Root "$ExeName.spec"
 if (Test-Path -LiteralPath $SpecPath) {
@@ -128,7 +140,11 @@ if (-not (Test-Path -LiteralPath $PublishTemplate -PathType Leaf)) {
     throw "Publish template not found: $PublishTemplate"
 }
 $ReleaseHash = (Get-FileHash -LiteralPath $ReleaseExe -Algorithm SHA256).Hash
-"$ReleaseHash  $ExeName.exe" | Set-Content -LiteralPath $ReleaseHashes -Encoding ascii
+$DiagnosticsHash = (Get-FileHash -LiteralPath $DiagnosticsArchive -Algorithm SHA256).Hash
+@(
+    "$ReleaseHash  $ExeName.exe"
+    "$DiagnosticsHash  $DiagnosticsName"
+) | Set-Content -LiteralPath $ReleaseHashes -Encoding ascii
 Copy-Item -LiteralPath $PublishTemplate -Destination $PublishScript -Force
 
 & $PublishScript -VerifyOnly
@@ -142,5 +158,6 @@ foreach ($TemporaryBuildPath in @($BuildDir, $DistDir)) {
 Write-Host "Release generated: $ReleaseExe"
 Write-Host "Release notes: $ReleaseNotes"
 Write-Host "Release hashes: $ReleaseHashes"
+Write-Host "Diagnostic tool: $DiagnosticsArchive"
 Write-Host "Publish script: $PublishScript"
 Write-Host "Temporary PyInstaller folders removed."

@@ -2,11 +2,20 @@
 
 from __future__ import annotations
 
+import ctypes
+import sys
 from typing import Literal
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QPalette
-from PySide6.QtWidgets import QApplication, QComboBox, QFrame, QPushButton, QStyleFactory
+from PySide6.QtGui import QColor, QFont, QPalette
+from PySide6.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QFrame,
+    QPushButton,
+    QStyleFactory,
+    QWidget,
+)
 
 ThemeName = Literal["light", "dark"]
 
@@ -34,10 +43,21 @@ def apply_theme(app: QApplication, preference: ThemeName | None) -> ThemeName:
     """Apply the palette and control contrast for the resolved application theme."""
 
     resolved = effective_theme(app, preference)
-    if preference is not None:
-        app.setPalette(_palette(resolved))
+    app.setFont(_application_font())
+    # Always apply the complete matching palette. Older Windows/Qt combinations
+    # can report a dark color scheme while still exposing a light native palette,
+    # which otherwise produces a mixed light/dark interface.
+    app.setPalette(_palette(resolved))
     app.setStyleSheet(_style_sheet(resolved))
     return resolved
+
+
+def _application_font() -> QFont:
+    """Use readable, stable application typography on Windows 10 and 11."""
+
+    font = QFont("Segoe UI")
+    font.setPointSize(10)
+    return font
 
 
 def configure_theme_button(button: QPushButton) -> None:
@@ -53,6 +73,34 @@ def set_theme_button_state(button: QPushButton, current_theme: ThemeName) -> Non
     """Show the theme the button will activate when clicked."""
 
     button.setText("☾" if current_theme == "light" else "☀")
+
+
+def sync_native_title_bar(window: QWidget, theme: ThemeName) -> bool:
+    """Match the native Windows 10/11 title bar to the application theme."""
+
+    if sys.platform != "win32":
+        return False
+    try:
+        return _set_windows_title_bar_dark(int(window.winId()), theme == "dark")
+    except (AttributeError, OSError, TypeError, ValueError):
+        return False
+
+
+def _set_windows_title_bar_dark(window_handle: int, enabled: bool) -> bool:
+    """Set immersive title-bar mode with Windows 11 and Windows 10 IDs."""
+
+    value = ctypes.c_int(1 if enabled else 0)
+    dwm_set_window_attribute = ctypes.windll.dwmapi.DwmSetWindowAttribute
+    for attribute in (20, 19):
+        result = dwm_set_window_attribute(
+            ctypes.c_void_p(window_handle),
+            ctypes.c_uint(attribute),
+            ctypes.byref(value),
+            ctypes.sizeof(value),
+        )
+        if result == 0:
+            return True
+    return False
 
 
 class ThemedComboBox(QComboBox):
@@ -211,6 +259,9 @@ def _style_sheet(theme: ThemeName) -> str:
 
 
 _STYLE_SHEET_TEMPLATE = """
+QWidget {{
+    color: {text};
+}}
 QGroupBox {{
     border: 1px solid {border};
     border-radius: 5px;
@@ -218,12 +269,15 @@ QGroupBox {{
     padding-top: 7px;
 }}
 QGroupBox::title {{
+    color: {text};
+    font-weight: 600;
     subcontrol-origin: margin;
     subcontrol-position: top left;
     left: 8px;
     padding: 0 4px;
 }}
 QTableView, QPlainTextEdit, QLineEdit, QComboBox, QSpinBox {{
+    color: {text};
     background-color: {field};
     border: 1px solid {border};
     border-radius: 4px;
@@ -253,6 +307,8 @@ QComboBox QAbstractItemView::item:selected {{
     background-color: {selection};
 }}
 QHeaderView::section {{
+    color: {text};
+    font-weight: 600;
     background-color: {header};
     border: none;
     border-right: 1px solid {section_border};
@@ -260,6 +316,7 @@ QHeaderView::section {{
     padding: 5px;
 }}
 QPushButton {{
+    color: {text};
     background-color: {button};
     border: 1px solid {button_border};
     border-radius: 4px;

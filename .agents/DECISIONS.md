@@ -173,6 +173,14 @@ matches the current copy. Delete clean and handled markers immediately, expire
 unresolved markers after 30 days, and retain at most 20 per executable path.
 Keep one shared daily log, with session UUID and PID included in every line.
 
+## HTTPS Trust for Update Checks
+
+Update checks must keep certificate and hostname validation enabled. The
+packaged application uses `truststore` so HTTPS is validated by the native
+operating-system trust store; on Windows this means CryptoAPI, including public
+roots and organization roots installed by IT. Never use `CERT_NONE`, disable
+hostname checks, or bundle a customer-specific certificate to bypass failures.
+
 ## Release Publication
 
 Local release artifacts remain ignored by Git. `scripts/release.ps1` owns the

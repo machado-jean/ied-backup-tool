@@ -266,6 +266,17 @@ Verify generated release assets without publishing:
   separate `O que há de novo?` / `What's new?` link to the specific release.
 - Keep network errors silent; update checks must never block backup workflows.
 - Do not auto-download or replace the executable.
+- Validate update HTTPS connections through the native operating-system trust
+  store using `truststore`; on Windows this uses CryptoAPI and honors public or
+  corporate CAs installed by the administrator.
+- Never disable certificate or hostname verification to make update checks
+  succeed.
+- For support collection, distribute `COLETAR_DIAGNOSTICO.cmd` together with
+  `Collect-Diagnostics.ps1`. The user sends the resulting sanitized ZIP to the
+  maintainer and does not need Git or GitHub access.
+- Keep the collector and launcher on the same declared version, package them
+  together as `IED_Backup_Manager_Diagnostics_Tool.zip`, and include that asset
+  in SHA256 and publication verification.
 
 ## Release Publishing Rules
 

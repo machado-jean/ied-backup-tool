@@ -73,6 +73,7 @@ Expected local artifacts:
 
 ```text
 releases/vX.Y.Z/IED_Backup_Manager.exe
+releases/vX.Y.Z/IED_Backup_Manager_Diagnostics_Tool.zip
 releases/vX.Y.Z/RELEASE_NOTES.md
 releases/vX.Y.Z/SHA256SUMS.txt
 releases/vX.Y.Z/PUBLISH_RELEASE.ps1
@@ -94,7 +95,8 @@ Remove only the explicitly created smoke-test directory afterward.
 
 Confirm that all release assets exist, `-VerifyOnly` passes, `.spec`/`build`/
 `dist` are absent, executable size is near the previous release, SHA256 matches,
-and `releases/` remains ignored. Report paths, test count, size, hash, smoke-test
+the diagnostic-tool archive contains matching CMD/PS1 version files, and
+`releases/` remains ignored. Report paths, test count, sizes, hashes, smoke-test
 result, and whether publication occurred.
 
 ## 7. Commit, Push, and Publish

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from src.config.config_manager import AppConfig, ConfigError, parse_config, save_config
+from src.config.config_manager import AppConfig, ConfigError, load_config, parse_config, save_config
 
 
 def test_parse_config_normalizes_collaborator() -> None:
@@ -77,6 +77,17 @@ def test_parse_config_accepts_language() -> None:
     )
 
     assert config.language == "en_US"
+
+
+def test_load_config_accepts_utf8_bom_from_windows_powershell(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_bytes(
+        b'\xef\xbb\xbf{"colaborador":"SUPORTE TESTE","atu_path":"ATU","his_path":"HIS"}'
+    )
+
+    config = load_config(config_path)
+
+    assert config.collaborator == "SUPORTE TESTE"
 
 
 def test_parse_config_accepts_explicit_theme() -> None:

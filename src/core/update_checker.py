@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import json
+import ssl
 from dataclasses import dataclass
 from urllib.request import Request, urlopen
+
+import truststore
 
 LATEST_RELEASE_API_URL = (
     "https://api.github.com/repos/machado-jean/ied-backup-tool/releases/latest"
@@ -34,7 +37,7 @@ def check_latest_release(
     *,
     api_url: str = LATEST_RELEASE_API_URL,
     timeout: float = 4,
-    opener=urlopen,
+    opener=None,
 ) -> UpdateCheckResult:
     """Fetch the latest GitHub release and compare it with the current version."""
 
@@ -45,7 +48,13 @@ def check_latest_release(
             "User-Agent": "IED-Backup-Manager",
         },
     )
-    with opener(request, timeout=timeout) as response:
+    if opener is None:
+        response_context = _native_tls_context()
+        response = urlopen(request, timeout=timeout, context=response_context)
+    else:
+        response = opener(request, timeout=timeout)
+
+    with response:
         payload = json.loads(response.read().decode("utf-8"))
 
     latest_version = _normalize_version(payload.get("tag_name", ""))
@@ -68,6 +77,12 @@ def _normalize_version(version: str) -> str:
     """Remove a leading tag prefix from a version string."""
 
     return version.strip().lstrip("vV")
+
+
+def _native_tls_context() -> ssl.SSLContext:
+    """Use the operating system trust store without disabling TLS verification."""
+
+    return truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 
 
 def _version_key(version: str) -> tuple[int, int, int]:

@@ -4,7 +4,7 @@ Use this index for every behavior, interface, packaging, or release change.
 Review every row and record why it is impacted or not impacted. Public examples
 must remain fictional and generic.
 
-## Current Change
+## Previous v1.18.0 Change
 
 Released change: family-based current-backup identity, explicit choice for
 different individual software families, and coverage-aware `IED-PACK`
@@ -38,11 +38,29 @@ replacement.
 | `.github/ISSUE_TEMPLATE/new_ied_type.md` | New-adapter intake | No | Adapter evidence requirements are unchanged. |
 | `.github/pull_request_template.md` | Pull requests | No | Existing test and documentation checks remain sufficient. |
 
-## Release Review Completed
+## Post-release Corrective Change Review
 
-- Development-state wording was replaced with the approved version and date.
-- The implemented milestone was moved to both roadmap histories.
-- Version references were updated in both README files and the DOCX manual.
-- Generic release notes were prepared and reviewed for operational identifiers.
-- The final interface matches the sanitized decision-dialog screenshot.
-- Every row above was reviewed for the final release diff.
+Change reviewed: native Windows TLS trust for update checks, Windows 10 theme
+consistency, and a PowerShell 5.1-compatible sanitized diagnostic collector.
+
+| Document | Impact | Current action |
+| --- | --- | --- |
+| `README.md` / `README.en.md` | Yes | Linked the support collection guide. |
+| `docs/USO_EXECUTAVEL.md` / `docs/EXECUTABLE_USAGE.en.md` | Yes | Documented secure native certificate trust and troubleshooting. |
+| `docs/HELP.md` / `docs/HELP.en.md` | Yes | Added missing-update-notice guidance. |
+| `docs/COLETA_DIAGNOSTICO.md` / `docs/DIAGNOSTIC_COLLECTION.en.md` | Yes | Added the sanitized ZIP workflow for nontechnical users. |
+| Roadmaps and identification logic | No | Product roadmap and backup identity behavior are unchanged. |
+| Printable manual | No | The operational workflow and manual instructions are unchanged. |
+| `docs/images/*.png` | Yes | Regenerated from a sanitized generic workspace and visually verified with the final typography and themes. |
+| Release procedure | Yes | Publishes and hash-verifies the matched diagnostic-tool ZIP as a release asset. |
+| Contributor procedures | No | Contribution requirements remain unchanged. |
+| `.agents` maintainer records | Yes | Recorded the security decision and current development state. |
+
+## v1.18.1 Release Review Completed
+
+- Version references and maintainer state were updated to `v1.18.1`.
+- Generic release notes were reviewed for operational identifiers.
+- All seven public screenshots were regenerated from generic sample data and
+  visually checked in both themes.
+- The diagnostic-tool ZIP and executable are hash-verified release assets.
+- Every corrective-change row above was reviewed for the final release diff.

@@ -170,6 +170,11 @@ IED_Backup_Manager.exe
 Replace the old executable with the new one. Existing `config.json`, `ATU`, and
 `HIS` folders can remain in place.
 
+The update check validates HTTPS with certificates trusted by Windows. This
+includes public roots and corporate roots correctly installed by IT; security
+validation is not disabled. If the notice does not appear, follow
+`docs/DIAGNOSTIC_COLLECTION.en.md` and send the ZIP to the support contact.
+
 If the app closes by itself or freezes during startup, check the daily log under:
 
 ```text

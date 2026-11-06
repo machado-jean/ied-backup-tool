@@ -618,6 +618,12 @@ Quando receber uma nova versão do executável:
 
 O arquivo `config.json` não precisa ser recriado a cada versão.
 
+A consulta de atualização valida a conexão HTTPS com os certificados confiáveis
+do Windows. Isso inclui certificados públicos e certificados corporativos
+instalados corretamente pela equipe de TI; a validação de segurança não é
+desativada. Se o aviso não aparecer, use a coleta de diagnóstico descrita em
+`docs/COLETA_DIAGNOSTICO.md` e envie o ZIP ao responsável pelo suporte.
+
 O download direto da versão mais recente pode usar sempre o mesmo link:
 
 ```text

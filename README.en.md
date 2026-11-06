@@ -26,12 +26,13 @@
 
 Windows application for standardizing IED project backups, keeping the current
 backup in `ATU`, historical backups in `HIS`, and consistent ZIP names for
-technical traceability. Current version: `1.18.0`.
+technical traceability. Current version: `1.18.1`.
 
 - Executable usage guide: [docs/EXECUTABLE_USAGE.en.md](docs/EXECUTABLE_USAGE.en.md)
 - Operational help: [docs/HELP.en.md](docs/HELP.en.md)
 - IED identification logic: [docs/IED_IDENTIFICATION_LOGIC.en.md](docs/IED_IDENTIFICATION_LOGIC.en.md)
 - Roadmap: [docs/ROADMAP.en.md](docs/ROADMAP.en.md)
+- Diagnostic collection for support: [docs/DIAGNOSTIC_COLLECTION.en.md](docs/DIAGNOSTIC_COLLECTION.en.md)
 - Public sample files: [docs/examples](docs/examples)
 - How to contribute: [CONTRIBUTING.en.md](CONTRIBUTING.en.md)
 

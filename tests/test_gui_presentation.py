@@ -8,6 +8,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QMessageBox, QTableWidget
 
+import src.gui.theme as gui_theme
 from src.config.config_manager import AppConfig, HistoryCleanupConfig, save_config
 from src.core.app_logging import PreviousSessionIncident
 from src.core.backup_models import BackupPlan, BackupStatus, BackupSummary
@@ -498,6 +499,38 @@ def test_theme_toggle_applies_and_persists_explicit_preference(tmp_path: Path) -
     ) == light_geometry
     assert parse_config_json(tmp_path / "config.json")["theme"] == "dark"
     window.close()
+
+
+def test_system_theme_applies_a_complete_matching_palette(monkeypatch) -> None:
+    app = QApplication.instance() or QApplication([])
+    monkeypatch.setattr(gui_theme, "effective_theme", lambda _app, _preference: "dark")
+
+    resolved = apply_theme(app, None)
+
+    assert resolved == "dark"
+    assert app.font().family() == "Segoe UI"
+    assert app.font().pointSize() == 10
+    assert app.palette().window().color().name() == "#202328"
+    assert app.palette().buttonText().color().name() == "#e6e9ed"
+    assert "font-weight: 600" in app.styleSheet()
+
+
+def test_native_title_bar_uses_windows_10_and_11_theme_bridge(monkeypatch) -> None:
+    calls = []
+
+    class FakeWindow:
+        def winId(self) -> int:
+            return 12345
+
+    monkeypatch.setattr(gui_theme.sys, "platform", "win32")
+    monkeypatch.setattr(
+        gui_theme,
+        "_set_windows_title_bar_dark",
+        lambda handle, enabled: calls.append((handle, enabled)) or True,
+    )
+
+    assert gui_theme.sync_native_title_bar(FakeWindow(), "dark") is True
+    assert calls == [(12345, True)]
 
 
 def test_theme_combo_popup_uses_uniform_frame() -> None:

@@ -13,3 +13,4 @@ PySide6==6.10.1
 pytest==9.0.3
 pytokens==0.4.1
 ruff==0.15.17
+truststore==0.10.4

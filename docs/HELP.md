@@ -322,6 +322,16 @@ a identificar cada linha com o UUID da sessão e o PID.
 
 ### O programa não abre em pasta sincronizada
 
+### O aviso de nova versão não aparece
+
+A consulta usa os certificados confiáveis do Windows e mantém a validação HTTPS
+ativa. Se a rede corporativa inspeciona conexões HTTPS, o certificado raiz da
+organização precisa estar instalado como confiável no Windows pela equipe de TI.
+Para diagnóstico, execute `COLETAR_DIAGNOSTICO.cmd` junto com
+`Collect-Diagnostics.ps1` e envie o ZIP criado ao responsável pelo suporte.
+
+### O programa não abre em pasta sincronizada
+
 Teste copiar o executável para uma pasta local não sincronizada. Se abrir
 normalmente, a causa provável é bloqueio, sincronização pendente ou permissão da
 pasta sincronizada.

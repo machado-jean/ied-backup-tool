@@ -26,12 +26,13 @@
 
 Aplicação Windows para padronizar backups de projetos de IED, mantendo um backup
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
-rastreabilidade técnica. Versão atual: `1.18.0`.
+rastreabilidade técnica. Versão atual: `1.18.1`.
 
 - Manual do executável: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)
 - Lógica de identificação dos IEDs: [docs/LOGICA_IDENTIFICACAO_IEDS.md](docs/LOGICA_IDENTIFICACAO_IEDS.md)
 - Plano de melhorias: [docs/PLANO_MELHORIAS.md](docs/PLANO_MELHORIAS.md)
+- Coleta de diagnóstico para suporte: [docs/COLETA_DIAGNOSTICO.md](docs/COLETA_DIAGNOSTICO.md)
 - Arquivos públicos de exemplo: [docs/examples](docs/examples)
 - Como contribuir: [CONTRIBUTING.md](CONTRIBUTING.md)
 

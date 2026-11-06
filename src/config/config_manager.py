@@ -65,7 +65,7 @@ def load_config(path: Path) -> AppConfig:
         )
 
     try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
+        raw = json.loads(path.read_text(encoding="utf-8-sig"))
     except json.JSONDecodeError as exc:
         raise ConfigError(f"Arquivo de configuracao invalido: {path}") from exc
 

@@ -9,7 +9,11 @@ $Tag = Split-Path -Leaf $ReleaseDirectory
 $ProjectRoot = (Resolve-Path (Join-Path $ReleaseDirectory "..\..")).Path
 $ReleaseNotes = Join-Path $ReleaseDirectory "RELEASE_NOTES.md"
 $HashFile = Join-Path $ReleaseDirectory "SHA256SUMS.txt"
-$AssetNames = @("IED_Backup_Manager.exe", "SHA256SUMS.txt")
+$AssetNames = @(
+    "IED_Backup_Manager.exe",
+    "IED_Backup_Manager_Diagnostics_Tool.zip",
+    "SHA256SUMS.txt"
+)
 $Report = [System.Collections.Generic.List[object]]::new()
 $LocationPushed = $false
 
@@ -105,8 +109,8 @@ try {
         }
         $AssetPath
     }
-    Confirm-Check "Assets locais" "Executável e SHA256SUMS.txt estão presentes."
-    Confirm-Check "Integridade do executável" "O SHA256 do executável confere."
+    Confirm-Check "Assets locais" "Executável, coletor e SHA256SUMS.txt estão presentes."
+    Confirm-Check "Integridade dos assets" "Os hashes do executável e do coletor conferem."
 
     if ($VerifyOnly) {
         Show-VerificationReport

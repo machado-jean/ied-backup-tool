@@ -90,6 +90,7 @@ from src.gui.theme import (
     apply_theme,
     configure_theme_button,
     set_theme_button_state,
+    sync_native_title_bar,
 )
 from src.gui.update_worker import UpdateCheckWorker
 from src.version import APP_DISPLAY_NAME
@@ -110,6 +111,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.project_dir = (project_dir or get_runtime_project_dir()).resolve()
         self.config_path = self.project_dir / "config.json"
+        self.language = DEFAULT_LANGUAGE
         self.config = self._load_config()
         self.current_plans: list[BackupPlan] = []
         self.atu_duplicate_plans: list[AtuDuplicatePlan] = []
@@ -152,6 +154,18 @@ class MainWindow(QMainWindow):
         if not self.startup_sequence_active:
             self.refresh_preview()
         self.schedule_update_check()
+
+    def showEvent(self, event) -> None:
+        """Synchronize the native title bar after Windows creates the handle."""
+
+        super().showEvent(event)
+        title_bar_synced = sync_native_title_bar(self, self.current_theme)
+        self.logger.info(
+            "Theme applied: effective=%s, preference=%s, native_title_bar=%s",
+            self.current_theme,
+            self.theme_preference or "system",
+            title_bar_synced,
+        )
 
     def schedule_startup_dialogs(self) -> None:
         """Open startup dialogs after the window has entered the event loop."""
@@ -547,7 +561,9 @@ class MainWindow(QMainWindow):
         if self.update_thread is not None:
             return
 
-        self.logger.info("Starting update check")
+        self.logger.info(
+            "Starting update check using the native operating-system TLS trust store"
+        )
         self.update_thread = QThread(self)
         self.update_worker = UpdateCheckWorker()
         self.update_worker.moveToThread(self.update_thread)
@@ -1419,6 +1435,12 @@ class MainWindow(QMainWindow):
         if app is None:
             return
         self.current_theme = apply_theme(app, self.theme_preference)
+        title_bar_synced = sync_native_title_bar(self, self.current_theme)
+        self.logger.info(
+            "Theme changed: effective=%s, native_title_bar=%s",
+            self.current_theme,
+            title_bar_synced,
+        )
         set_theme_button_state(self.theme_button, self.current_theme)
         if self.config:
             self.config = AppConfig(

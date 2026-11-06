@@ -213,6 +213,16 @@ single file, with each line identifying its session UUID and PID.
 
 ### The app does not open in a synced folder
 
+### The new-version notice does not appear
+
+The check uses certificates trusted by Windows and keeps HTTPS validation
+enabled. If the corporate network inspects HTTPS traffic, its root certificate
+must be installed as trusted in Windows by the IT team. For diagnosis, run
+`COLETAR_DIAGNOSTICO.cmd` beside `Collect-Diagnostics.ps1` and send the generated
+ZIP directly to the support contact.
+
+### The app does not open in a synced folder
+
 Try copying the executable to a local, non-synced folder. If it opens normally,
 the likely cause is sync, pending cloud activity, or folder permissions.
 

@@ -1,10 +1,10 @@
 # IED Backup Manager - Current State
 
-Last updated: 2026-10-16
+Last updated: 2026-11-06
 
 ## Current Version
 
-Current application version: `1.18.0`.
+Current application version: `1.18.1`.
 
 The user approved the family-based identity workflow and the updated printable
 manual. Packaging is complete. The generated release remains local until the
@@ -14,14 +14,36 @@ publisher manually.
 Expected release assets:
 
 ```text
-releases/v1.18.0/IED_Backup_Manager.exe
-releases/v1.18.0/RELEASE_NOTES.md
-releases/v1.18.0/SHA256SUMS.txt
-releases/v1.18.0/PUBLISH_RELEASE.ps1
+releases/v1.18.1/IED_Backup_Manager.exe
+releases/v1.18.1/IED_Backup_Manager_Diagnostics_Tool.zip
+releases/v1.18.1/RELEASE_NOTES.md
+releases/v1.18.1/SHA256SUMS.txt
+releases/v1.18.1/PUBLISH_RELEASE.ps1
 ```
 
 Generated release folders remain ignored by Git and are published through
 GitHub Releases.
+
+## Current v1.18.1 Patch Scope
+
+- Update checks now use `truststore` and the native Windows certificate store,
+  preserving certificate and hostname validation in packaged executables.
+- The startup log identifies the native operating-system TLS trust source.
+- A support collector can open an executable for 10 seconds and create a
+  sanitized ZIP for the user to send directly to the maintainer, without UAC,
+  Git, Python, automatic upload, backups, configuration, or credentials.
+- Automatic system-theme selection now applies a complete matching palette on
+  Windows 10 instead of mixing the native light palette with dark controls.
+- The native title bar follows the selected theme through the Windows 11 DWM
+  attribute with the compatible Windows 10 fallback.
+- Internal typography uses Segoe UI 10 pt with stronger group titles and table
+  headers for readable Windows 10/11 rendering at 96 DPI.
+- Diagnostic JSON is written without a BOM for Windows PowerShell 5.1, while
+  application config loading also tolerates UTF-8 BOM input.
+- Diagnostic collector `1.1.0` validates CMD/PS1 compatibility, reports
+  OK/FAIL states, records sanitized display/theme/timing data, and is packaged
+  as a hash-verified GitHub Release asset.
+- The packaged candidate passed smoke testing and local release verification.
 
 ## Current v1.18.0 Scope
 
@@ -46,20 +68,22 @@ Latest release validation:
 
 ```text
 ruff check .: passed
-pytest: 171 passed
+pytest: 176 passed
 git diff --check: passed (line-ending normalization warnings only)
-printable DOCX: rendered to 10 pages and visually verified
-public examples/screenshots: reviewed for generic data
+public screenshots: regenerated and visually verified with generic data
 PowerShell syntax validation: passed
 PUBLISH_RELEASE.ps1 -VerifyOnly: passed
 packaged executable smoke test: exit code 0 and no remaining session marker
+collector 1.1.0: PowerShell 5.1 end-to-end and version mismatch tests passed
 ```
 
 Latest generated executable:
 
 ```text
-size: 47,553,113 bytes
-SHA256: E66587A75EE0F0AC700358B234B7246DAFCEF344C2F72974FB1CABD958063FC4
+size: 48,015,372 bytes
+SHA256: 141145FC794FF55AD00D527D44A6F04643ADC98C681AFF105674C20C2BD67386
+diagnostic ZIP size: 9,367 bytes
+diagnostic ZIP SHA256: E9939F9AAEBE0025973D6B700E73FEA812807CBC3C69C37570F8AD0908B5BB87
 ```
 
 The release tooling now aborts immediately when lint, tests, or PyInstaller
