@@ -20,6 +20,11 @@ Git. Não enviar automaticamente configuração, logs ou projetos. Exemplos
 públicos devem ser artificiais/sanitizados. Diagnóstico exige ação e
 consentimento explícitos e deve minimizar dados.
 
+Screenshots e exemplos públicos usam identificadores fictícios e o workspace
+de `docs/examples` em caminho genérico. Não capturar desktop pessoal, perfil de
+usuário nem repetir nomes de cliente, local, subestação, equipamento,
+colaborador ou caminho recebidos em diagnóstico real.
+
 ## Consequências
 
 - o GitHub sozinho não é backup dos dados operacionais;

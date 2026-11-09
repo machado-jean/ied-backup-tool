@@ -16,16 +16,16 @@ comportamento executável.
 | [`AMBIENTE_DESENVOLVIMENTO.md`](AMBIENTE_DESENVOLVIMENTO.md) | Preparação reproduzível do PC e comandos de desenvolvimento. | Mudança de Python, dependência, ferramenta ou comando. |
 | [`CONTINUIDADE.md`](CONTINUIDADE.md) | Migração para outro computador, backup e recuperação do projeto. | Mudança em dados locais, Git, release ou restauração. |
 | [`PROMPT_RETOMADA.md`](PROMPT_RETOMADA.md) | Prompt pronto para orientar a retomada em outro computador ou agente. | Mudança nas fontes de contexto, preparação ou processo de retomada. |
-| [`AUDITORIA_CONTINUIDADE_PROJETOS.md`](AUDITORIA_CONTINUIDADE_PROJETOS.md) | Método reutilizável para auditar Git, conversas e arquivos locais de outros projetos. | Mudança no processo geral de preservação ou transferência de projetos. |
+| [`project-continuity-kit/`](../project-continuity-kit/README.md) | Kit autocontido com checklist e modelos genéricos para copiar a outros projetos. | Mudança nos modelos ou no processo reutilizável. |
 | [`ESTADO_ATUAL.md`](ESTADO_ATUAL.md) | Foto curta da versão vigente, validação, pendências e próximo ponto de retomada. | Ao concluir trabalho material ou mudar a próxima prioridade. |
 | [`PLANO_MELHORIAS.md`](PLANO_MELHORIAS.md) | Roadmap ativo e histórico dos marcos implementados. | Nova entrega, adiamento ou mudança de prioridade. |
+| [`RELEASE.md`](RELEASE.md) | Build, smoke test, gates, tag e publicação de releases. | Mudança em versão, CI, scripts, artefatos ou processo de publicação. |
 | [`decisions/README.md`](decisions/README.md) | Catálogo de decisões arquiteturais (ADRs). | Nova decisão ou substituição de decisão existente. |
 | [`decisions/template.md`](decisions/template.md) | Modelo para registrar uma decisão. | Mudança no formato exigido para ADRs. |
 
 Os pares em inglês são `README.en.md`, `ARCHITECTURE.en.md`,
 `DEVELOPMENT_ENVIRONMENT.en.md`, `CONTINUITY.en.md`,
-`DEVELOPMENT_RESUME_PROMPT.en.md`, `PROJECT_CONTINUITY_AUDIT.en.md` e
-`CURRENT_STATE.en.md`.
+`DEVELOPMENT_RESUME_PROMPT.en.md` e `CURRENT_STATE.en.md`.
 
 ## Uso e suporte
 

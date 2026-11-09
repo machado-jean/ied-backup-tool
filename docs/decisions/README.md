@@ -24,6 +24,10 @@ links e erros de digitação podem ser ajustados sem alterar a decisão históri
 | [`003-atu-his-transactional-storage.md`](003-atu-his-transactional-storage.md) | Aceita | Manter atual em ATU, anteriores em HIS e publicar ZIP validado. |
 | [`004-project-type-adapters.md`](004-project-type-adapters.md) | Aceita | Isolar regras de fabricantes em adaptadores registrados. |
 | [`005-local-configuration-and-private-data.md`](005-local-configuration-and-private-data.md) | Aceita | Configuração e dados operacionais permanecem locais e fora do Git. |
+| [`006-family-based-current-backup-identity.md`](006-family-based-current-backup-identity.md) | Aceita | Backup atual usa família de software e escolhas explícitas para ambiguidades. |
+| [`007-consented-crash-diagnostics.md`](007-consented-crash-diagnostics.md) | Aceita | Diagnóstico de encerramento inesperado é concorrente, limitado e consentido. |
+| [`008-native-tls-trust-for-update-checks.md`](008-native-tls-trust-for-update-checks.md) | Aceita | Consulta de atualização usa confiança TLS nativa sem reduzir validação. |
+| [`009-gated-release-publication.md`](009-gated-release-publication.md) | Aceita | Publicador controla tag e release somente após gates e confirmação. |
 
 ## Quando criar uma ADR
 

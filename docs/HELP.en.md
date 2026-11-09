@@ -211,8 +211,6 @@ Clean and handled markers are removed immediately. Other pending markers expire
 after 30 days and are limited to 20 per executable path. The daily log remains a
 single file, with each line identifying its session UUID and PID.
 
-### The app does not open in a synced folder
-
 ### The new-version notice does not appear
 
 The check uses certificates trusted by Windows and keeps HTTPS validation

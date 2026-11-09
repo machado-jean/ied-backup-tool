@@ -320,8 +320,6 @@ tratadas também são removidas; as demais expiram após 30 dias e são limitada
 20 registros por caminho. O log diário continua sendo um único arquivo e passa
 a identificar cada linha com o UUID da sessão e o PID.
 
-### O programa não abre em pasta sincronizada
-
 ### O aviso de nova versão não aparece
 
 A consulta usa os certificados confiáveis do Windows e mantém a validação HTTPS

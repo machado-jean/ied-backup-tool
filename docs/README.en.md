@@ -16,9 +16,10 @@ the source of truth for executable behaviour.
 | [`DEVELOPMENT_ENVIRONMENT.en.md`](DEVELOPMENT_ENVIRONMENT.en.md) | Reproducible workstation setup and development commands. |
 | [`CONTINUITY.en.md`](CONTINUITY.en.md) | Migration, backup, and project recovery. |
 | [`DEVELOPMENT_RESUME_PROMPT.en.md`](DEVELOPMENT_RESUME_PROMPT.en.md) | Ready-to-use prompt for resuming work on another computer or agent. |
-| [`PROJECT_CONTINUITY_AUDIT.en.md`](PROJECT_CONTINUITY_AUDIT.en.md) | Reusable method for auditing Git, conversations, and local-only files in other projects. |
+| [`project-continuity-kit/`](../project-continuity-kit/README.md) | Self-contained checklist and generic templates that can be copied to other projects. |
 | [`CURRENT_STATE.en.md`](CURRENT_STATE.en.md) | Current version, validation, pending work, and restart point. |
 | [`ROADMAP.en.md`](ROADMAP.en.md) | Active roadmap and implemented milestones. |
+| [`RELEASE.md`](RELEASE.md) | Canonical build, verification, tag, and release-publication procedure. |
 | [`decisions/README.md`](decisions/README.md) | Architecture decision record catalogue. |
 
 The complete catalogue, including user, support, security, privacy, examples,

@@ -25,7 +25,7 @@ Versão, nome do aplicativo e identidade visual devem permanecer coerentes com
 - decisões duráveis: `docs/decisions/`;
 - operação do usuário: `docs/USO_EXECUTAVEL.md` e `docs/HELP.md`;
 - regras por tipo de IED: `docs/LOGICA_IDENTIFICACAO_IEDS.md`;
-- geração e publicação de release: `scripts/release.ps1`,
+- geração e publicação de release: `docs/RELEASE.md`, `scripts/release.ps1`,
   `scripts/PUBLISH_RELEASE.Template.ps1` e `CONTRIBUTING.md`.
 
 Consulte `docs/README.md` para o catálogo completo.

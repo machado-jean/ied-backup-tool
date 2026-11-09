@@ -20,6 +20,10 @@ arquivo temporário no destino e movimentação controlada; conflitos de SHA nã
 são sobrescritos automaticamente. Falhas raras podem preservar material em
 `IED-QUARENTENA`.
 
+No Windows, a colocação final não usa `shutil.move` direto a partir do diretório
+temporário. O arquivo final é recriado no destino para herdar as permissões de
+`ATU`/`HIS`, evitando carregar ACLs inadequadas da origem.
+
 ## Consequências
 
 - `ATU` e `HIS` precisam ser distintos, acessíveis e revalidados;
