@@ -15,13 +15,15 @@ comportamento executável.
 | [`ARQUITETURA.md`](ARQUITETURA.md) | Componentes, dependências, fluxos e fronteiras do sistema. | Mudança estrutural ou novo subsistema. |
 | [`AMBIENTE_DESENVOLVIMENTO.md`](AMBIENTE_DESENVOLVIMENTO.md) | Preparação reproduzível do PC e comandos de desenvolvimento. | Mudança de Python, dependência, ferramenta ou comando. |
 | [`CONTINUIDADE.md`](CONTINUIDADE.md) | Migração para outro computador, backup e recuperação do projeto. | Mudança em dados locais, Git, release ou restauração. |
+| [`PROMPT_RETOMADA.md`](PROMPT_RETOMADA.md) | Prompt pronto para orientar a retomada em outro computador ou agente. | Mudança nas fontes de contexto, preparação ou processo de retomada. |
 | [`ESTADO_ATUAL.md`](ESTADO_ATUAL.md) | Foto curta da versão vigente, validação, pendências e próximo ponto de retomada. | Ao concluir trabalho material ou mudar a próxima prioridade. |
 | [`PLANO_MELHORIAS.md`](PLANO_MELHORIAS.md) | Roadmap ativo e histórico dos marcos implementados. | Nova entrega, adiamento ou mudança de prioridade. |
 | [`decisions/README.md`](decisions/README.md) | Catálogo de decisões arquiteturais (ADRs). | Nova decisão ou substituição de decisão existente. |
 | [`decisions/template.md`](decisions/template.md) | Modelo para registrar uma decisão. | Mudança no formato exigido para ADRs. |
 
 Os pares em inglês são `README.en.md`, `ARCHITECTURE.en.md`,
-`DEVELOPMENT_ENVIRONMENT.en.md`, `CONTINUITY.en.md` e `CURRENT_STATE.en.md`.
+`DEVELOPMENT_ENVIRONMENT.en.md`, `CONTINUITY.en.md`,
+`DEVELOPMENT_RESUME_PROMPT.en.md` e `CURRENT_STATE.en.md`.
 
 ## Uso e suporte
 
