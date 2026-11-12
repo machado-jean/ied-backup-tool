@@ -2,19 +2,19 @@
 
 [Português](ESTADO_ATUAL.md) | [English](CURRENT_STATE.en.md)
 
-Atualizado em: **8 de novembro de 2026**.
+Atualizado em: **12 de novembro de 2026**.
 
 ## Produto vigente
 
 - aplicação: IED Backup Manager;
-- versão em `src/version.py`: **1.18.1**;
+- versão em `src/version.py`: **1.18.2**;
 - branch principal: `master`;
 - plataforma: Windows 10/11;
 - runtime de desenvolvimento/CI: Python 3.13;
 - GUI: PySide6;
 - distribuição: executável único `IED_Backup_Manager.exe` por PyInstaller.
 
-O README descreve v1.18.1 como a versão pública atual. O histórico dos marcos e
+O README descreve v1.18.2 como a versão preparada localmente. O histórico dos marcos e
 as funções implementadas estão em `PLANO_MELHORIAS.md` e nas releases do GitHub.
 
 ## Capacidades consolidadas
@@ -43,12 +43,28 @@ O núcleo está em `src/core/`, os adaptadores em
 
 ## Última validação observada
 
-Em 8 de novembro de 2026:
+Em 12 de novembro de 2026:
 
 - `python -m ruff check .`: aprovado;
-- `python -m pytest`: **176 testes aprovados** em Python 3.13.16;
+- `python -m pytest`: **177 testes aprovados** em Python 3.13.17;
 - verificação de links Markdown relativos: aprovada;
 - `git diff --check`: aprovado.
+
+A regra de timestamp do backup foi generalizada: o nome do ZIP usa a maior data
+de modificação entre todos os arquivos relacionados que entram no backup. O
+caso real SEL com `.rdb` de 6 de novembro e `.scd` de 11 de novembro passou de
+`Conflito SHA` para substituição planejada com timestamp de 11 de novembro, sem
+alterar os arquivos reais durante a validação.
+
+O seletor de retenção da janela `Limpeza HIS` passou a reservar dimensões
+mínimas e a desenhar os botões de incremento e decremento dentro da borda do
+campo, com contraste coerente nos temas claro e escuro. Os 21 testes de
+apresentação da GUI foram aprovados após o ajuste.
+
+O release local **v1.18.2** foi gerado e passou pela verificação de hashes e
+assets. O smoke test isolado abriu a janela principal, encerrou os workers e o
+event loop com código zero e não deixou marcador de sessão órfão. Nenhum
+commit, tag, push ou GitHub Release foi criado nesta etapa.
 
 Após o sucesso dos testes, o callback de encerramento do Pytest registrou
 `PermissionError` ao inspecionar `pytest-current` no diretório temporário do

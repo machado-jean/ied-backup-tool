@@ -25,6 +25,12 @@ ETD-BBB_OUTRO-COMENTARIO.rdb                 -> Projeto: ETD-BBB
 Todo texto depois do primeiro sublinhado `"_"` é tratado como comentário do
 usuário e não entra na chave técnica do backup.
 
+Para qualquer tipo de projeto, a data/hora usada no nome do ZIP é a maior data
+de modificação entre todos os arquivos efetivamente incluídos naquele backup.
+Em tipos de arquivo único, ela continua sendo a data do arquivo principal. Em
+tipos com acompanhantes ou vários arquivos, editar qualquer item incluído
+avança a data do backup e evita reutilizar a identidade temporal anterior.
+
 ## Siemens DIGSI
 
 Arquivos considerados:
@@ -72,6 +78,8 @@ Regra:
 - o arquivo principal é o `.rdb`;
 - o projeto é identificado pelo texto antes do primeiro sublinhado `"_"`;
 - arquivos `.scd` ou `.selaprj` com o mesmo nome-base entram como acompanhantes;
+- a data/hora do backup é a maior modificação entre o `.rdb` e todos os
+  acompanhantes efetivamente incluídos no ZIP;
 - a versão do QuickSet é lida no `.rdb`;
 - a versão do Architect é lida no `.scd` ou `.selaprj`, quando existir.
 

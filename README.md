@@ -12,8 +12,8 @@
 <p align="center">
   <a href="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml"><img src="https://github.com/machado-jean/ied-backup-tool/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI"></a>
   <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/v/release/machado-jean/ied-backup-tool?display_name=tag&sort=semver" alt="Última versão"></a>
-  <a href="https://github.com/machado-jean/ied-backup-tool/releases"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/IED_Backup_Manager.exe?label=downloads&amp;color=blue&amp;cacheSeconds=3600" alt="Downloads totais do executável"></a>
-  <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/latest/IED_Backup_Manager.exe?sort=semver&amp;label=downloads%20da%20vers%C3%A3o&amp;color=blue&amp;cacheSeconds=3600" alt="Downloads do executável na versão atual"></a>
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/total?label=downloads&amp;color=blue&amp;cacheSeconds=3600" alt="Downloads totais das releases"></a>
+  <a href="https://github.com/machado-jean/ied-backup-tool/releases/latest"><img src="https://img.shields.io/github/downloads/machado-jean/ied-backup-tool/latest/total?sort=semver&amp;label=downloads%20da%20vers%C3%A3o&amp;color=blue&amp;cacheSeconds=3600" alt="Downloads da versão atual"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows" alt="Windows 10 e 11">
   <img src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white" alt="Python 3.13">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licença-não%20comercial-blue" alt="Licença não comercial"></a>
@@ -26,7 +26,7 @@
 
 Aplicação Windows para padronizar backups de projetos de IED, mantendo um backup
 atual em `ATU`, histórico em `HIS` e nomes de arquivo consistentes para
-rastreabilidade técnica. Versão atual: `1.18.1`.
+rastreabilidade técnica. Versão atual: `1.18.2`.
 
 - Manual do executável: [docs/USO_EXECUTAVEL.md](docs/USO_EXECUTAVEL.md)
 - Ajuda operacional: [docs/HELP.md](docs/HELP.md)

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from src.core.backup_service import process_all_backups
+from src.core.backup_service import plan_latest_backup, process_all_backups
 from src.core.naming import BackupStage
 from src.core.project_types.base import ProjectVersionRequiredError
 from src.core.project_types.registry import get_project_type
@@ -37,8 +37,10 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
         'toolID="AcSELerator Architect 2.4.2.34" />',
         encoding="utf-8",
     )
-    timestamp = datetime(2026, 6, 19, 0, 13).timestamp()
-    os.utime(rdb, (timestamp, timestamp))
+    rdb_timestamp = datetime(2026, 6, 19, 0, 13).timestamp()
+    scd_timestamp = datetime(2026, 6, 20, 9, 45).timestamp()
+    os.utime(rdb, (rdb_timestamp, rdb_timestamp))
+    os.utime(scd, (scd_timestamp, scd_timestamp))
 
     results = process_all_backups(
         project_dir=project_dir,
@@ -52,7 +54,7 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
     assert [result.status for result in results] == ["stored"]
     [zip_path] = list(atu.glob("*.zip"))
     assert zip_path.name == (
-        "QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_SE-FFF_2026-06-19_00h13_"
+        "QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34_SE-FFF_2026-06-20_09h45_"
         "COLABORADOR EXEMPLO_TAF.zip"
     )
     with zipfile.ZipFile(zip_path) as archive:
@@ -63,6 +65,43 @@ def test_sel_backup_includes_same_stem_architect_file(tmp_path: Path) -> None:
         ]
         backup_info = archive.read(BACKUP_INFO_FILENAME).decode("utf-8")
         assert "SEL (.rdb): QUICKSET-V7.5.3.10-ARCHITECT-V2.4.2.34" in backup_info
+
+
+def test_sel_latest_backup_uses_newest_related_file_timestamp(tmp_path: Path) -> None:
+    project_dir = tmp_path / "IED-DES"
+    atu = tmp_path / "IED-ATU"
+    his = tmp_path / "IED-HIS"
+    project_dir.mkdir()
+
+    older_rdb = project_dir / "SE-AAA.rdb"
+    older_scd = project_dir / "SE-AAA.scd"
+    newer_rdb = project_dir / "SE-BBB.rdb"
+    for rdb in (older_rdb, newer_rdb):
+        rdb.write_text("Saved with Main Shell Version: 7.5.3.10", encoding="utf-8")
+    older_scd.write_text(
+        '<Header toolID="AcSELerator Architect 2.4.2.34" />',
+        encoding="utf-8",
+    )
+
+    old_primary_time = datetime(2026, 6, 19, 8, 0).timestamp()
+    newest_related_time = datetime(2026, 6, 21, 10, 30).timestamp()
+    newer_primary_time = datetime(2026, 6, 20, 9, 0).timestamp()
+    os.utime(older_rdb, (old_primary_time, old_primary_time))
+    os.utime(older_scd, (newest_related_time, newest_related_time))
+    os.utime(newer_rdb, (newer_primary_time, newer_primary_time))
+
+    plan = plan_latest_backup(
+        project_dir=project_dir,
+        atu_path=atu,
+        his_path=his,
+        collaborator="COLABORADOR EXEMPLO",
+        stage=BackupStage.DEV,
+        project_type=SEL_PROJECT_TYPE,
+    )
+
+    assert plan.source_file == older_rdb
+    assert plan.source_files == (older_rdb, older_scd)
+    assert plan.timestamp_text == "2026-06-21_10h30"
 
 
 def test_sel_version_fallback_is_used_when_quickset_is_missing(tmp_path: Path) -> None:

@@ -60,6 +60,8 @@ class HistoryCleanupWindow(QDialog):
         controls.addWidget(QLabel(ui_text("history_cleanup_retention_days", self.language)))
         self.retention_input = QSpinBox()
         self.retention_input.setRange(0, 3650)
+        self.retention_input.setMinimumWidth(100)
+        self.retention_input.setMinimumHeight(30)
         self.retention_input.setValue(self.config.history_cleanup.retention_days)
         self.retention_input.valueChanged.connect(self._save_preferences)
         controls.addWidget(self.retention_input)

@@ -20,6 +20,11 @@ ETD-BBB_OTHER-COMMENT.rdb                -> Project: ETD-BBB
 Everything after the first underscore is treated as a comment and is not part of
 the technical backup key.
 
+For every project type, the timestamp used in the ZIP name is the newest
+modification time among all files actually included in that backup. Single-file
+types keep using their main file timestamp; for companion or multi-file types,
+editing any included file advances the backup timestamp.
+
 ## Siemens DIGSI
 
 - Main file: `.dz5`.
@@ -34,6 +39,8 @@ Manual version: no.
 
 - Main file: `.rdb`.
 - Optional companion files with the same base name: `.scd` or `.selaprj`.
+- The backup timestamp is the newest modification time among the `.rdb` and
+  every companion file actually included in the ZIP.
 - QuickSet version is read from the `.rdb`.
 - Architect version is read from `.scd` or `.selaprj` when present.
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Protocol
 
@@ -28,6 +29,9 @@ class ProjectType(Protocol):
 
     def get_related_files(self, project_file: Path) -> list[Path]:
         """Return every source file that must be included in the backup zip."""
+
+    def get_backup_timestamp(self, project_file: Path) -> datetime:
+        """Return the newest modification time among files included in the backup."""
 
     def get_backup_info_sections(
         self,
@@ -78,7 +82,7 @@ class BaseProjectType:
                 f"Nenhum arquivo {self.label} encontrado em: {project_dir} ({extensions})"
             )
 
-        return sorted(matches, key=lambda path: (path.stat().st_mtime, path.name))
+        return sorted(matches, key=lambda path: (self.get_backup_timestamp(path), path.name))
 
     def find_latest_file(self, project_dir: Path) -> Path:
         """Return the newest supported file in a project folder."""
@@ -89,6 +93,14 @@ class BaseProjectType:
         """Return only the primary file for single-file project types."""
 
         return [project_file]
+
+    def get_backup_timestamp(self, project_file: Path) -> datetime:
+        """Return the newest modification time among all files included in the ZIP."""
+
+        source_files = self.get_related_files(project_file)
+        if not source_files:
+            raise ProjectDetectionError(f"Nenhum arquivo relacionado encontrado: {project_file}")
+        return datetime.fromtimestamp(max(path.stat().st_mtime for path in source_files))
 
     def get_backup_info_sections(
         self,

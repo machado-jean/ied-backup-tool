@@ -350,6 +350,8 @@ def test_history_cleanup_window_shows_candidates(tmp_path: Path) -> None:
     )
 
     assert window.windowTitle() == "Limpeza HIS"
+    assert window.retention_input.minimumWidth() == 100
+    assert window.retention_input.minimumHeight() == 30
     assert window.table.rowCount() == 1
     assert window.table.item(0, 0).checkState() == Qt.CheckState.Unchecked
     assert window.table.item(0, 1).text().startswith("DIGSI5-V10.00_SE-AAA_2026-01-01")
@@ -513,6 +515,8 @@ def test_system_theme_applies_a_complete_matching_palette(monkeypatch) -> None:
     assert app.palette().window().color().name() == "#202328"
     assert app.palette().buttonText().color().name() == "#e6e9ed"
     assert "font-weight: 600" in app.styleSheet()
+    assert "QSpinBox::up-button, QSpinBox::down-button" in app.styleSheet()
+    assert "subcontrol-origin: border" in app.styleSheet()
 
 
 def test_native_title_bar_uses_windows_10_and_11_theme_bridge(monkeypatch) -> None:

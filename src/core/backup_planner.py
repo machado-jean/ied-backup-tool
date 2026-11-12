@@ -72,7 +72,10 @@ def plan_grouped_backups(
     for project, entries_by_type in sorted(grouped_sources.items()):
         if len(entries_by_type) == 1:
             project_type, project_files = next(iter(entries_by_type.values()))
-            for project_file in sorted(project_files, key=get_file_timestamp):
+            for project_file in sorted(
+                project_files,
+                key=lambda path: project_type.get_backup_timestamp(path),
+            ):
                 plan = plan_backup_file(
                     project_file=project_file,
                     atu_path=atu_path,
@@ -101,7 +104,10 @@ def plan_grouped_backups(
         entries: list[tuple[ProjectType, Path, tuple[Path, ...], str]] = []
         extra_metadata_sections: list[str] = []
         for project_type, project_files in entries_by_type.values():
-            project_file = max(project_files, key=get_file_timestamp)
+            project_file = max(
+                project_files,
+                key=lambda path: project_type.get_backup_timestamp(path),
+            )
             version = project_type.get_software_version(
                 project_file,
                 _software_version_override_for(
@@ -253,14 +259,15 @@ def plan_backup_file(
 ) -> BackupPlan:
     """Plan how a single project file should interact with ATU and HIS."""
 
+    source_files = tuple(project_type.get_related_files(project_file))
     backup_name = build_project_backup_name(
         project_file=project_file,
         collaborator=collaborator,
         stage=stage,
         project_type=project_type,
         software_version_override=software_version_override,
+        source_files=source_files,
     )
-    source_files = tuple(project_type.get_related_files(project_file))
     extra_metadata_sections = project_type.get_backup_info_sections(
         project_file,
         list(source_files),
@@ -286,12 +293,17 @@ def build_project_backup_name(
     stage: StageValue,
     project_type: ProjectType = DEFAULT_PROJECT_TYPE,
     software_version_override: str | None = None,
+    source_files: tuple[Path, ...] | None = None,
 ) -> str:
-    """Build a backup filename using the selected project type adapter."""
+    """Build a backup filename using the newest included source-file timestamp."""
 
     project_id = project_type.get_project_id(project_file)
     version = project_type.get_software_version(project_file, software_version_override)
-    timestamp = get_file_timestamp(project_file)
+    timestamp = (
+        max(get_file_timestamp(path) for path in source_files)
+        if source_files
+        else project_type.get_backup_timestamp(project_file)
+    )
     return build_backup_name(
         software_version=version,
         project_id=project_id,

@@ -289,6 +289,30 @@ QComboBox:focus, QSpinBox:focus {{
 QComboBox {{
     padding-left: 8px;
 }}
+QSpinBox {{
+    padding: 3px 26px 3px 8px;
+}}
+QSpinBox::up-button, QSpinBox::down-button {{
+    subcontrol-origin: border;
+    width: 22px;
+    background-color: {button};
+    border-left: 1px solid {border};
+}}
+QSpinBox::up-button {{
+    subcontrol-position: top right;
+    border-top-right-radius: 3px;
+    border-bottom: 1px solid {border};
+}}
+QSpinBox::down-button {{
+    subcontrol-position: bottom right;
+    border-bottom-right-radius: 3px;
+}}
+QSpinBox::up-button:hover, QSpinBox::down-button:hover {{
+    background-color: {button_hover};
+}}
+QSpinBox::up-button:pressed, QSpinBox::down-button:pressed {{
+    background-color: {button_pressed};
+}}
 QComboBox QAbstractItemView {{
     color: {text};
     background-color: {field};

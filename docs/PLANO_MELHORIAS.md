@@ -23,6 +23,7 @@ notes detalhadas, mas ajuda a entender a evolução técnica do projeto.
 
 | Versão | Marco | Entregas principais |
 | --- | --- | --- |
+| `v1.18.2` | Timestamp de arquivos relacionados e polimento visual | Usa a maior data de modificação entre todos os arquivos incluídos no backup, corrige o seletor de retenção da Limpeza HIS e simplifica os badges de downloads. |
 | `v1.18.0` | Identidade por família e decisão entre softwares | Trata mudança somente de versão como atualização do mesmo backup atual; solicita decisão explícita quando a mesma SE aparece em outra família; usa a composição do `IED-PACK` para arquivar somente os individuais cobertos. |
 | `v1.0.0` | Versão inicial funcional | Primeira versão consolidada do fluxo de backup, com processamento de arquivos de projeto, geração de ZIP padronizado e organização entre backup atual e histórico. |
 | `v1.1.0` | Preparação para multiplos tipos de IED | Estrutura preparada para receber adaptadores por fabricante/software, reduzindo acoplamento das regras específicas no fluxo principal. |

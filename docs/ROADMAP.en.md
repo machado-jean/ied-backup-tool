@@ -15,6 +15,7 @@ discarded decisions.
 
 | Version | Milestone | Main deliveries |
 | --- | --- | --- |
+| `v1.18.2` | Related-file timestamps and visual polish | Uses the newest modification time among every file included in a backup, fixes the HIS Cleanup retention selector, and simplifies download badges. |
 | `v1.18.0` | Family identity and cross-software choice | Treats version-only changes as updates to the same current backup; requires an explicit choice when the same project appears under another family; uses `IED-PACK` composition to archive only covered individual backups. |
 | `v1.0.0` | Initial functional version | Consolidated backup flow, standardized ZIP generation, and `ATU`/`HIS` organization. |
 | `v1.5.0` | Metadata in every ZIP | `IEDS-BACKUP-INFO.txt` with backup, project, software, stage, included files, size, and dates. |
